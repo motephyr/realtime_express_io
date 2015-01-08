@@ -42,10 +42,6 @@
 
 </script>
 
-
-<script src="//cdnjs.cloudflare.com/ajax/libs/underscore.js/1.6.0/underscore-min.js"></script>
-
-
 </head>
 <body>
 
@@ -55,7 +51,7 @@
 	<div id="canvas-wrap">
 		
 		<div id="overlay"><ul id="scene">
-		<li class="layer" data-depth="0.00"><img src="/image/paris-skyline.jpg"></li>
+		<li id="paris-street" class="layer" data-depth="0.1"></li>
 		<li class="layer" data-depth="0.04"><img class="leave" src="/image/autumn_leaves_200.png"></li>
 		<li class="layer" data-depth="0.6"><img class="bottle" src="/image/bottle_200.png"></li>
 		<li class="layer" data-depth="0.01"><img class="tree" src="/image/fir_tree_h400.png"></li>
@@ -63,16 +59,17 @@
 		<li class="layer" data-depth="0.4"><img class="smoke shift-1" src="/image/smoke_PNG973.png"></li>
 	</ul></div>
 	</div>
+		<script data-main="js/main" src="bower_components/requirejs/require.js"></script>
+	<!--
 		<script src="/bower_components/jquery/dist/jquery.js"></script>
 		<script src="/bower_components/threejs/build/three.js"></script>
 		<script src="/bower_components/parallax/deploy/parallax.js"></script>
 		<script src="/js/THREEx.KeyboardState.js"></script>
 		<script src="/js/3d.js"></script>
+	-->
 
 
 		<script>
-		var parallaxScene = document.getElementById('scene');
-		var parallax = new Parallax(parallaxScene);
 		var delta = 1;
 
 		if (window.realtime.socketIo) {

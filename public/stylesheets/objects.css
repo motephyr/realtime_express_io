@@ -1,25 +1,25 @@
 .leave {
-	transform: translate(800px, 500px);
+  transform: translate(800px, 500px);
 }
 
 .bottle {
-	transform: translate(100px, 500px) scale(.5,.5);
+  transform: translate(100px, 500px) scale(.5,.5);
 }
 
 .tree {
-	transform: translate(1000px, 400px) scale(.5,.5);
+  transform: translate(1000px, 400px) scale(.5,.5);
 }
 
 .ship {
-	transform: translate(300px, 500px) scale(1,1);
+  transform: translate(100px, 500px) scale(1,1);
 }
 
 .smoke {
-	transform: translate(400px, 400px) scale(1,1);
+  transform: translate(400px, 400px) scale(1,1);
 }
 
 .shift-1 {
-	-webkit-animation: shift 3.5s infinite alternate cubic-bezier(0.455, 0.03, 0.515, 0.955);
+  -webkit-animation: shift 3.5s infinite alternate cubic-bezier(0.455, 0.03, 0.515, 0.955);
   -moz-animation: shift 3.5s infinite alternate cubic-bezier(0.455, 0.03, 0.515, 0.955);
   animation: shift 3.5s infinite alternate cubic-bezier(0.455, 0.03, 0.515, 0.955);
 }

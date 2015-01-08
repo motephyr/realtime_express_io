@@ -1,4 +1,25 @@
-body { margin: 0;}
-#canvas-wrap { position:relative; width:800px; height:600px }
-#canvas-wrap canvas { position:absolute; top:0; left:0; z-index:0 }
+body { 
+	background-color: #000;
+	min-height: 800px;
+  	max-height: 1200px;
+	margin: 0;
+	overflow:hidden;
+}
 
+#canvas-wrap { position:relative; width: 100%; height: 100%;}
+#canvas-wrap canvas { position:absolute; top:0; left:0; z-index:0; height: 100%;}
+
+#overlay {
+	height: 100%;
+}
+#scene { 
+  padding: 0;
+  margin: 0;
+  height: 100%;
+}
+
+#paris-street {
+  background: url("/image/La-Vitrine.png") no-repeat;
+  background-size: cover;
+  height: 100%;
+}
