@@ -23,6 +23,10 @@ requirejs(['jquery',
 
 		ioevents.init();
 		var gamers = new Gamers();
+		
+		for(var i=0; i < 225; i++) {
+			gamers.push(i);
+		}
 
 		$(document.body).height($(window).height());
 		var $container = $('#canvas-wrap');
@@ -63,17 +67,19 @@ requirejs(['jquery',
 			updateFcts.push(function(delta, now){
 				player.update(delta, now);
 			});
+			player.character.root.position.x = (Math.random() * 4);
+			player.character.root.position.y = (Math.random() * 0.1);
+
+			player.character.loadWellKnownSkin('joker');
 			return player;
 		}
 
-		littleMen.push(LittleMan());
-		//////////////////////////////////////////////////////////////////////////////////
-		//		comment								//
-		//////////////////////////////////////////////////////////////////////////////////
+		gamers.all().forEach( function(g) {
+			littleMen.push(LittleMan());
+		});
 		
-		// load a well known skin
-		player.character.loadWellKnownSkin('joker');
-				//////////////////////////////////////////////////////////////////////////////////
+		
+		//////////////////////////////////////////////////////////////////////////////////
 		//		controls.input based on keyboard				//
 		//////////////////////////////////////////////////////////////////////////////////
 
@@ -97,12 +103,17 @@ requirejs(['jquery',
 
 
 		document.body.addEventListener('keydown', function(event){
-			doKeyActions.call(player.controls.input, event.keyCode, event.shiftKey, true);
+			littleMen.forEach(function(lm) {
+				doKeyActions.call(lm.controls.input, event.keyCode, event.shiftKey, true);
+			});
 			console.log('key:'+event.keyCode+' press down');
-		})
+		});
+
 		document.body.addEventListener('keyup', function(event){
-			doKeyActions.call(player.controls.input, event.keyCode, event.shiftKey, false);
-		})
+			littleMen.forEach(function(lm) {
+				doKeyActions.call(lm.controls.input, event.keyCode, event.shiftKey, false);
+			});
+		});
 
 
 		//////////////////////////////////////////////////////////////////////////////////
