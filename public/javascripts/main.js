@@ -19,12 +19,13 @@ requirejs(['jquery',
 		   'background', 
 		   'three',
 		   '/bower_components/threex/src/threex.minecraft/package.require.js',
+		   '/bower_components/threex.text/package.require.js',
 		   '/js/THREEx.KeyboardState.js'], function($, ioevents, Gamers) {
 
 		ioevents.init();
 		var gamers = new Gamers();
 		
-		for(var i=0; i < 225; i++) {
+		for(var i=0; i < 5; i++) {
 			gamers.push(i);
 		}
 
@@ -50,13 +51,14 @@ requirejs(['jquery',
 				NEAR,
 				FAR );
 
+
 		$container.append(renderer.domElement);
 
 		var updateFcts	= [];
 		var scene	= new THREE.Scene();
 		
 		camera.position.set(0, 1, 3);
-		camera.lookAt( new THREE.Vector3(0, 2, -10) );
+		//camera.lookAt( new THREE.Vector3(0, 2, -10) );
 
 
 		littleMen = [];
@@ -67,10 +69,11 @@ requirejs(['jquery',
 			updateFcts.push(function(delta, now){
 				player.update(delta, now);
 			});
-			player.character.root.position.x = (Math.random() * 4);
-			player.character.root.position.y = (Math.random() * 0.1);
+			player.character.root.position.x = (Math.random() * 1);
+			player.character.root.position.y = (Math.random() * 0.5);
 
 			player.character.loadWellKnownSkin('joker');
+
 			return player;
 		}
 
@@ -116,6 +119,25 @@ requirejs(['jquery',
 		});
 
 
+		/////////////////////
+		// add text
+		/////////////////////
+		var canvas1 = document.createElement('canvas');
+			canvas1.width = 1000;
+			canvas1.height = 1000;
+			var context1 = canvas1.getContext('2d');
+			context1.font = "Bold 100px Helvetica";
+			context1.fillStyle = "rgba(255,0,0,0.95)";
+			context1.fillText('David', 0, 300);
+
+		  	// canvas contents will be used for a texture
+		  	var texture1 = new THREE.Texture(canvas1)
+		    texture1.needsUpdate = true;
+			var material = new THREE.SpriteMaterial( { map: texture1 } );	
+			spriteTL = new THREE.Sprite( material );
+			spriteTL.scale.set( 1, 1, 1 );
+			spriteTL.position.set(1,1,0);
+			scene.add(spriteTL);
 		//////////////////////////////////////////////////////////////////////////////////
 		//		render the scene						//
 		//////////////////////////////////////////////////////////////////////////////////
