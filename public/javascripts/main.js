@@ -2,6 +2,7 @@ requirejs.config({
 	paths: {
 		jquery: '/js/jquery.min',
 		three: '/js/three.min',
+		ioevents: '/js/events',
 		parallax: '/js/parallax.min'
 	},
 	shim: {
@@ -11,9 +12,15 @@ requirejs.config({
 	}
 });
 
-requirejs(['jquery', 'background', 'three',
+requirejs(['jquery',
+		   'ioevents', 
+		   'background', 
+		   'three',
 		   '/bower_components/threex/src/threex.minecraft/package.require.js',
-		   '/js/THREEx.KeyboardState.js'], function($) {
+		   '/js/THREEx.KeyboardState.js'], function($, ioevents) {
+
+		ioevents.init();
+
 		$(document.body).height($(window).height());
 		var $container = $('#canvas-wrap');
 
@@ -114,19 +121,19 @@ requirejs(['jquery', 'background', 'three',
 		//////////////////////////////////////////////////////////////////////////////////
 		var lastTimeMsec= null
 		requestAnimationFrame(function animate(nowMsec){
-		// keep looping
-		requestAnimationFrame( animate );
-		// measure time
-		lastTimeMsec	= lastTimeMsec || nowMsec-1000/60
-		var deltaMsec	= Math.min(200, nowMsec - lastTimeMsec)
-		lastTimeMsec	= nowMsec
-		// call each update function
-		updateFcts.forEach(function(updateFn){
-			updateFn(deltaMsec/1000, nowMsec/1000)
-			})
-		})
+			// keep looping
+			requestAnimationFrame( animate );
+			// measure time
+			lastTimeMsec	= lastTimeMsec || nowMsec-1000/60
+			var deltaMsec	= Math.min(200, nowMsec - lastTimeMsec)
+			lastTimeMsec	= nowMsec
+			// call each update function
+			updateFcts.forEach(function(updateFn){
+				updateFn(deltaMsec/1000, nowMsec/1000)
+				});
+		});
 
-		
+		// DOM Events
 		$(window).resize(function() {
 			$(document.body).height($(window).height());
 			renderer.setSize( $(window).width(), $(window).height());
