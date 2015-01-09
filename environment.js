@@ -27,21 +27,30 @@ module.exports = {
                 io.to(socket.id).emit('realtime_user_id_connected',{"user_id": currentSocketIoUserId})
             });
 
-            socket.on('move_left', function(){
-                console.log("server receive move_left");
-                io.to(client_id["server"]).emit('move_left');
+            socket.on('move_left_keydown', function(){
+                io.to(client_id["server"]).emit('move_left_keydown');
             });
-            socket.on('move_right', function(){
-                console.log("server receive move_right");
-                io.to(client_id["server"]).emit('move_right');
+            socket.on('move_right_keydown', function(){
+                io.to(client_id["server"]).emit('move_right_keydown');
             });
-            socket.on('move_up', function(){
-                console.log("server receive move_up");
-                io.to(client_id["server"]).emit('move_up');
+            socket.on('move_up_keydown', function(){
+                io.to(client_id["server"]).emit('move_up_keydown');
             });
-            socket.on('move_down', function(){
-                console.log("server receive move_down");
-                io.to(client_id["server"]).emit('move_down');
+            socket.on('move_down_keydown', function(){
+                io.to(client_id["server"]).emit('move_down_keydown');
+            });
+            socket.on('move_left_keyup', function(){
+                io.to(client_id["server"]).emit('move_left_keyup');
+            });
+            socket.on('move_right_keyup', function(){
+                io.to(client_id["server"]).emit('move_right_keyup');
+            });
+            socket.on('move_up_keyup', function(){
+                io.to(client_id["server"]).emit('move_up_keyup');
+            });
+            socket.on('move_down_keyup', function(){
+                //console.log("move down keyup");
+                io.to(client_id["server"]).emit('move_down_keyup');
             });
 
             socket.on('disconnect', function(message) {
