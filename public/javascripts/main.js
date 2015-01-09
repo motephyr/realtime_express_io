@@ -19,8 +19,7 @@ requirejs(['jquery',
 		   '/bower_components/threex/src/threex.minecraft/package.require.js',
 		   '/js/THREEx.KeyboardState.js'], function($, ioevents) {
 
-		ioevents.init();
-
+		
 		$(document.body).height($(window).height());
 		var $container = $('#canvas-wrap');
 
@@ -55,15 +54,15 @@ requirejs(['jquery',
 		//		comment								//
 		//////////////////////////////////////////////////////////////////////////////////
 
-		var player	= new THREEx.MinecraftPlayer()
+		var player	= new THREEx.MinecraftPlayer();
 		//player.character.root.position.y = -3;
 		
 		
-		scene.add(player.character.root)
+		scene.add(player.character.root);
 
 		updateFcts.push(function(delta, now){
 			player.update(delta, now)
-		})
+		});
 		
 		// load a well known skin
 		player.character.loadWellKnownSkin('joker');
@@ -92,13 +91,16 @@ requirejs(['jquery',
 
 		document.body.addEventListener('keydown', function(event){
 			doKeyActions.call(player.controls.input, event.keyCode, event.shiftKey, true);
-			console.log('key:'+event.keyCode+' press down');
 		})
 		document.body.addEventListener('keyup', function(event){
 			doKeyActions.call(player.controls.input, event.keyCode, event.shiftKey, false);
 		})
 
-
+		ioevents.init((function(obj, callback){
+			return function(key, isKeydown){
+				callback.call(obj.controls.input, key, false, isKeydown);
+			};
+		})(player, doKeyActions));
 		//////////////////////////////////////////////////////////////////////////////////
 		//		render the scene						//
 		//////////////////////////////////////////////////////////////////////////////////
