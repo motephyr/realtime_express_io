@@ -71,41 +71,31 @@ requirejs(['jquery',
 		//		controls.input based on keyboard				//
 		//////////////////////////////////////////////////////////////////////////////////
 
-		document.body.addEventListener('keydown', function(event){
-			var input	= player.controls.input
-			if( event.keyCode === 'W'.charCodeAt(0) )	input.up	= true
-			if( event.keyCode === 'S'.charCodeAt(0) )	input.down	= true
-			if( event.keyCode === 'A'.charCodeAt(0) )	input.left	= true
-			if( event.keyCode === 'D'.charCodeAt(0) )	input.right	= true
-			if( event.keyCode === 'Q'.charCodeAt(0) )	input.strafeLeft= true
-			if( event.keyCode === 'E'.charCodeAt(0) )	input.strafeRight= true
+		var doKeyActions = function(key, shift, isKeydown){
+			var input = this;
+			if( key === 'W'.charCodeAt(0) )	input.up	= isKeydown;
+			if( key === 'S'.charCodeAt(0) )	input.down	= isKeydown;
+			if( key === 'A'.charCodeAt(0) )	input.left	= isKeydown;
+			if( key === 'D'.charCodeAt(0) )	input.right	= isKeydown;
+			if( key === 'Q'.charCodeAt(0) )	input.strafeLeft= isKeydown;
+			if( key === 'E'.charCodeAt(0) )	input.strafeRight= isKeydown;
 
 			// to support arrows because tsate asked me :)
-			if( event.keyCode === 38 )			input.up	= true
-			if( event.keyCode === 40 )			input.down	= true
-			if( event.keyCode === 37 && !event.shiftKey )	input.left	= true
-			if( event.keyCode === 39 && !event.shiftKey )	input.right	= true
-			if( event.keyCode === 37 &&  event.shiftKey )	input.strafeLeft= true
-			if( event.keyCode === 39 &&  event.shiftKey )	input.strafeRight= true
+			if( key === 38 )			input.up	= isKeydown;
+			if( key === 40 )			input.down	= isKeydown;
+			if( key === 37 && !shift )	input.left	= isKeydown;
+			if( key === 39 && !shift )	input.right	= isKeydown;
+			if( key === 37 &&  shift )	input.strafeLeft= isKeydown;
+			if( key === 39 &&  shift )	input.strafeRight= isKeydown;
+		};
+
+
+		document.body.addEventListener('keydown', function(event){
+			doKeyActions.call(player.controls.input, event.keyCode, event.shiftKey, true);
+			console.log('key:'+event.keyCode+' press down');
 		})
 		document.body.addEventListener('keyup', function(event){
-			var input	= player.controls.input
-
-			if( event.keyCode === 'W'.charCodeAt(0) )	input.up	= false
-			if( event.keyCode === 'S'.charCodeAt(0) )	input.down	= false
-			if( event.keyCode === 'A'.charCodeAt(0) )	input.left	= false
-			if( event.keyCode === 'D'.charCodeAt(0) )	input.right	= false
-			if( event.keyCode === 'Q'.charCodeAt(0) )	input.strafeLeft= false
-			if( event.keyCode === 'E'.charCodeAt(0) )	input.strafeRight= false
-
-
-			// to support arrows because tsate asked me :)
-			if( event.keyCode === 38 )			input.up	= false
-			if( event.keyCode === 40 )			input.down	= false
-			if( event.keyCode === 37 ||  event.shiftKey )	input.left	= false
-			if( event.keyCode === 39 ||  event.shiftKey )	input.right	= false
-			if( event.keyCode === 37 || !event.shiftKey )	input.strafeLeft= false
-			if( event.keyCode === 39 || !event.shiftKey )	input.strafeRight= false
+			doKeyActions.call(player.controls.input, event.keyCode, event.shiftKey, false);
 		})
 
 
