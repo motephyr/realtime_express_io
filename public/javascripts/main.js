@@ -3,7 +3,8 @@ requirejs.config({
 		jquery: '/js/jquery.min',
 		three: '/js/three.min',
 		ioevents: '/js/events',
-		parallax: '/js/parallax.min'
+		parallax: '/js/parallax.min',
+		gamers: '/js/gamers'
 	},
 	shim: {
 		'parallax' : {
@@ -13,13 +14,15 @@ requirejs.config({
 });
 
 requirejs(['jquery',
-		   'ioevents', 
+		   'ioevents',
+		   'gamers', 
 		   'background', 
 		   'three',
 		   '/bower_components/threex/src/threex.minecraft/package.require.js',
-		   '/js/THREEx.KeyboardState.js'], function($, ioevents) {
+		   '/js/THREEx.KeyboardState.js'], function($, ioevents, Gamers) {
 
 		ioevents.init();
+		var gamers = new Gamers();
 
 		$(document.body).height($(window).height());
 		var $container = $('#canvas-wrap');
@@ -51,19 +54,22 @@ requirejs(['jquery',
 		camera.position.set(0, 1, 3);
 		camera.lookAt( new THREE.Vector3(0, 2, -10) );
 
+
+		littleMen = [];
+
+		function LittleMan() {
+			var player	= new THREEx.MinecraftPlayer();
+			scene.add(player.character.root);
+			updateFcts.push(function(delta, now){
+				player.update(delta, now);
+			});
+			return player;
+		}
+
+		littleMen.push(LittleMan());
 		//////////////////////////////////////////////////////////////////////////////////
 		//		comment								//
 		//////////////////////////////////////////////////////////////////////////////////
-
-		var player	= new THREEx.MinecraftPlayer()
-		//player.character.root.position.y = -3;
-		
-		
-		scene.add(player.character.root)
-
-		updateFcts.push(function(delta, now){
-			player.update(delta, now)
-		})
 		
 		// load a well known skin
 		player.character.loadWellKnownSkin('joker');
