@@ -79,21 +79,30 @@ module.exports = {
 
             socket.on('move_location',move_location_callback);
 
-            socket.on('move_left', function(){
-                console.log("server receive move_left");
-                socket.broadcast.emit('move_left');
+            socket.on('move_left_keydown', function(){
+                socket.broadcast.emit('move_left_keydown');
             });
-            socket.on('move_right', function(){
-                console.log("server receive move_right");
-                socket.broadcast.emit('move_right');
+            socket.on('move_right_keydown', function(){
+                socket.broadcast.emit('move_right_keydown');
             });
-            socket.on('move_up', function(){
-                console.log("server receive move_up");
-                socket.broadcast.emit('move_up');
+            socket.on('move_up_keydown', function(){
+                socket.broadcast.emit('move_up_keydown');
             });
-            socket.on('move_down', function(){
-                console.log("server receive move_down");
-                socket.broadcast.emit('move_down');
+            socket.on('move_down_keydown', function(){
+                socket.broadcast.emit('move_down_keydown');
+            });
+            socket.on('move_left_keyup', function(){
+                socket.broadcast.emit('move_left_keyup');
+            });
+            socket.on('move_right_keyup', function(){
+                socket.broadcast.emit('move_right_keyup');
+            });
+            socket.on('move_up_keyup', function(){
+                socket.broadcast.emit('move_up_keyup');
+            });
+            socket.on('move_down_keyup', function(){
+                //console.log("move down keyup");
+                socket.broadcast.emit('move_down_keyup');
             });
 
             // socket.on('disconnect', function(message) {

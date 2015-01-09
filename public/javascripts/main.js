@@ -22,7 +22,7 @@ requirejs(['jquery',
 		   '/bower_components/threex.text/package.require.js',
 		   '/js/THREEx.KeyboardState.js'], function($, ioevents, Gamers) {
 
-		ioevents.init();
+		//ioevents.init();
 		var gamers = new Gamers();
 		
 		for(var i=0; i < 30; i++) {
@@ -128,6 +128,17 @@ requirejs(['jquery',
 			});
 		});
 
+		ioevents.init((function(obj, callback){
+			return function(key, isKeydown){
+				obj.forEach(
+					(function(cb){
+						return function(lm){
+							cb.call(lm.controls.input, key, false, isKeydown);
+						};
+					})(callback)
+				);
+			};
+		})(littleMen, doKeyActions));
 
 		/////////////////////
 		// add text
