@@ -12,7 +12,8 @@
         "nodetime": "0.8.x",
         "nodemon": "1.x",
         "forever": "0.10.x",
-        "forever-monitor": "1.2.x"
+        "forever-monitor": "1.2.x",
+        "node-uuid": "1.4.2"
     },
     "repository": {
         "type": "git",

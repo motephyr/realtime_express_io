@@ -1,11 +1,12 @@
 var environment = require('./environment.js');
 //var redis = environment.loadRedis();
 var io = environment.loadSocketIo();
-
-environment.authorize(io);
+var uuid = require('node-uuid');
+environment.authorize(io,uuid);
 
 var express = require('express');
 var app = express();
+
 app.set('trust proxy', ['loopback', 'linklocal', 'uniquelocal']);
 app.get('/',function(req,res){
 	res.sendFile(__dirname + '/public/index.html');
