@@ -29,29 +29,29 @@ module.exports = {
             });
 
             socket.on('move_left_keydown', function(){
-                io.to(client_id["server"]).emit('move_left_keydown');
+                io.to(client_id["server"]).emit('move_left_keydown',{"user_id": currentSocketIoUserId});
             });
             socket.on('move_right_keydown', function(){
-                io.to(client_id["server"]).emit('move_right_keydown');
+                io.to(client_id["server"]).emit('move_right_keydown',{"user_id": currentSocketIoUserId});
             });
             socket.on('move_up_keydown', function(){
-                io.to(client_id["server"]).emit('move_up_keydown');
+                io.to(client_id["server"]).emit('move_up_keydown',{"user_id": currentSocketIoUserId});
             });
             socket.on('move_down_keydown', function(){
-                io.to(client_id["server"]).emit('move_down_keydown');
+                io.to(client_id["server"]).emit('move_down_keydown',{"user_id": currentSocketIoUserId});
             });
             socket.on('move_left_keyup', function(){
-                io.to(client_id["server"]).emit('move_left_keyup');
+                io.to(client_id["server"]).emit('move_left_keyup',{"user_id": currentSocketIoUserId});
             });
             socket.on('move_right_keyup', function(){
-                io.to(client_id["server"]).emit('move_right_keyup');
+                io.to(client_id["server"]).emit('move_right_keyup',{"user_id": currentSocketIoUserId});
             });
             socket.on('move_up_keyup', function(){
-                io.to(client_id["server"]).emit('move_up_keyup');
+                io.to(client_id["server"]).emit('move_up_keyup',{"user_id": currentSocketIoUserId});
             });
             socket.on('move_down_keyup', function(){
                 //console.log("move down keyup");
-                io.to(client_id["server"]).emit('move_down_keyup');
+                io.to(client_id["server"]).emit('move_down_keyup',{"user_id": currentSocketIoUserId});
             });
 
             socket.on('disconnect', function(message) {

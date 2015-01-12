@@ -13,8 +13,9 @@ define([], function() {
 
 			if (window.realtime.socketIo) {
 			
-				window.realtime.socketIo.on('move_up_keydown', function() {
+				window.realtime.socketIo.on('move_up_keydown', function(message) {
 					eventCallback(38, true);
+					console.log(message);
 		    		//console.log("receive move_up_keydown");
 		  		});
 		  		window.realtime.socketIo.on('move_up_keyup', function() {
