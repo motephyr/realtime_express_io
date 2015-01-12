@@ -77,7 +77,11 @@ define([], function() {
 
 		  		window.realtime.socketIo.on('disconnect', function(message) {
 					// Give a nice round-trip ACK to our realtime server that we connected.
+<<<<<<< HEAD
 		    		console.log("User " + message.user_id + "disconnect");
+=======
+		    		console.log("disconnect:" + message.user_id);
+>>>>>>> 99f2a960aaf94499aa1466b4a0ed4bdec946a89e
 		  		});
 
 			}
