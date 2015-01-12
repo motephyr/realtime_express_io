@@ -1,11 +1,13 @@
 define([], function() {
 	return {
-		init: function(players, playerCallback, eventCallback) {
-			this.connect(players);
+		init: function(players, createPlayer, eventCallback) {
+			this.connect(players, createPlayer);
 			this.setEvents(eventCallback);
 		},
 
 		setEvents: function(eventCallback) {
+			console.log(eventCallback);
+			
 			var delta = 1;
 			console.log("IOEvents init");
 
@@ -49,7 +51,7 @@ define([], function() {
 			}
 		},
 
-		connect: function(players, playerCallback) {
+		connect: function(players, createPlayer, destroyPlayer) {
 			if (typeof io != 'undefined' && io != null) {
 				window.realtime.token = '291c8816b32d71664f45c3e2278967dc';
 				window.realtime.userId = '';
@@ -68,20 +70,19 @@ define([], function() {
 		  		});
 
 				window.realtime.socketIo.on('realtime_user_id_connected',function(message){
+					if (message.user_id == 'server') return;
 		    		console.log("user_id:" + message.user_id);
 		    		console.log(players);
 		    		players.push(message.user_id);
-		    		playerCallback(message.user_id);
+		    		createPlayer(message.user_id);
 
 		    	});
 
 		  		window.realtime.socketIo.on('disconnect', function(message) {
 					// Give a nice round-trip ACK to our realtime server that we connected.
-<<<<<<< HEAD
-		    		console.log("User " + message.user_id + "disconnect");
-=======
-		    		console.log("disconnect:" + message.user_id);
->>>>>>> 99f2a960aaf94499aa1466b4a0ed4bdec946a89e
+
+		    		console.log("User " + message.user_id + "disconnected.");
+		    		players.remove(message.user_id);
 		  		});
 
 			}

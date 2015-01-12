@@ -63,7 +63,7 @@ requirejs(['jquery',
 
 		littleMen = [];
 
-		function LittleMan(user_id) {
+		function createLittleMan(user_id) {
 			var player	= new THREEx.MinecraftPlayer();
 			scene.add(player.character.root);
 			updateFcts.push(function(delta, now){
@@ -82,7 +82,7 @@ requirejs(['jquery',
 		}
 
 		gamers.all().forEach( function(g) {
-			littleMen.push(LittleMan());
+			littleMen.push(createLittleMan());
 		});
 		
 		player1 = littleMen[0];
@@ -128,7 +128,9 @@ requirejs(['jquery',
 			});
 		});
 
-		ioevents.init(gamers, LittleMan, (function(obj, callback){
+		ioevents.init(gamers, createLittleMan, doKeyActions);
+		/*
+		ioevents.init(gamers, createLittleMan, (function(obj, callback){
 			return function(key, isKeydown){
 				obj.forEach(
 					(function(cb){
@@ -139,7 +141,7 @@ requirejs(['jquery',
 				);
 			};
 		})(littleMen, doKeyActions));
-
+		*/
 		//////////////////////////////////////////////////////////////////////////////////
 		//		render the scene						//
 		//////////////////////////////////////////////////////////////////////////////////
