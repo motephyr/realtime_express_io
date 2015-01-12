@@ -25,6 +25,7 @@ module.exports = {
                 client_id[currentSocketIoUserId].push(socket.id);
 
                 io.to(socket.id).emit('realtime_user_id_connected',{"user_id": currentSocketIoUserId})
+                io.to(client_id["server"]).emit('realtime_user_id_connected',{"user_id": currentSocketIoUserId})
             });
 
             socket.on('move_left_keydown', function(){
@@ -54,6 +55,7 @@ module.exports = {
             });
 
             socket.on('disconnect', function(message) {
+                io.to(client_id["server"]).emit('disconnect',{"user_id": currentSocketIoUserId})
                 delete client_id[currentSocketIoUserId];
             });
 

@@ -71,9 +71,9 @@ define([], function() {
 		    		console.log("user_id:"+message.user_id);
 		    	});
 
-		  		window.realtime.socketIo.on('disconnect', function() {
+		  		window.realtime.socketIo.on('disconnect', function(message) {
 					// Give a nice round-trip ACK to our realtime server that we connected.
-		    		console.log("disconnect");
+		    		console.log("disconnect:" + message.user_id);
 		  		});
 
 			}
