@@ -26,6 +26,10 @@ module.exports = {
 
                 io.to(socket.id).emit('realtime_user_id_connected',{"user_id": currentSocketIoUserId})
                 io.to(client_id["server"]).emit('realtime_user_id_connected',{"user_id": currentSocketIoUserId})
+<<<<<<< HEAD
+
+=======
+>>>>>>> 99f2a960aaf94499aa1466b4a0ed4bdec946a89e
             });
 
             socket.on('move_left_keydown', function(){

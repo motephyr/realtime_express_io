@@ -25,7 +25,7 @@ requirejs(['jquery',
 		//ioevents.init();
 		var gamers = new Gamers();
 		
-		for(var i=0; i < 30; i++) {
+		for(var i=0; i < 3; i++) {
 			gamers.push(i);
 		}
 
@@ -63,7 +63,7 @@ requirejs(['jquery',
 
 		littleMen = [];
 
-		function LittleMan() {
+		function LittleMan(user_id) {
 			var player	= new THREEx.MinecraftPlayer();
 			scene.add(player.character.root);
 			updateFcts.push(function(delta, now){
@@ -75,7 +75,7 @@ requirejs(['jquery',
 
 
 			player.character.loadWellKnownSkin('agentsmith');
-			player.setNickname('史密斯');
+			player.setNickname(user_id);
 			//var sprite=createTextSprite('Name', player.character.root.position);
 			//player.add(sprite);
 			return player;
@@ -128,7 +128,7 @@ requirejs(['jquery',
 			});
 		});
 
-		ioevents.init((function(obj, callback){
+		ioevents.init(gamers, LittleMan, (function(obj, callback){
 			return function(key, isKeydown){
 				obj.forEach(
 					(function(cb){
@@ -140,33 +140,6 @@ requirejs(['jquery',
 			};
 		})(littleMen, doKeyActions));
 
-		/////////////////////
-		// add text
-		/////////////////////
-		function createTextSprite(msg, position) {
-			var canvas1 = document.createElement('canvas');
-			canvas1.width = 1000;
-			canvas1.height = 1000;
-			var context1 = canvas1.getContext('2d');
-			context1.font = "Bold 100px Helvetica";
-			context1.fillStyle = "rgba(255,0,0,0.95)";
-			context1.fillText(msg, 0, 300);
-
-		  	// canvas contents will be used for a texture
-		  	var texture1 = new THREE.Texture(canvas1)
-		    texture1.needsUpdate = true;
-			var material = new THREE.SpriteMaterial( { map: texture1 } );	
-			var sprite = new THREE.Sprite( material );
-			sprite.scale.set( 1, 1, 1 );
-
-			console.log(position);
-			sprite.position.x = position.x + 0.2;
-			sprite.position.y = position.y + 1.2;
-			sprite.position.z = camera.position.z - 3;
-			//scene.add(sprite);
-			return sprite;
-		}
-		
 		//////////////////////////////////////////////////////////////////////////////////
 		//		render the scene						//
 		//////////////////////////////////////////////////////////////////////////////////
@@ -196,29 +169,5 @@ requirejs(['jquery',
 			$(document.body).height($(window).height());
 			renderer.setSize( $(window).width(), $(window).height());
 		});
-
-		function Flow(){
-		var self, stack = [], timerId = setTimeout(function(){ timerId = null; self._next(); }, 0);
-		return self = {
-			destroy : function(){ timerId && clearTimeout(timerId); },
-			par	: function(callback, isSeq){
-				if(isSeq || !(stack[stack.length-1] instanceof Array)) stack.push([]);
-				stack[stack.length-1].push(callback);
-				return self;
-			},seq	: function(callback){ return self.par(callback, true);	},
-			_next	: function(err, result){
-				var errors = [], results = [], callbacks = stack.shift() || [], nbReturn = callbacks.length, isSeq = nbReturn == 1;
-				for(var i = 0; i < callbacks.length; i++){
-					(function(fct, index){
-						fct(function(error, result){
-							errors[index]	= error;
-							results[index]	= result;		
-							if(--nbReturn == 0)	self._next(isSeq?errors[0]:errors, isSeq?results[0]:results)
-						}, err, result)
-					})(callbacks[i], i);
-				}
-			}
-		}
-	};
 
 });
