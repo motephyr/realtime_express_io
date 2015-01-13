@@ -23,7 +23,7 @@ define([], function() {
   }; 
 
   Gamers.prototype.get = function(uid) {
-      return this.uid;
+      return this[uid];
   }
 
   Gamers.prototype.remove = function(i) {

@@ -76,15 +76,32 @@ requirejs(['jquery',
 
 			player.character.loadWellKnownSkin('agentsmith');
 			player.setNickname(user_id);
+
+			gamers.push(user_id, player);
+			document.body.addEventListener('keydown', function(event){
+				doKeyActions.call(player.controls.input, event.keyCode, event.shiftKey, true);
+				console.log('key:'+event.keyCode+' press down');
+			});
+
+			document.body.addEventListener('keyup', function(event){
+				doKeyActions.call(player.controls.input, event.keyCode, event.shiftKey, false);
+			});
+			
+			EVENTS.setEvents( function(key, isKeydown) {
+    			doKeyActions.call(player.controls.input, key, false, isKeydown);
+    		});
 			//var sprite=createTextSprite('Name', player.character.root.position);
 			//player.add(sprite);
 			return player;
 		}
 
 		function destroyLittleMan(user_id) {
-			console.log(gamers);
-			scene.remove()
+			var plyr = gamers.get(user_id);
+			if (!plyr) return;
+			scene.remove(plyr.character.root);
+			gamers.remove(user_id);
 			console.log('destroyLittleman');
+			console.log(scene);
 		}
 
 		gamers.all().forEach( function(g) {

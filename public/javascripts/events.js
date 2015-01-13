@@ -73,21 +73,8 @@ define([], function() {
 		    		console.log("User " + message.user_id + " connected.");
 		    		
 		    		// add player to gamers list...
-		    		var plr = createPlayer(message.user_id);
-		    		players.push(message.user_id, plr);
-
-		    		document.body.addEventListener('keydown', function(event){
-						eventRegister.call(plr.controls.input, event.keyCode, event.shiftKey, true);
-						console.log('key:'+event.keyCode+' press down');
-					});
-
-					document.body.addEventListener('keyup', function(event){
-						eventRegister.call(plr.controls.input, event.keyCode, event.shiftKey, false);
-					});
-
-		    		EVENTS.setEvents( function(key, isKeydown) {
-		    			eventRegister.call(plr.controls.input, key, false, isKeydown);
-		    		});
+		    		createPlayer(message.user_id);
+		    		
 		    	});
 
 		  		window.realtime.socketIo.on('disconnect', function(message) {
@@ -95,7 +82,7 @@ define([], function() {
 
 		    		console.log("User " + message.user_id + " disconnected.");
 		    		destroyPlayer(message.user_id);
-		    		players.remove(message.user_id);
+		    		
 		  		});
 
 			}
