@@ -71,7 +71,7 @@ requirejs(['jquery',
 			});
 			player.character.root.position.x = (Math.random() - 0.5) * 3;
 			//player.character.root.position.y = (Math.random() - 0.5) * 2;
-			player.character.root.position.z = (Math.random() - 0.5) * 10;
+			player.character.root.position.z = (Math.random() - 0.5) * 2;
 
 
 			player.character.loadWellKnownSkin('agentsmith');
@@ -115,9 +115,10 @@ requirejs(['jquery',
 		});
 		
 		player1 = littleMen[0];
+		player1.character.root.position.z = 8;
 		player2 = littleMen[1];
 		
-		player1.setSay('你好, 我叫小丑!');
+		player1.setSay('記得千萬不要宣傳蔡正元罷免案喔!!!');
 		player2.setSay('我也叫小丑!')
 
 		
