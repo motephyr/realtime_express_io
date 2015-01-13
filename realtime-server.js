@@ -4,6 +4,8 @@ var io = environment.loadSocketIo();
 var uuid = require('node-uuid');
 environment.authorize(io,uuid);
 
+var path = require('path');
+var proxy = require('express-http-proxy');
 var express = require('express');
 var app = express();
 
@@ -23,6 +25,11 @@ app.use('/bower_components', express.static(__dirname + '/bower_components'));
 app.use('/js', express.static(__dirname + '/public/javascripts'));
 app.use('/css', express.static(__dirname + '/public/stylesheets'));
 app.use('/image', express.static(__dirname + '/public/images'));
+app.use('/proxy', proxy('54.183.70.63', {
+  forwardPath: function(req, res) {
+    return require('url').parse(req.url).path;
+  }
+}));
 
 
 
