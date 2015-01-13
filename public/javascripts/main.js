@@ -63,6 +63,13 @@ requirejs(['jquery',
 
 		littleMen = [];
 
+		function getRandomSkin() {
+			var skins = Object.keys(THREEx.MinecraftChar.skinWellKnownUrls);
+			var N = skins.length;
+			var i = Math.floor(Math.random() * N)
+			return skins[i];
+		}
+
 		function createLittleMan(user_id) {
 			var player	= new THREEx.MinecraftPlayer();
 			scene.add(player.character.root);
@@ -73,8 +80,7 @@ requirejs(['jquery',
 			//player.character.root.position.y = (Math.random() - 0.5) * 2;
 			player.character.root.position.z = (Math.random() - 0.5) * 2;
 
-
-			player.character.loadWellKnownSkin('agentsmith');
+			player.character.loadWellKnownSkin(getRandomSkin());
 			player.setNickname("人客");
 
 			gamers.push(user_id, player);
