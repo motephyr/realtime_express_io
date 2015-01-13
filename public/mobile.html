@@ -48,14 +48,14 @@
 
 </head>
 <body>
-
+	<input id="nickname" type="text" />
 	<div style="padding:20px;">
 		<div class="arrow-button arrow-button-up" id="upSection"></div>
 		<div class="arrow-button arrow-button-down" id="downSection"></div>
 		<div class="arrow-button arrow-button-left" id="leftSection"></div>
 		<div class="arrow-button arrow-button-right" id="rightSection"></div>
-
 	</div>
+
 	<script src="/js/jquery.min.js"></script>
 	<script type='text/javascript'>
 
@@ -164,6 +164,10 @@
 				});
 				$(right).on(et[1], function(){
 					window.realtime.socketIo.emit('move_right_keyup');
+				});
+
+				$("#nickname").on('keydown', function() {
+					window.realtime.socketIo.emit('send_message',{"nickname": this.value});
 				});
 
 			//}

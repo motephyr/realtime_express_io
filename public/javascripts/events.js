@@ -47,6 +47,12 @@ define([], function() {
 		  			eventCallback(39, false);
 		    		//console.log("receive move_right_keyup");
 		  		});
+
+		  		window.realtime.socketIo.on('send_message', function(message) {
+		  			console.log(message.user_id);
+		  			console.log(message.nickname);
+		  		});
+
 			}
 		},
 

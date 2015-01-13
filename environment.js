@@ -50,9 +50,12 @@ module.exports = {
                 io.to(client_id["server"]).emit('move_up_keyup',{"user_id": currentSocketIoUserId});
             });
             socket.on('move_down_keyup', function(){
-                //console.log("move down keyup");
                 io.to(client_id["server"]).emit('move_down_keyup',{"user_id": currentSocketIoUserId});
             });
+            socket.on('send_message', function(){
+                io.to(client_id["server"]).emit('send_message',{"user_id": currentSocketIoUserId});
+            });
+
 
             socket.on('disconnect', function(message) {
                 io.to(client_id["server"]).emit('disconnect',{"user_id": currentSocketIoUserId})
