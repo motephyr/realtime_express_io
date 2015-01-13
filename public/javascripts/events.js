@@ -1,7 +1,8 @@
 define([], function() {
 	EVENTS = {
-		init: function(players, createPlayer, destroyPlayer, eventCallback) {
-			this.connect(players, createPlayer, destroyPlayer, eventCallback);
+		init: function(createPlayer, destroyPlayer, eventCallback, messageCallback) {
+			this.connect(createPlayer, destroyPlayer, eventCallback);
+			this.messages(messageCallback);
 			//this.setEvents(eventCallback);
 		},
 
@@ -47,16 +48,10 @@ define([], function() {
 		  			eventCallback(39, false);
 		    		//console.log("receive move_right_keyup");
 		  		});
-
-		  		window.realtime.socketIo.on('send_message', function(message) {
-		  			console.log(message.user_id);
-		  			console.log(message.nickname);
-		  		});
-
 			}
 		},
 
-		connect: function(players, createPlayer, destroyPlayer, eventRegister) {
+		connect: function(createPlayer, destroyPlayer, eventRegister) {
 			if (typeof io != 'undefined' && io != null) {
 				window.realtime.token = '291c8816b32d71664f45c3e2278967dc';
 				window.realtime.userId = '';
@@ -93,6 +88,14 @@ define([], function() {
 
 			}
 
+		},
+
+		messages: function(messageCallback) {
+			window.realtime.socketIo.on('send_message', function(message) {
+		  			console.log(message.user_id);
+		  			console.log(message);
+		  			messageCallback(message);
+		  	});
 		}
 	};
 
