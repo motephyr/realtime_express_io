@@ -75,20 +75,21 @@ requirejs(['jquery',
 
 
 			player.character.loadWellKnownSkin('agentsmith');
-			player.setNickname(user_id);
+			player.setNickname("人客");
 
 			gamers.push(user_id, player);
+
 			document.body.addEventListener('keydown', function(event){
-				doKeyActions.call(player.controls.input, event.keyCode, event.shiftKey, true);
+				doKeyActions(user_id, event.keyCode, event.shiftKey, true);
 				console.log('key:'+event.keyCode+' press down');
 			});
 
 			document.body.addEventListener('keyup', function(event){
-				doKeyActions.call(player.controls.input, event.keyCode, event.shiftKey, false);
+				doKeyActions(user_id, event.keyCode, event.shiftKey, false);
 			});
 			
-			EVENTS.setEvents( function(key, isKeydown) {
-    			doKeyActions.call(player.controls.input, key, false, isKeydown);
+			EVENTS.setEvents( function(user_id, key, isKeydown) {
+    			doKeyActions(user_id, key, false, isKeydown);
     		});
 			//var sprite=createTextSprite('Name', player.character.root.position);
 			//player.add(sprite);
@@ -115,7 +116,7 @@ requirejs(['jquery',
 		});
 		
 		player1 = littleMen[0];
-		player1.character.root.position.z = 8;
+		player1.character.root.position.z = 9;
 		player2 = littleMen[1];
 		
 		player1.setSay('記得千萬不要宣傳蔡正元罷免案喔!!!');
@@ -126,8 +127,10 @@ requirejs(['jquery',
 		//		controls.input based on keyboard				//
 		//////////////////////////////////////////////////////////////////////////////////
 
-		var doKeyActions = function(key, shift, isKeydown){
-			var input = this;
+		var doKeyActions = function(user_id, key, shift, isKeydown){
+			//var input = this;
+			if (!gamers.get(user_id)) return;
+			var input = gamers[user_id].controls.input;
 			if( key === 'W'.charCodeAt(0) )	input.up	= isKeydown;
 			if( key === 'S'.charCodeAt(0) )	input.down	= isKeydown;
 			if( key === 'A'.charCodeAt(0) )	input.left	= isKeydown;
@@ -162,19 +165,7 @@ requirejs(['jquery',
 					  destroyLittleMan, 
 					  doKeyActions,
 					  littleManMessages);
-		/*
-		ioevents.init(gamers, createLittleMan, (function(obj, callback){
-			return function(key, isKeydown){
-				obj.forEach(
-					(function(cb){
-						return function(lm){
-							cb.call(lm.controls.input, key, false, isKeydown);
-						};
-					})(callback)
-				);
-			};
-		})(littleMen, doKeyActions));
-		*/
+		
 		//////////////////////////////////////////////////////////////////////////////////
 		//		render the scene						//
 		//////////////////////////////////////////////////////////////////////////////////
