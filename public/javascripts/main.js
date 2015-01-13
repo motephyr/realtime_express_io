@@ -104,6 +104,12 @@ requirejs(['jquery',
 			console.log(scene);
 		}
 
+		function littleManMessages(message) {
+			var player = gamers.get(message.user_id);
+			if (!player) return;
+			player.setNickname(message.nickname);
+		}
+
 		gamers.all().forEach( function(g) {
 			littleMen.push(createLittleMan());
 		});
@@ -151,7 +157,10 @@ requirejs(['jquery',
 			});
 		});
 
-		ioevents.init(gamers, createLittleMan, destroyLittleMan, doKeyActions);
+		ioevents.init(createLittleMan, 
+					  destroyLittleMan, 
+					  doKeyActions,
+					  littleManMessages);
 		/*
 		ioevents.init(gamers, createLittleMan, (function(obj, callback){
 			return function(key, isKeydown){
