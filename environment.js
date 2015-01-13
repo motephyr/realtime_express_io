@@ -53,7 +53,8 @@ module.exports = {
                 io.to(client_id["server"]).emit('move_down_keyup',{"user_id": currentSocketIoUserId});
             });
             socket.on('send_message', function(message){
-                io.to(client_id["server"]).emit('send_message',{"user_id": currentSocketIoUserId, "nickname": message.nickname});
+                message.user_id = currentSocketIoUserId;
+                io.to(client_id["server"]).emit('send_message',message);
             });
 
 
