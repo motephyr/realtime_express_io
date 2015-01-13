@@ -1,0 +1,14 @@
+#canvas {
+  width: 400px;
+  height: 400px;
+  border: 1px #123123 solid;
+}
+
+#assets img {
+  width: 100px;
+  height: 100px;
+}
+
+.thumbnail {
+  display: inline-block;
+}
