@@ -1,13 +1,13 @@
 define([], function() {
-	return {
-		init: function(players, createPlayer, eventCallback) {
-			this.connect(players, createPlayer);
-			this.setEvents(eventCallback);
+	EVENTS = {
+		init: function(players, createPlayer, destroyPalyer, eventCallback) {
+			this.connect(players, createPlayer, destroyPlayer, eventCallback);
+			//this.setEvents(eventCallback);
 		},
 
 		setEvents: function(eventCallback) {
 			console.log(eventCallback);
-			
+
 			var delta = 1;
 			console.log("IOEvents init");
 
@@ -15,7 +15,6 @@ define([], function() {
 			
 				window.realtime.socketIo.on('move_up_keydown', function(message) {
 					eventCallback(38, true);
-					console.log(message);
 		    		//console.log("receive move_up_keydown");
 		  		});
 		  		window.realtime.socketIo.on('move_up_keyup', function() {
@@ -58,7 +57,7 @@ define([], function() {
 			}
 		},
 
-		connect: function(players, createPlayer, destroyPlayer) {
+		connect: function(players, createPlayer, destroyPlayer, eventRegister) {
 			if (typeof io != 'undefined' && io != null) {
 				window.realtime.token = '291c8816b32d71664f45c3e2278967dc';
 				window.realtime.userId = '';
@@ -80,9 +79,21 @@ define([], function() {
 					if (message.user_id == 'server') return;
 		    		console.log("user_id:" + message.user_id);
 		    		console.log(players);
-		    		players.push(message.user_id);
-		    		createPlayer(message.user_id);
+		    		var plr = createPlayer(message.user_id);
+		    		players.push({message.user_id: plr});
+		    		console.log(players);
+		    		document.body.addEventListener('keydown', function(event){
+						eventRegister.call(plr.controls.input, event.keyCode, event.shiftKey, true);
+						console.log('key:'+event.keyCode+' press down');
+					});
 
+					document.body.addEventListener('keyup', function(event){
+						eventRegister.call(plr.controls.input, event.keyCode, event.shiftKey, false);
+					});
+
+		    		EVENTS.setEvents( function(key, isKeydown) {
+		    			eventRegister.call(plr.controls.input, key, false, isKeydown);
+		    		});
 		    	});
 
 		  		window.realtime.socketIo.on('disconnect', function(message) {
@@ -95,6 +106,8 @@ define([], function() {
 			}
 
 		}
-	}
+	};
+
+	return EVENTS;
 		
 });
