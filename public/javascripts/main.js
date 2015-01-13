@@ -82,7 +82,9 @@ requirejs(['jquery',
 		}
 
 		function destroyLittleMan(user_id) {
-			  
+			console.log(gamers);
+			scene.remove()
+			console.log('destroyLittleman');
 		}
 
 		gamers.all().forEach( function(g) {
@@ -132,7 +134,7 @@ requirejs(['jquery',
 			});
 		});
 
-		ioevents.init(gamers, createLittleMan, doKeyActions);
+		ioevents.init(gamers, createLittleMan, destroyLittleMan, doKeyActions);
 		/*
 		ioevents.init(gamers, createLittleMan, (function(obj, callback){
 			return function(key, isKeydown){

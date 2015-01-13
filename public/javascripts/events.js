@@ -1,13 +1,12 @@
 define([], function() {
 	EVENTS = {
-		init: function(players, createPlayer, destroyPalyer, eventCallback) {
+		init: function(players, createPlayer, destroyPlayer, eventCallback) {
 			this.connect(players, createPlayer, destroyPlayer, eventCallback);
 			//this.setEvents(eventCallback);
 		},
 
 		setEvents: function(eventCallback) {
-			console.log(eventCallback);
-
+			
 			var delta = 1;
 			console.log("IOEvents init");
 
@@ -71,11 +70,12 @@ define([], function() {
 
 				window.realtime.socketIo.on('realtime_user_id_connected',function(message){
 					if (message.user_id == 'server') return;
-		    		console.log("user_id:" + message.user_id);
-		    		console.log(players);
+		    		console.log("User " + message.user_id + " connected.");
+		    		
+		    		// add player to gamers list...
 		    		var plr = createPlayer(message.user_id);
-		    		players.push({message.user_id: plr});
-		    		console.log(players);
+		    		players.push(message.user_id, plr);
+
 		    		document.body.addEventListener('keydown', function(event){
 						eventRegister.call(plr.controls.input, event.keyCode, event.shiftKey, true);
 						console.log('key:'+event.keyCode+' press down');
@@ -93,7 +93,8 @@ define([], function() {
 		  		window.realtime.socketIo.on('disconnect', function(message) {
 					// Give a nice round-trip ACK to our realtime server that we connected.
 
-		    		console.log("User " + message.user_id + "disconnected.");
+		    		console.log("User " + message.user_id + " disconnected.");
+		    		destroyPlayer(message.user_id);
 		    		players.remove(message.user_id);
 		  		});
 

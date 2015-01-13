@@ -1,6 +1,7 @@
 define([], function() {
   var Gamers = function(){
       this.gamersList = [];
+      this.gamersIDs = [];
       this.last = null;
   };
   
@@ -15,15 +16,23 @@ define([], function() {
       return this.last;
   };
 
-  Gamers.prototype.push = function(i) {
-      this.gamersList.push(i);
+  Gamers.prototype.push = function(uid, obj) {
+      this.gamersIDs.push(uid);
+      this.gamersList.push(obj);
+      this[uid] = obj;
   }; 
 
+  Gamers.prototype.get = function(uid) {
+      return this.uid;
+  }
+
   Gamers.prototype.remove = function(i) {
-      var idx = this.gamersList.indexOf(i);
+      var idx = this.gamersIDs.indexOf(i);
       if (idx > -1) {
+        this.gamersIDs.splice(idx, 1);
         this.gamersList.splice(idx, 1);
       }
+      this[i] = null;
   };
 
   Gamers.prototype.all = function() {
