@@ -81,6 +81,10 @@ requirejs(['jquery',
 			return player;
 		}
 
+		function destroyLittleMan(user_id) {
+			  
+		}
+
 		gamers.all().forEach( function(g) {
 			littleMen.push(createLittleMan());
 		});
