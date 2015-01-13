@@ -167,7 +167,9 @@
 				});
 
 				$("#nickname").on('keydown', function() {
-					window.realtime.socketIo.emit('send_message',{"nickname": this.value});
+					message = {};
+					message.nickname = this.value;
+					window.realtime.socketIo.emit('send_message',message);
 				});
 
 			//}
