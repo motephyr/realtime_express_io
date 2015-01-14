@@ -37,6 +37,7 @@
 		    height:     100%;
 		    width:      100%;
 		    background-color:#9a9a9a;
+		    font-size: 28px;
 			opacity:0.8;
 			filter: alpha(opacity=80);
 			-moz-opacity:0.8;
@@ -55,8 +56,10 @@
 
 </head>
 <body>
-	<input id="headFileInput" type="file" style="display:none;" accept="image/*;capture=camera">
-
+	<form id="face-form" enctype="multipart/form-data" style="display:none;">
+		<input id="headFileInput" type="file" name="face" accept="image/*;capture=camera">
+	</form>
+	<canvas id="headCache"></canvas>
 	<div id="getPhoto" class="button">
 		<div id="photoText" class="buttonText">選擇圖片<br/>或<br/>拍照</div>
 	</div>
@@ -64,10 +67,35 @@
 		<div id="defaultText" class="buttonText">直接進入</div>
 	</div>
 	<div class="ui-load-mask">
-		<div class="ui-load-msg"><?php echo $newEmployeePage['submitLoadingTitle']; ?></div>
+		<div class="ui-load-msg">Please Wait...</div>
+		<div id="secondText"></div>
 	</div>
 	<script src="/js/jquery.min.js"></script>
 	<script type='text/javascript'>
+
+		var readImage = function(file) {
+
+		    var reader = new FileReader();
+		    var image  = new Image();
+
+		    reader.readAsDataURL(file);  
+		    reader.onload = function(_file) {
+		        image.src    = _file.target.result;              // url.createObjectURL(file);
+		        image.onload = function() {
+		            var w = this.width,
+		                h = this.height;
+		            alert("width:"+w + "  height:" + h);
+
+		            //h = Math.max(w, h);
+		            //w = Math.min(w, h);
+
+
+		        };
+		        image.onerror= function() {
+		            alert('Invalid file type: '+ file.type);
+		        };      
+		    };
+		};
 
 		$(window).load(function(){
 			//$('#getPhoto').
@@ -82,12 +110,38 @@
 			$('#headFileInput').on('change', function(){
 				// Do jquery ajax to 3Dpypy
 				// and callback
+				if($('#headFileInput').val()){
+					//if(this.disabled) return alert('File upload not supported!');
+				    // var F = this.files;
+				    // if(F && F[0]) for(var i=0; i<F.length; i++) readImage( F[i] );
+					var formData = new FormData(document.getElementById('face-form'));
+				    $.ajax({
+				      url: '/proxy/api/figurines/face',
+				      type: 'POST',
+				      processData: false,
+				      contentType: false,
+				      data: formData,
+				      success: function(data) {
+				      	//alert(data.modelId);
+				        window.location.href = "./mobile?modelid="+data.modelId;
+				      },
+				      error: function(xhr, text, errMsg){
+				      	alert("TextStatus:"+text+ " ErrorMessage:"+errMsg);
+				      }
+				    });
+				}
 			});
 
 			$(document).ajaxStart(function(){
-				$("body").addClass("loading");			
+				$("body").addClass("loading");
+				window.alarm = setInterval(function(){
+					var t = $("#secondText").html();
+					$("#secondText").html(parseInt(t || 0) + 1);
+				},1000);
 			}).ajaxStop(function(){
 				$("body").removeClass("loading");
+				clearInterval(window.alarm);
+				$("#secondText").html("");
 			});
 			
 		});
