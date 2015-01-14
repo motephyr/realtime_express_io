@@ -4,23 +4,28 @@ requirejs.config({
 		three: '/js/three.min',
 		ioevents: '/js/events',
 		parallax: '/js/parallax.min',
-		gamers: '/js/gamers'
+		gamers: '/js/gamers',
+		datgui: '/bower_components/dat.gui/dat.gui'
 	},
 	shim: {
 		'parallax' : {
 			exports: 'Parallax'
+		},
+		'datgui': {
+			exports: 'dat'
 		}
 	}
 });
 
 requirejs(['jquery',
 		   'ioevents',
-		   'gamers', 
+		   'gamers',
+		   'datgui', 
 		   'background', 
 		   'three',
 		   '/bower_components/threex/src/threex.minecraft/package.require.js',
 		   '/bower_components/threex.text/package.require.js',
-		   '/js/THREEx.KeyboardState.js'], function($, ioevents, Gamers) {
+		   '/js/THREEx.KeyboardState.js'], function($, ioevents, Gamers, dat) {
 
 		//ioevents.init();
 		var gamers = new Gamers();
@@ -58,7 +63,10 @@ requirejs(['jquery',
 		var scene	= new THREE.Scene();
 		
 		camera.position.set(0, 2, 12);
-		camera.lookAt( new THREE.Vector3(0, -2, -10) );
+
+		camera.lookAt( new THREE.Vector3(0, 
+										 -2, 
+										 -10) );
 
 
 		littleMen = [];
@@ -122,11 +130,13 @@ requirejs(['jquery',
 		});
 		
 		player1 = littleMen[0];
-		player1.character.root.position.z = 9;
+		player1.setNickname("舉牌小人1");
+		player1.character.root.position.z = 7;
 		player2 = littleMen[1];
-		
+		player2.setNickname("舉牌小人2");
+
 		player1.setSay('記得千萬不要宣傳蔡正元罷免案喔!!!');
-		player2.setSay('我也叫小丑!')
+		player2.setSay('歡迎光臨!')
 
 		
 		//////////////////////////////////////////////////////////////////////////////////
@@ -171,6 +181,43 @@ requirejs(['jquery',
 					  destroyLittleMan, 
 					  doKeyActions,
 					  littleManMessages);
+		
+		//////////////////////////////////////////////////////////////////////////////////
+		//		dat.gui
+		//////////////////////////////////////////////////////////////////////////////////
+		(function startDatGUI() {
+			var gui = new dat.GUI();
+			var direction = { x: 0, y: -2, z: -10};
+
+			var cameraPos = gui.addFolder('Camera Position');
+			cameraPos.add(camera.position, 'x', -50, 50).step(1);
+			cameraPos.add(camera.position, 'y', -50, 50).step(1);
+			cameraPos.add(camera.position, 'z', -50, 50).step(1);
+			
+			var cameraLookAt = gui.addFolder('Camera LookAt');
+			var control1 = cameraLookAt.add(direction, 'x', -50, 50);
+			control1.onChange(function(value){
+				console.log("changed!" + value);
+				camera.lookAt(new THREE.Vector3(direction.x, 
+												direction.y,
+												direction.z));
+			});
+			var control2 = cameraLookAt.add(direction, 'y', -50, 50);
+			control2.onChange(function(value){
+				console.log("changed!" + value);
+				camera.lookAt(new THREE.Vector3(direction.x, 
+												direction.y,
+												direction.z));
+			});
+			var control2 = cameraLookAt.add(direction, 'z', -50, 50);
+			control2.onChange(function(value){
+				console.log("changed!" + value);
+				camera.lookAt(new THREE.Vector3(direction.x, 
+												direction.y,
+												direction.z));
+			});
+		})();
+		
 		
 		//////////////////////////////////////////////////////////////////////////////////
 		//		render the scene						//
