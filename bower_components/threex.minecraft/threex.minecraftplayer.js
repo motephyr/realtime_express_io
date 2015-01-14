@@ -124,7 +124,7 @@ THREEx.MinecraftPlayer	= function(){
 		});
 		var sprite		= new THREE.Sprite( material );
 		this._sayObject3D	= sprite
-		sprite.scale.multiplyScalar(4)
+		sprite.scale.multiplyScalar(10)
 		sprite.position.y	= 1.5
 		// add sprite to the character
 		character.root.add(this._sayObject3D)
@@ -148,13 +148,13 @@ THREEx.MinecraftPlayer._buildChatBubble = function(text) {
 	// center the origin
 	context.translate( canvas.width/2, canvas.height/2 );
 	// measure text
-	var fontSize	= 24;
+	var fontSize	= 36;
 	context.font	= "bolder "+fontSize+"px Verdana";
 	var fontH	= fontSize;
 	var fontW	= context.measureText(text).width;
 	// build the background
 	context.fillStyle = "rgba(255,255,255,0.3)";
-	var scale	= 1.2;
+	var scale	= 1.3;
 	context.fillRect(-fontW*scale/2,-fontH*scale/1.3,fontW*scale,fontH*scale)
 	// display the text
 	context.fillStyle = "rgba(0,0,0,0.7)";
@@ -181,7 +181,7 @@ THREEx.MinecraftPlayer._buildNickCartouche = function(text){
 	var fontW	= context.measureText(text).width;
 	// build the background
 	context.fillStyle = "rgba(0,0,0,0.3)";
-	var scale	= 1.2;
+	var scale	= 5;
 	context.fillRect(-fontW*scale/2,-fontH*scale/1.3,fontW*scale,fontH*scale)
 	// display the text
 	context.fillStyle = "rgba(255,255,255,0.7)";

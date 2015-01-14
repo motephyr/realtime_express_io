@@ -2,7 +2,7 @@ var figurineModel;
 
 var changeAsset;
 
-
+loader = new THREE.OBJMTLLoader();
 $(document).ready(function() {
   // Button click event
   $('#uploadButton').click(function() {
@@ -108,7 +108,7 @@ $(document).ready(function() {
         object.children.forEach(function(child) {
           child.material.specular = new THREE.Color( 0x000000 );
         });
-
+  
         scene.add(object);
         figurine = object;
         render();

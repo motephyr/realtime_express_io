@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title></title>
+  <link rel="stylesheet" href="css/3dpypy.css">
+</head>
+<body>
+
+<form id="face-form" enctype="multipart/form-data">
+  <input type="file" name="face" id="face"></input>
+  <input type="button" id="uploadButton" value="Upload"></input>
+</form>
+
+<div id="canvas"></div>
+<script src="/js/jquery.min.js"></script>
+<script src="/js/vendor/three.min.js"></script>
+<script src="/js/vendor/MTLLoader.js"></script>
+<script src="/js/vendor/OBJMTLLoader.js"></script>
+<script src="/js/vendor/TrackballControls.js"></script>
+<script>
+	
+	$(document).ready(function() {
+	  // Button click event
+	  $('#uploadButton').click(function() {
+	    var formData = new FormData(document.getElementById('face-form'));
+	    $.ajax({
+	      url: '/proxy/api/figurines/face',
+	      type: 'POST',
+	      processData: false,
+	      contentType: false,
+	      data: formData,
+	      success: function(data) {
+	        console.log(data);
+	        figurineModel = data;
+	        //loadModel(data.modelId);
+	      }
+	    });
+  	});
+</script>
+</body>
+</html>

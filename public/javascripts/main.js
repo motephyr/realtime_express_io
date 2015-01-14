@@ -5,7 +5,8 @@ requirejs.config({
 		ioevents: '/js/events',
 		parallax: '/js/parallax.min',
 		gamers: '/js/gamers',
-		datgui: '/bower_components/dat.gui/dat.gui'
+		datgui: '/bower_components/dat.gui/dat.gui',
+		LittleMan3DPy: '/js/LittleMan3DPy'
 	},
 	shim: {
 		'parallax' : {
@@ -21,15 +22,17 @@ requirejs(['jquery',
 		   'ioevents',
 		   'gamers',
 		   'datgui', 
+		   'LittleMan3DPy',
 		   'background', 
 		   'three',
 		   '/bower_components/threex/src/threex.minecraft/package.require.js',
 		   '/bower_components/threex.text/package.require.js',
-		   '/js/THREEx.KeyboardState.js'], function($, ioevents, Gamers, dat) {
+		   '/js/THREEx.KeyboardState.js'], function($, ioevents, Gamers, dat, LittleMan3DPy) {
 
 		//ioevents.init();
 		var gamers = new Gamers();
 		
+
 		for(var i=0; i < 3; i++) {
 			gamers.push(i);
 		}
@@ -62,14 +65,29 @@ requirejs(['jquery',
 		var updateFcts	= [];
 		var scene	= new THREE.Scene();
 		
-		camera.position.set(0, 2, 12);
+		var ambient = new THREE.AmbientLight( 0x101030 );
+    	scene.add( ambient );
+
+    	var directionalLight = new THREE.DirectionalLight( 0xffeedd );
+	    directionalLight.position.set( 0, 0, 1 );
+	    scene.add( directionalLight );
+
+	    var backLight = new THREE.DirectionalLight( 0xffeedd );
+	    backLight.position.set( 0, 0, -1 );
+	    scene.add( backLight );
+    	
+		camera.position.set(0, 0, 15);
 
 		camera.lookAt( new THREE.Vector3(0, 
-										 -2, 
+										 10, 
 										 -10) );
 
 
 		littleMen = [];
+
+	
+		var l3D = new LittleMan3DPy();
+	    
 
 		function getRandomSkin() {
 			var skins = Object.keys(THREEx.MinecraftChar.skinWellKnownUrls);
@@ -78,33 +96,53 @@ requirejs(['jquery',
 			return skins[i];
 		}
 
-		function createLittleMan(user_id) {
-			var player	= new THREEx.MinecraftPlayer();
-			scene.add(player.character.root);
-			updateFcts.push(function(delta, now){
-				player.update(delta, now);
-			});
-			player.character.root.position.x = (Math.random() - 0.5) * 3;
-			//player.character.root.position.y = (Math.random() - 0.5) * 2;
-			player.character.root.position.z = (Math.random() - 0.5) * 2;
 
-			player.character.loadWellKnownSkin(getRandomSkin());
-			player.setNickname("人客");
 
-			gamers.push(user_id, player);
-
-			document.body.addEventListener('keydown', function(event){
-				doKeyActions(user_id, event.keyCode, event.shiftKey, true);
-				console.log('key:'+event.keyCode+' press down');
-			});
-
-			document.body.addEventListener('keyup', function(event){
-				doKeyActions(user_id, event.keyCode, event.shiftKey, false);
-			});
+		function createLittleMan(user_id, modelId) {
 			
-			EVENTS.setEvents( function(user_id, key, isKeydown) {
-    			doKeyActions(user_id, key, false, isKeydown);
-    		});
+			if (!modelId) {
+				var player	= new THREEx.MinecraftPlayer();
+				scene.add(player.character.root);
+				updateFcts.push(function(delta, now){
+					player.update(delta, now);
+				});
+				player.character.root.position.x = (Math.random() - 0.5) * 3;
+				//player.character.root.position.y = (Math.random() - 0.5) * 2;
+				player.character.root.position.z = (Math.random() - 0.5) * 2;
+
+				player.character.loadWellKnownSkin(getRandomSkin());
+				player.setNickname("人客");
+
+				gamers.push(user_id, player);
+
+				document.body.addEventListener('keydown', function(event){
+					doKeyActions(user_id, event.keyCode, event.shiftKey, true);
+					console.log('key:'+event.keyCode+' press down');
+				});
+
+				document.body.addEventListener('keyup', function(event){
+					doKeyActions(user_id, event.keyCode, event.shiftKey, false);
+				});
+				
+				EVENTS.setEvents( function(user_id, key, isKeydown) {
+	    			doKeyActions(user_id, key, false, isKeydown);
+	    		});
+			} else {
+				console.log(modelId);
+				l3D.loadModel(modelId, function(object) {
+					console.log(object);
+					object.position.x = (Math.random() - 0.5) * 3;
+					object.position.y = -0.5;
+					object.position.z =  8;
+					var s = .015;
+					object.scale.set(s, s, s);
+			        object.children.forEach(function(child) {
+			          child.material.specular = new THREE.Color( 0x000000 );
+			        });
+					scene.add(object);
+				});
+			}
+
 			//var sprite=createTextSprite('Name', player.character.root.position);
 			//player.add(sprite);
 			return player;
@@ -122,12 +160,14 @@ requirejs(['jquery',
 		function littleManMessages(message) {
 			var player = gamers.get(message.user_id);
 			if (!player) return;
-			player.setNickname(message.nickname);
+			if (message.nickname) player.setNickname(message.nickname);
+			if (message.saying) player.setSay(message.saying);
 		}
 
 		gamers.all().forEach( function(g) {
 			littleMen.push(createLittleMan());
 		});
+
 		
 		player1 = littleMen[0];
 		player1.setNickname("舉牌小人1");
@@ -136,7 +176,10 @@ requirejs(['jquery',
 		player2.setNickname("舉牌小人2");
 
 		player1.setSay('記得千萬不要宣傳蔡正元罷免案喔!!!');
-		player2.setSay('歡迎光臨!')
+		player2.setSay('歡迎光臨!');
+
+		modelId = 421039200975;
+		createLittleMan("fdsafdafs", modelId);
 
 		
 		//////////////////////////////////////////////////////////////////////////////////
@@ -190,28 +233,25 @@ requirejs(['jquery',
 			var direction = { x: 0, y: -2, z: -10};
 
 			var cameraPos = gui.addFolder('Camera Position');
-			cameraPos.add(camera.position, 'x', -50, 50).step(1);
-			cameraPos.add(camera.position, 'y', -50, 50).step(1);
-			cameraPos.add(camera.position, 'z', -50, 50).step(1);
+			cameraPos.add(camera.position, 'x', -100, 100).step(1);
+			cameraPos.add(camera.position, 'y', -100, 100).step(1);
+			cameraPos.add(camera.position, 'z', -100, 200).step(1);
 			
 			var cameraLookAt = gui.addFolder('Camera LookAt');
 			var control1 = cameraLookAt.add(direction, 'x', -50, 50);
 			control1.onChange(function(value){
-				console.log("changed!" + value);
 				camera.lookAt(new THREE.Vector3(direction.x, 
 												direction.y,
 												direction.z));
 			});
 			var control2 = cameraLookAt.add(direction, 'y', -50, 50);
 			control2.onChange(function(value){
-				console.log("changed!" + value);
 				camera.lookAt(new THREE.Vector3(direction.x, 
 												direction.y,
 												direction.z));
 			});
 			var control2 = cameraLookAt.add(direction, 'z', -50, 50);
 			control2.onChange(function(value){
-				console.log("changed!" + value);
 				camera.lookAt(new THREE.Vector3(direction.x, 
 												direction.y,
 												direction.z));

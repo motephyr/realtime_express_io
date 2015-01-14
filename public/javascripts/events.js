@@ -94,7 +94,7 @@ define([], function() {
 		messages: function(messageCallback) {
 			window.realtime.socketIo.on('send_message', function(message) {
 		  			console.log(message.user_id);
-		  			console.log(message);
+		  			console.log(message.saying);
 		  			messageCallback(message);
 		  	});
 		}
