@@ -27,6 +27,7 @@
 		}
 
 		.arrow-button{
+			position: absolute;
 			border: solid 7px #9a9a9a;
 		}
 		.arrow-button-left{
@@ -48,8 +49,13 @@
 
 </head>
 <body>
-	<input id="nickname" type="text" />
-	<div style="padding:20px;">
+	<div id="inputSection" style="color:#ececec; font-size:28px;">
+		<div>Name: </div>
+		<input id="nickname" type="text" style="font-size:24px;" />
+		<div>Saying: </div>
+		<input id="messageInput" type="text" style="font-size:24px;" />
+	</div>
+	<div id="arrowContainer" style="position:relative; padding:20px;">
 		<div class="arrow-button arrow-button-up" id="upSection"></div>
 		<div class="arrow-button arrow-button-down" id="downSection"></div>
 		<div class="arrow-button arrow-button-left" id="leftSection"></div>
@@ -104,16 +110,32 @@
 		var doLayout = function(){
 			var w = $(window).width() * 0.95;
 			var h = $(window).height() * 0.95;
+			var protrait = h > w;
 			var cw = w / 3;
 			cw = Math.min(cw, h / 3);
-
+			if(protrait){
+				$('#arrowContainer').css({left:0,top:10});
+				$("#nickname").width(w * 0.8);
+				$("#messageInput").width(w * 0.8);
+				$("#inputSection").css('float',"");
+				$("#arrowContainer").css('float', "");
+			}else{
+				$('#arrowContainer').css({left:0,top:0});
+				$("#nickname").width(w * 0.4);
+				$("#messageInput").width(w * 0.4);
+				$("#inputSection").css('float',"left");
+				$("#arrowContainer").css('left', w * 0.5);
+			}
 			$("#upSection,#downSection,#leftSection,#rightSection").width(cw).height(cw);
-			$("#upSection").offset({left: cw ,top: 0});
-			$("#downSection").offset({left: cw ,top: cw * 2});
-			$("#leftSection").offset({left: 0 ,top: cw});
-			$("#rightSection").offset({left: cw * 2 ,top: cw});
+			$("#upSection").css({left: cw ,top: 0});
+			$("#downSection").css({left: cw ,top: cw * 2});
+			$("#leftSection").css({left: 0 ,top: cw});
+			$("#rightSection").css({left: cw * 2 ,top: cw});
 		};
 		$(window).ready(function(){
+
+
+
 			up = document.getElementById('upSection');
 			//upContext = up.getContext('2d');
 
@@ -169,6 +191,12 @@
 				$("#nickname").on('keydown', function() {
 					message = {};
 					message.nickname = this.value;
+					window.realtime.socketIo.emit('send_message',message);
+				});
+
+				$("#messageInput").on('keydown', function() {
+					message = {};
+					message.saying = this.value;
 					window.realtime.socketIo.emit('send_message',message);
 				});
 
