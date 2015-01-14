@@ -76,7 +76,7 @@ define([], function() {
 		    		
 		    		// add player to gamers list...
 		    		createPlayer(message.user_id);
-		    		
+		    		//if(message.model_id) alert(message.model_id);
 		    	});
 
 		  		window.realtime.socketIo.on('disconnect', function(message) {

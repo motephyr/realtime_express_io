@@ -15,6 +15,30 @@
 
 		document.getElementsByTagName('head')[0].appendChild(socketLoadScript);
 
+		// refers to: http://stackoverflow.com/questions/979975/how-to-get-the-value-from-the-url-parameter
+		var QueryString = function () {
+		  // This function is anonymous, is executed immediately and 
+		  // the return value is assigned to QueryString!
+		  var query_string = {};
+		  var query = window.location.search.substring(1);
+		  var vars = query.split("&");
+		  for (var i=0;i<vars.length;i++) {
+		    var pair = vars[i].split("=");
+		        // If first entry with this name
+		    if (typeof query_string[pair[0]] === "undefined") {
+		      query_string[pair[0]] = pair[1];
+		        // If second entry with this name
+		    } else if (typeof query_string[pair[0]] === "string") {
+		      var arr = [ query_string[pair[0]], pair[1] ];
+		      query_string[pair[0]] = arr;
+		        // If third or later entry with this name
+		    } else {
+		      query_string[pair[0]].push(pair[1]);
+		    }
+		  } 
+		    return query_string;
+		} ();
+
 	</script>
 	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
 	<link rel="stylesheet" type="text/css" href="/css/objects.css">
@@ -78,7 +102,7 @@
 
 				window.realtime.socketIo.on('connect', function() {
 					// Give a nice round-trip ACK to our realtime server that we connected.
-					window.realtime.socketIo.emit('realtime_user_id_connected');
+					window.realtime.socketIo.emit('realtime_user_id_connected', { model_id: QueryString['modelid'] });
 					console.log("connect");
 				});
 
@@ -111,21 +135,27 @@
 			var w = $(window).width() * 0.95;
 			var h = $(window).height() * 0.95;
 			var protrait = h > w;
-			var cw = w / 3;
-			cw = Math.min(cw, h / 3);
+			var cw, ch;
 			if(protrait){
 				$('#arrowContainer').css({left:0,top:10});
 				$("#nickname").width(w * 0.8);
 				$("#messageInput").width(w * 0.8);
 				$("#inputSection").css('float',"");
 				$("#arrowContainer").css('float', "");
+				cw = w / 3;
+				ch = (h - $('#inputSection').height()) / 3;
 			}else{
 				$('#arrowContainer').css({left:0,top:0});
 				$("#nickname").width(w * 0.4);
 				$("#messageInput").width(w * 0.4);
 				$("#inputSection").css('float',"left");
 				$("#arrowContainer").css('left', w * 0.5);
+				cw = (w - $('#inputSection').width()) / 3;
+				ch = h / 3;
 			}
+
+			cw = Math.min(cw, ch);
+
 			$("#upSection,#downSection,#leftSection,#rightSection").width(cw).height(cw);
 			$("#upSection").css({left: cw ,top: 0});
 			$("#downSection").css({left: cw ,top: cw * 2});
