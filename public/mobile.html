@@ -111,21 +111,27 @@
 			var w = $(window).width() * 0.95;
 			var h = $(window).height() * 0.95;
 			var protrait = h > w;
-			var cw = w / 3;
-			cw = Math.min(cw, h / 3);
+			var cw, ch;
 			if(protrait){
 				$('#arrowContainer').css({left:0,top:10});
 				$("#nickname").width(w * 0.8);
 				$("#messageInput").width(w * 0.8);
 				$("#inputSection").css('float',"");
 				$("#arrowContainer").css('float', "");
+				cw = w / 3;
+				ch = (h - $('#inputSection').height()) / 3;
 			}else{
 				$('#arrowContainer').css({left:0,top:0});
 				$("#nickname").width(w * 0.4);
 				$("#messageInput").width(w * 0.4);
 				$("#inputSection").css('float',"left");
 				$("#arrowContainer").css('left', w * 0.5);
+				cw = (w - $('#inputSection').width()) / 3;
+				ch = h / 3;
 			}
+
+			cw = Math.min(cw, ch);
+
 			$("#upSection,#downSection,#leftSection,#rightSection").width(cw).height(cw);
 			$("#upSection").css({left: cw ,top: 0});
 			$("#downSection").css({left: cw ,top: cw * 2});
