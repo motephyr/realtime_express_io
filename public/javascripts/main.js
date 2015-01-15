@@ -33,7 +33,7 @@ requirejs(['jquery',
 		var gamers = new Gamers();
 		
 
-		for(var i=0; i < 3; i++) {
+		for(var i=0; i < 2; i++) {
 			gamers.push(i);
 		}
 
@@ -92,7 +92,9 @@ requirejs(['jquery',
 			return skins[i];
 		}
 
-
+		Math.uniform = function(min, max) {
+			return Math.random() * (max - min) + min;
+		}
 
 		function createLittleMan(user_id, modelId) {
 			console.log(user_id);
@@ -102,9 +104,9 @@ requirejs(['jquery',
 				updateFcts.push(function(delta, now){
 					player.update(delta, now);
 				});
-				player.character.root.position.x = (Math.random() - 0.5) * 3;
+				player.character.root.position.x = Math.uniform(-5, 5);
 				//player.character.root.position.y = (Math.random() - 0.5) * 2;
-				player.character.root.position.z = (Math.random() - 0.5) * 2;
+				player.character.root.position.z = Math.uniform(5, 10);
 
 				player.character.loadWellKnownSkin(getRandomSkin());
 				player.setNickname("人客");
@@ -126,34 +128,18 @@ requirejs(['jquery',
 			} else {
 				console.log(modelId);
 				LittleMan3DPy.loadModel(modelId, function(object) {
-					console.log('load call back');
-					var oldModel = gamers.get(user_id);
-					if(oldModel){
-						// object.position.x = oldModel.position.x;
-						// object.position.y = oldModel.position.y;
-						// object.position.z = oldModel.position.z;
-						object.position.x = (Math.random() - 0.5) * 3;
-						object.position.y = -0.5;
-						object.position.z =  8;
-						var s = .015;
-						object.scale.set(s, s, s);
-				        object.children.forEach(function(child) {
-				          child.material.specular = new THREE.Color( 0x000000 );
-				        });
-				        scene.remove(oldModel);
-				        gamers.remove(user_id);
-					}else{
-						object.position.x = (Math.random() - 0.5) * 3;
-						object.position.y = -0.5;
-						object.position.z =  8;
-						var s = .015;
-						object.scale.set(s, s, s);
-				        object.children.forEach(function(child) {
-				          child.material.specular = new THREE.Color( 0x000000 );
-				        });
-				        //console.log(object);
-					}
+					var oldModel = gamer.get(user_id)
+					if (oldModel) scene.
 					gamers.push(user_id, object);
+					object.position.x = (Math.random() - 0.5) * 3;
+					object.position.y = -0.5;
+					object.position.z =  8;
+					var s = .015;
+					object.scale.set(s, s, s);
+			        object.children.forEach(function(child) {
+			          child.material.specular = new THREE.Color( 0x000000 );
+			        });
+			        //console.log(object);
 					scene.add(object);
 				});
 			}
@@ -193,11 +179,8 @@ requirejs(['jquery',
 		player1.setSay('記得千萬不要宣傳蔡正元罷免案喔!!!');
 		player2.setSay('歡迎光臨!');
 
-		// modelId = 421460800438;
-		// createLittleMan("fdsafdafs", modelId);
-
-		// modelId = 421039200975;
-		// createLittleMan("fdsafdafs", modelId);
+		//modelId = 421039200975;
+		//createLittleMan("fdsafdafs", modelId);
 
 		
 		//////////////////////////////////////////////////////////////////////////////////

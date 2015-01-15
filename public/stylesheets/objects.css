@@ -1,4 +1,32 @@
+#tree {
+  transform:  translate(1200px, 100px) scale(.7, .7);
+}
+#table_chair {
+  transform:  translate(200px, 400px) scale(.6, .6);
+}
 
+#pyramid {
+  transform:  translate(100px, 200px)  scale(.4, .4);
+}
+
+#notredame {
+  transform:  translate(300px, 100px) scale(.3, .3);
+}
+
+#sacrecoeur {
+  transform: translate(1000px, 120px) scale(.6, .6);
+}
+
+#eiffel {
+  transform: translate(500px, -240px) scale(.3, .3);
+}
+
+#triomphe {
+  transform: translate(700px, 100px) scale(.3, .3);
+}
+#tramway {
+  transform: scale(.5, .5) translate(800px, 500px);
+}
 .leave {
   transform: translate(800px, 200px);
 }
@@ -19,6 +47,17 @@
   transform: translate(400px, 400px) scale(1,1);
 }
 
+.roll-1 {
+  -webkit-animation-name: roll;
+  -webkit-animation-duration: 60s;
+  -webkit-animation-iteration-count: infinite;
+  -webkit-animation-play-state: running;
+  animation-name: roll;
+  animation-duration: 60s;
+  animation-iteration-count: infinite;
+  animation-play-state: running;
+}
+
 .shift-1 {
   -webkit-animation: shift 3.5s infinite alternate cubic-bezier(0.455, 0.03, 0.515, 0.955);
   -moz-animation: shift 3.5s infinite alternate cubic-bezier(0.455, 0.03, 0.515, 0.955);
@@ -35,6 +74,16 @@
   -webkit-animation: swing 2s infinite alternate cubic-bezier(0.455, 0.03, 0.515, 0.955);
   -moz-animation: swing 2s infinite alternate cubic-bezier(0.455, 0.03, 0.515, 0.955);
   animation: swing 2s infinite alternate cubic-bezier(0.455, 0.03, 0.515, 0.955);
+}
+
+@-webkit-keyframes roll {
+  0% { transform: translate(-100px, 300px) scale(.3, .3);}
+  100% { transform: translate(1500px, 300px) scale(.3, .3);}
+}
+
+@keyframes roll {
+  0% { transform: translate(-100px, 300px) scale(.3, .3);}
+  100% { transform: translate(1000px, 300px) scale(.3, .3);}
 }
 
 @-webkit-keyframes swing {
@@ -133,7 +182,6 @@
     -moz-transform: translate(500px, 0px);
     transform: translate(500px, 0px);
   }
-}
 
 @keyframes shift {
   0% {
@@ -148,3 +196,4 @@
     transform: translate(500px, 0px);
   }
 }
+
