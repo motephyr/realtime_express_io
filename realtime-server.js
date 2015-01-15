@@ -13,9 +13,9 @@ var app = express();
 // image upload & resize.
 var formidable = require('formidable');
 var fs = require('fs');
-var sharp = require('sharp');
+//var sharp = require('sharp');
 var util = require('util');
-var base64 = require('base64');
+//var base64 = require('base64');
 
 app.set('trust proxy', ['loopback', 'linklocal', 'uniquelocal']);
 app.get('/', function (req, res) {
@@ -43,15 +43,19 @@ app.post('/upload/image', function (req, res, next) {
     // 存储图片到根目录下
     var imageSavedPath = './user_image/' + files.preface.name;
     fs.rename(files.preface.path, imageSavedPath, function () {
-      var filename = '/user_image/' + files.preface.name.split('.')[0] + '_fix.jpg';
-      sharp(imageSavedPath).resize(500).jpeg().rotate().toBuffer(function (err, buffer, info) {
-        //console.log(base64.encode(buffer));
-        var b64 = base64.encode(buffer); 
-        var obj = util.inspect({
-          filename: b64
-        });
-        res.end(obj);
+      //var filename = '/user_image/' + files.preface.name.split('.')[0] + '_fix.jpg';
+      // sharp(imageSavedPath).resize(500).jpeg().rotate().toBuffer(function (err, buffer, info) {
+      //   //console.log(base64.encode(buffer));
+      //   var b64 = base64.encode(buffer); 
+      //   var obj = util.inspect({
+      //     filename: b64
+      //   });
+      //   res.end(obj);
+      // });
+      var obj = util.inspect({
+        filename: imageSavedPath
       });
+      res.end(obj);
 
     });
 

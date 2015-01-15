@@ -4,33 +4,9 @@ var changeAsset;
 
 loader = new THREE.OBJMTLLoader();
 
-function b64toBlob(b64Data, contentType, sliceSize) {
-  contentType = contentType || '';
-  sliceSize = sliceSize || 512;
-
-  var byteCharacters = atob(b64Data);
-  var byteArrays = [];
-
-  for (var offset = 0; offset < byteCharacters.length; offset += sliceSize) {
-    var slice = byteCharacters.slice(offset, offset + sliceSize);
-
-    var byteNumbers = new Array(slice.length);
-    for (var i = 0; i < slice.length; i++) {
-        byteNumbers[i] = slice.charCodeAt(i);
-    }
-
-    var byteArray = new Uint8Array(byteNumbers);
-
-    byteArrays.push(byteArray);
-  }
-
-  var blob = new Blob(byteArrays, {type: contentType});
-  return blob;
-}
-
-$(document).ready(function() {
+$(document).ready(function () {
   // Button click event
-  $('#uploadButton').click(function() {
+  $('#uploadButton').click(function () {
     var formData = new FormData(document.getElementById('face-form'));
 
     $.ajax({
@@ -39,22 +15,46 @@ $(document).ready(function() {
       processData: false,
       contentType: false,
       data: formData,
-      success: function(data) {
-        var b64 = eval(data);
-        var blob = b64toBlob(b64,'image/jpeg');
-        formData.append('face',blob);
-        $.ajax({
-          url: '/proxy/api/figurines/face',
-          type: 'POST',
-          processData: false,
-          contentType: false,
-          data: formData,
-          success: function(data) {
-            console.log(data);
-            figurineModel = data;
-            loadModel(data.modelId);
+      success: function (data) {
+
+        var imageObj = new Image();
+        imageObj.onload = function () {
+          var canvas = document.getElementById('resize_canvas');
+
+          var MAX_HEIGHT = 500;
+          if (imageObj.height > MAX_HEIGHT) {
+            imageObj.width *= MAX_HEIGHT / imageObj.height;
+            imageObj.height = MAX_HEIGHT;
           }
-        });
+          var context = canvas.getContext('2d');
+          context.clearRect(0, 0, canvas.width, canvas.height);
+          canvas.width = imageObj.width;
+          canvas.height = imageObj.height;
+          
+          context.drawImage(imageObj, 0, 0, imageObj.width, imageObj.height);
+
+          if (canvas.toBlob) {
+            canvas.toBlob(function (blob) {
+              formData.append('face', blob);
+              $.ajax({
+                url: '/proxy/api/figurines/face',
+                type: 'POST',
+                processData: false,
+                contentType: false,
+                data: formData,
+                success: function (data) {
+                  console.log(data);
+                  figurineModel = data;
+                  loadModel(data.modelId);
+                }
+              });
+            }, 'image/jpeg');
+          }
+        };
+        imageObj.src = eval(data);
+
+
+
       }
     });
 

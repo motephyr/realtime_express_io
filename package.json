@@ -15,9 +15,7 @@
         "forever": "0.10.x",
         "forever-monitor": "1.2.x",
         "node-uuid": "1.4.2",
-        "sharp": "*",
-        "formidable": "*",
-        "base64": "*"
+        "formidable": "*"
     },
     "repository": {
         "type": "git",
