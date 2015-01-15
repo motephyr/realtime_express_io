@@ -33,6 +33,14 @@ module.exports = {
                 io.to(client_id["server"]).emit('realtime_user_id_connected',{"user_id": currentSocketIoUserId, "model_id":mid});
             });
 
+            socket.on('style_change', function(message){
+                var mid = null;
+                if(message){
+                    mid = message['model_id'];
+                }
+                io.to(client_id["server"]).emit('style_change',{"user_id": currentSocketIoUserId, "model_id":mid});
+            });
+
             socket.on('move_left_keydown', function(){
                 io.to(client_id["server"]).emit('move_left_keydown',{"user_id": currentSocketIoUserId});
             });

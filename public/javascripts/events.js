@@ -81,6 +81,11 @@ define([], function() {
 		    		//if(message.model_id) alert(message.model_id);
 		    	});
 
+		    	window.realtime.socketIo.on('style_change',function(message){
+		    		console.log(message.model_id);
+		    		createPlayer(message.user_id, message.model_id);
+		    	});
+
 		  		window.realtime.socketIo.on('disconnect', function(message) {
 					// Give a nice round-trip ACK to our realtime server that we connected.
 		    		console.log("User " + message.user_id + " disconnected.");
