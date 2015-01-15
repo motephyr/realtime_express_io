@@ -3,22 +3,61 @@ var figurineModel;
 var changeAsset;
 
 loader = new THREE.OBJMTLLoader();
+
+function b64toBlob(b64Data, contentType, sliceSize) {
+  contentType = contentType || '';
+  sliceSize = sliceSize || 512;
+
+  var byteCharacters = atob(b64Data);
+  var byteArrays = [];
+
+  for (var offset = 0; offset < byteCharacters.length; offset += sliceSize) {
+    var slice = byteCharacters.slice(offset, offset + sliceSize);
+
+    var byteNumbers = new Array(slice.length);
+    for (var i = 0; i < slice.length; i++) {
+        byteNumbers[i] = slice.charCodeAt(i);
+    }
+
+    var byteArray = new Uint8Array(byteNumbers);
+
+    byteArrays.push(byteArray);
+  }
+
+  var blob = new Blob(byteArrays, {type: contentType});
+  return blob;
+}
+
 $(document).ready(function() {
   // Button click event
   $('#uploadButton').click(function() {
     var formData = new FormData(document.getElementById('face-form'));
+
     $.ajax({
-      url: '/proxy/api/figurines/face',
+      url: '/upload/image',
       type: 'POST',
       processData: false,
       contentType: false,
       data: formData,
       success: function(data) {
-        console.log(data);
-        figurineModel = data;
-        loadModel(data.modelId);
+        var b64 = eval(data);
+        var blob = b64toBlob(b64,'image/jpeg');
+        formData.append('face',blob);
+        $.ajax({
+          url: '/proxy/api/figurines/face',
+          type: 'POST',
+          processData: false,
+          contentType: false,
+          data: formData,
+          success: function(data) {
+            console.log(data);
+            figurineModel = data;
+            loadModel(data.modelId);
+          }
+        });
       }
     });
+
   });
 
   // Assets manager
@@ -108,12 +147,12 @@ $(document).ready(function() {
         object.children.forEach(function(child) {
           child.material.specular = new THREE.Color( 0x000000 );
         });
-  
+
         scene.add(object);
         figurine = object;
         render();
       }
-    );
+      );
   }
 
   init();

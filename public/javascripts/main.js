@@ -128,6 +128,8 @@ requirejs(['jquery',
 			} else {
 				console.log(modelId);
 				LittleMan3DPy.loadModel(modelId, function(object) {
+					var oldModel = gamer.get(user_id)
+					if (oldModel) scene.
 					gamers.push(user_id, object);
 					object.position.x = (Math.random() - 0.5) * 3;
 					object.position.y = -0.5;

@@ -15,7 +15,7 @@
 		document.getElementsByTagName('head')[0].appendChild(socketLoadScript);
 
 		var figurineModel;
-		var changeAsset;
+		var changeAsset = function(){};
 
 	</script>
 	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=2.0, user-scalable=1">
@@ -140,6 +140,15 @@
 					window.realtime.socketIo.emit('realtime_user_id_connected', { model_id: modelId });
 					//console.log("model_id: " + modelId);
 					console.log("connect");
+
+					changeAsset = (function(mid){
+						return function(type, item){
+							figurineModel[type] = item;
+						    $.post('/proxy/api/figurines/changeAssets', figurineModel, function() {
+						    	window.realtime.socketIo.emit('style_change', { model_id: mid });
+						    });	
+						};
+					})(modelId);
 				});
 
 				window.realtime.socketIo.on('realtime_user_id_connected',function(message){
