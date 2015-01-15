@@ -68,7 +68,7 @@ requirejs(['jquery',
 		var ambient = new THREE.AmbientLight( 0x101030 );
     	scene.add( ambient );
 
-    	var directionalLight = new THREE.DirectionalLight( 0xffeedd );
+    	var directionalLight = new THREE.DirectionalLight( 0xfffaf5 );
 	    directionalLight.position.set( 0, 0, 1 );
 	    scene.add( directionalLight );
 
@@ -76,18 +76,14 @@ requirejs(['jquery',
 	    backLight.position.set( 0, 0, -1 );
 	    scene.add( backLight );
     	
-		camera.position.set(0, 0, 15);
+		camera.position.set(1, 1, 15);
 
-		camera.lookAt( new THREE.Vector3(0, 
-										 10, 
-										 -10) );
+		camera.lookAt( new THREE.Vector3(0, 0, 0) ); 
+										 
 
 
 		littleMen = [];
 
-	
-		var l3D = new LittleMan3DPy();
-	    
 
 		function getRandomSkin() {
 			var skins = Object.keys(THREEx.MinecraftChar.skinWellKnownUrls);
@@ -99,7 +95,7 @@ requirejs(['jquery',
 
 
 		function createLittleMan(user_id, modelId) {
-			
+			console.log(user_id);
 			if (!modelId) {
 				var player	= new THREEx.MinecraftPlayer();
 				scene.add(player.character.root);
@@ -129,8 +125,7 @@ requirejs(['jquery',
 	    		});
 			} else {
 				console.log(modelId);
-				l3D.loadModel(modelId, function(object) {
-					console.log(object);
+				LittleMan3DPy.loadModel(modelId, function(object) {
 					object.position.x = (Math.random() - 0.5) * 3;
 					object.position.y = -0.5;
 					object.position.z =  8;
@@ -139,6 +134,7 @@ requirejs(['jquery',
 			        object.children.forEach(function(child) {
 			          child.material.specular = new THREE.Color( 0x000000 );
 			        });
+			        //console.log(object);
 					scene.add(object);
 				});
 			}
@@ -178,8 +174,8 @@ requirejs(['jquery',
 		player1.setSay('記得千萬不要宣傳蔡正元罷免案喔!!!');
 		player2.setSay('歡迎光臨!');
 
-		modelId = 421039200975;
-		createLittleMan("fdsafdafs", modelId);
+		//modelId = 421039200975;
+		//createLittleMan("fdsafdafs", modelId);
 
 		
 		//////////////////////////////////////////////////////////////////////////////////
@@ -228,8 +224,9 @@ requirejs(['jquery',
 		//////////////////////////////////////////////////////////////////////////////////
 		//		dat.gui
 		//////////////////////////////////////////////////////////////////////////////////
-		(function startDatGUI() {
+		function startDatGUI() {
 			var gui = new dat.GUI();
+			dat.GUI.toggleHide();
 			var direction = { x: 0, y: -2, z: -10};
 
 			var cameraPos = gui.addFolder('Camera Position');
@@ -256,7 +253,9 @@ requirejs(['jquery',
 												direction.y,
 												direction.z));
 			});
-		})();
+
+		};
+
 		
 		
 		//////////////////////////////////////////////////////////////////////////////////

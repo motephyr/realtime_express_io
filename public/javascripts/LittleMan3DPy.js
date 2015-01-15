@@ -1,10 +1,7 @@
-define(["/js/vendor/OBJMTLLoader.js",
+define("LittleMan3DPy", ["/js/vendor/OBJMTLLoader.js",
 	    "/js/vendor/MTLLoader.js"], function(OBJMTLLoader) {
-	LittleMan3DPy = function () {
-	};
-
-    
-    LittleMan3DPy.prototype.loadModel = function(modelId, callback) {
+	LittleMan3DPy = {};
+    LittleMan3DPy.loadModel = function(modelId, callback) {
     	
     	var loader = new THREE.OBJMTLLoader();
 	    var files = ['.obj', '.mtl'].map(function(extname) {
@@ -14,10 +11,15 @@ define(["/js/vendor/OBJMTLLoader.js",
 	    loader.load(files[0], files[1], callback);
   	};
 
-  	LittleMan3DPy.prototype.simulate = function() {
+  	LittleMan3DPy.loadEiffel = function(callback) {
+  		var loader = new THREE.OBJMTLLoader();
+	    var files = ['.obj', '.mtl'].map(function(extname) {
+	    	console.log('/image/eiffel/Parijs' + extname);
+	      return '/image/eiffel/Parijs' + extname;
+	    });
+	    loader.load(files[0], files[1], callback);
+  	};
 
-  	}
+  	return LittleMan3DPy;
 
-
-	return LittleMan3DPy;
 });

@@ -71,20 +71,20 @@ define([], function() {
 		  		});
 
 				window.realtime.socketIo.on('realtime_user_id_connected',function(message){
+					console.log(message.user_id);
 					if (message.user_id == 'server') return;
+
 		    		console.log("User " + message.user_id + " connected.");
 		    		
 		    		// add player to gamers list...
-		    		createPlayer(message.user_id);
+		    		createPlayer(message.user_id, message.model_id);
 		    		//if(message.model_id) alert(message.model_id);
 		    	});
 
 		  		window.realtime.socketIo.on('disconnect', function(message) {
 					// Give a nice round-trip ACK to our realtime server that we connected.
-
 		    		console.log("User " + message.user_id + " disconnected.");
-		    		destroyPlayer(message.user_id);
-		    		
+		    		destroyPlayer(message.user_id);	
 		  		});
 
 			}
