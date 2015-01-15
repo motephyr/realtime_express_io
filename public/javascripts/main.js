@@ -33,7 +33,7 @@ requirejs(['jquery',
 		var gamers = new Gamers();
 		
 
-		for(var i=0; i < 3; i++) {
+		for(var i=0; i < 2; i++) {
 			gamers.push(i);
 		}
 
@@ -92,7 +92,9 @@ requirejs(['jquery',
 			return skins[i];
 		}
 
-
+		Math.uniform = function(min, max) {
+			return Math.random() * (max - min) + min;
+		}
 
 		function createLittleMan(user_id, modelId) {
 			console.log(user_id);
@@ -102,9 +104,9 @@ requirejs(['jquery',
 				updateFcts.push(function(delta, now){
 					player.update(delta, now);
 				});
-				player.character.root.position.x = (Math.random() - 0.5) * 3;
+				player.character.root.position.x = Math.uniform(-5, 5);
 				//player.character.root.position.y = (Math.random() - 0.5) * 2;
-				player.character.root.position.z = (Math.random() - 0.5) * 2;
+				player.character.root.position.z = Math.uniform(5, 10);
 
 				player.character.loadWellKnownSkin(getRandomSkin());
 				player.setNickname("人客");
@@ -126,6 +128,7 @@ requirejs(['jquery',
 			} else {
 				console.log(modelId);
 				LittleMan3DPy.loadModel(modelId, function(object) {
+					gamers.push(user_id, object);
 					object.position.x = (Math.random() - 0.5) * 3;
 					object.position.y = -0.5;
 					object.position.z =  8;
