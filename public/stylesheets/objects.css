@@ -1,6 +1,14 @@
+#tree {
+  transform:  translate(1200px, 100px) scale(.7, .7);
+}
 #table_chair {
   transform:  translate(200px, 400px) scale(.6, .6);
 }
+
+#pyramid {
+  transform:  translate(100px, 200px)  scale(.4, .4);
+}
+
 #notredame {
   transform:  translate(300px, 100px) scale(.3, .3);
 }
