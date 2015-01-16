@@ -1,9 +1,9 @@
 body { 
 	background-color: #000;
 	min-height: 800px;
-  	max-height: 1200px;
+  //max-height: 1200px;
 	margin: 0;
-	overflow:hidden;
+	overflow: visible;
 }
 
 #canvas-wrap { position:relative; width: 100%; height: 100%;}
@@ -18,8 +18,11 @@ body {
   height: 100%;
 }
 
-#paris-street {
+#main-background {
   background: url("/image/Paris.png") no-repeat;
-  background-size: cover;
   height: 100%;
+  -webkit-background-size: 100% 100%;           /* Safari 3.0 */
+     -moz-background-size: 100% 100%;           /* Gecko 1.9.2 (Firefox 3.6) */
+       -o-background-size: 100% 100%;           /* Opera 9.5 */
+          background-size: 100% 100%;           /* Gecko 2.0 (Firefox 4.0) and other CSS3-compliant browsers */
 }

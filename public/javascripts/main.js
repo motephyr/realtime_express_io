@@ -23,12 +23,14 @@ requirejs(['jquery',
 		   'gamers',
 		   'datgui', 
 		   'LittleMan3DPy',
-		   'background', 
+		   'parallax',
 		   'three',
 		   '/bower_components/threex/src/threex.minecraft/package.require.js',
 		   '/bower_components/threex.text/package.require.js',
 		   '/js/THREEx.KeyboardState.js'], function($, ioevents, Gamers, dat, LittleMan3DPy) {
 
+		var parallaxScene = document.getElementById('scene');
+		var parallax = new Parallax(parallaxScene);
 		//ioevents.init();
 		var gamers = new Gamers();
 		
@@ -261,6 +263,25 @@ requirejs(['jquery',
 
 		};
 
+		(function datGUIBgChange() {
+			var setting = {
+				背景: "/image/Paris.png"
+			};
+			var gui = new dat.GUI();
+
+			dat.GUI.toggleHide();
+			var backgroundController = gui.add(setting, 
+				'背景', {
+					巴黎: "/image/Paris.png",
+					埃及: "/image/pyramids_of_giza.jpg",
+					泰姬瑪哈陵: "/image/taj_mahal.jpg"
+				});
+			backgroundController.onChange(function(value) {
+				$("#main-background").css("background", "url(" + 
+					value + ")");
+				$("#main-background").css("background-repeat", "no-repeat");
+			});
+		})();
 		
 		
 		//////////////////////////////////////////////////////////////////////////////////
