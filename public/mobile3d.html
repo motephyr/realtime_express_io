@@ -83,14 +83,14 @@
 		}
 	</style>
 
+	<script src="/js/jquery.min.js"></script>
 	<script src="//cdnjs.cloudflare.com/ajax/libs/underscore.js/1.6.0/underscore-min.js"></script>
-
+	<script src="/bower_components/blueimp-canvas-to-blob/js/canvas-to-blob.min.js"></script>
 
 </head>
 <body>
-	<form id="face-form" enctype="multipart/form-data" style="display:none;">
-		<input id="headFileInput" type="file" name="face" accept="image/*;capture=camera">
-	</form>
+	<form id="face-form" enctype="multipart/form-data" style="display:none;"></form>
+	<input id="headFileInput" style="display:none;" type="file" name="face" accept="image/*;capture=camera">
 	
 	<div id="getPhoto" class="button">
 		<div id="photoText" class="buttonText">選擇圖片<br/>或<br/>拍照</div>
@@ -102,7 +102,7 @@
 		<div class="ui-load-msg">Please Wait...</div>
 		<div id="secondText"></div>
 	</div>
-	<script src="/js/jquery.min.js"></script>
+	
 	<script type='text/javascript'>
 		var assets = $('#assets');
 		$.getJSON('js/mobile_collections.json', function(assetData) {
@@ -174,27 +174,69 @@
 				// Do jquery ajax to 3Dpypy
 				// and callback
 				if($('#headFileInput').val()){
-					//if(this.disabled) return alert('File upload not supported!');
-				    // var F = this.files;
-				    // if(F && F[0]) for(var i=0; i<F.length; i++) readImage( F[i] );
-					
-					var formData = new FormData(document.getElementById('face-form'));
-				    $.ajax({
-				      url: '/proxy/api/figurines/face',
-				      type: 'POST',
-				      processData: false,
-				      contentType: false,
-				      data: formData,
-				      success: function(data) {
-				      	figurineModel = data;
-				      	socketConnect(data.modelId);
-				        $('#getPhoto').hide();
-				        $('#assets').show();
-				      },
-				      error: function(xhr, text, errMsg){
-				      	alert("TextStatus:"+text+ " ErrorMessage:"+errMsg);
-				      }
-				    });
+					$("body").addClass("loading");
+					var reader = new FileReader();
+					var imageObj = new Image();
+					reader.addEventListener('load', function(){
+						imageObj.src = reader.result;
+					});
+					imageObj.addEventListener('load', function(){
+						var canvas = document.createElement('canvas');
+						var MAX_HEIGHT = 500;
+						if (imageObj.height > MAX_HEIGHT) {
+							imageObj.width *= MAX_HEIGHT / imageObj.height;
+							imageObj.height = MAX_HEIGHT;
+						}
+						var context = canvas.getContext('2d');
+						context.clearRect(0, 0, canvas.width, canvas.height);
+						canvas.width = imageObj.width;
+						canvas.height = imageObj.height;
+
+						context.drawImage(imageObj, 0, 0, imageObj.width, imageObj.height);
+
+						if (canvas.toBlob) {
+							canvas.toBlob(function (blob) {
+								var formData = new FormData(document.getElementById('face-form'));
+								formData.append('face', blob);
+								$.ajax({
+									url: '/proxy/api/figurines/face',
+									type: 'POST',
+									processData: false,
+									contentType: false,
+									data: formData,
+									success: function (data) {
+										figurineModel = data;
+								      	socketConnect(data.modelId);
+								        $('#getPhoto').hide();
+								        $('#assets').show();
+									},
+								    error: function(xhr, text, errMsg){
+								    	alert("TextStatus:"+text+ " ErrorMessage:"+errMsg);
+								    }
+								});
+							}, 'image/jpeg');
+						}
+					});
+			        reader.readAsDataURL(this.files[0]);
+			        //imageObj.src = eval(data);
+
+					// var formData = new FormData(document.getElementById('face-form'));
+				 //    $.ajax({
+				 //      url: '/proxy/api/figurines/face',
+				 //      type: 'POST',
+				 //      processData: false,
+				 //      contentType: false,
+				 //      data: formData,
+				 //      success: function(data) {
+				 //      	figurineModel = data;
+				 //      	socketConnect(data.modelId);
+				 //        $('#getPhoto').hide();
+				 //        $('#assets').show();
+				 //      },
+				 //      error: function(xhr, text, errMsg){
+				 //      	alert("TextStatus:"+text+ " ErrorMessage:"+errMsg);
+				 //      }
+				 //    });
 				}
 			});
 			
