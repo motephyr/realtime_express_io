@@ -170,13 +170,17 @@ requirejs(['jquery',
 			if (message.saying) player.setSay(message.saying);
 		}
 
+<<<<<<< HEAD
 		/*
+=======
+>>>>>>> 166db6e5b6e3d475aca7d002bfc4d0b8c108e2f8
 		gamers.all().forEach( function(g) {
 			littleMen.push(createLittleMan());
 		});
 
 		
 		player1 = littleMen[0];
+<<<<<<< HEAD
 		//player1.setNickname("舉牌小人1");
 		player1.character.root.position.z = 7;
 		player2 = littleMen[1];
@@ -188,6 +192,19 @@ requirejs(['jquery',
 		//modelId = 421039200975;
 		//createLittleMan("fdsafdafs", modelId);
 		*/
+=======
+		player1.setNickname("舉牌小人1");
+		player1.character.root.position.z = 7;
+		player2 = littleMen[1];
+		player2.setNickname("舉牌小人2");
+
+		player1.setSay('記得千萬不要宣傳蔡正元罷免案喔!!!');
+		player2.setSay('歡迎光臨!');
+
+		//modelId = 421039200975;
+		//createLittleMan("fdsafdafs", modelId);
+
+>>>>>>> 166db6e5b6e3d475aca7d002bfc4d0b8c108e2f8
 		
 		//////////////////////////////////////////////////////////////////////////////////
 		//		controls.input based on keyboard				//
@@ -278,19 +295,26 @@ requirejs(['jquery',
 				'背景', {
 					巴黎: "/image/Paris.png",
 					埃及: "/image/pyramids_of_giza.jpg",
+<<<<<<< HEAD
 					泰姬瑪哈陵: "/image/taj_mahal.jpg",
 					東京: "/image/tokyo.jpg"
+=======
+					泰姬瑪哈陵: "/image/taj_mahal.jpg"
+>>>>>>> 166db6e5b6e3d475aca7d002bfc4d0b8c108e2f8
 				});
 			backgroundController.onChange(function(value) {
 				$("#main-background").css("background", "url(" + 
 					value + ")");
 				$("#main-background").css("background-repeat", "no-repeat");
+<<<<<<< HEAD
 				$("#main-background").css("height", "100%");
 				$("#main-background").css("background-size", "cover");
 				
 				if (value == "/image/Paris.png") {
 					$(".deco").show();
 				} else { $(".deco").hide(); }
+=======
+>>>>>>> 166db6e5b6e3d475aca7d002bfc4d0b8c108e2f8
 			});
 		})();
 		

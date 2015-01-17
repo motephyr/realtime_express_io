@@ -1,4 +1,5 @@
 #tree {
+<<<<<<< HEAD
   transform:  translate(20px, 155px) scale(.5, .5);
 }
 #table_chair {
@@ -38,6 +39,14 @@
 #airship {
   transform:  translate(300px, 20px) scale(.3, .3);
 }
+=======
+  transform:  translate(1200px, 100px) scale(.7, .7);
+}
+#table_chair {
+  transform:  translate(200px, 400px) scale(.6, .6);
+}
+
+>>>>>>> 166db6e5b6e3d475aca7d002bfc4d0b8c108e2f8
 #pyramid {
   transform:  translate(100px, 200px)  scale(.4, .4);
 }
@@ -55,6 +64,7 @@
 }
 
 #triomphe {
+<<<<<<< HEAD
   transform: translate(800px, 250px) scale(.5, .5);
 }
 
@@ -64,6 +74,13 @@
 
 
 
+=======
+  transform: translate(700px, 100px) scale(.3, .3);
+}
+#tramway {
+  transform: scale(.5, .5) translate(800px, 500px);
+}
+>>>>>>> 166db6e5b6e3d475aca7d002bfc4d0b8c108e2f8
 .leave {
   transform: translate(800px, 200px);
 }
@@ -73,7 +90,11 @@
 }
 
 .tree {
+<<<<<<< HEAD
   transform: translate(200px, 400px) scale(.6,.6);
+=======
+  transform: translate(1000px, 400px) scale(.5,.5);
+>>>>>>> 166db6e5b6e3d475aca7d002bfc4d0b8c108e2f8
 }
 
 .ship {
@@ -84,6 +105,7 @@
   transform: translate(400px, 400px) scale(1,1);
 }
 
+<<<<<<< HEAD
 
 .sun {
    -webkit-animation-name: sun;
@@ -129,10 +151,20 @@
   -webkit-animation-play-state: running;
   animation-name: swing-roll;
   animation-duration: 50s;
+=======
+.roll-1 {
+  -webkit-animation-name: roll;
+  -webkit-animation-duration: 60s;
+  -webkit-animation-iteration-count: infinite;
+  -webkit-animation-play-state: running;
+  animation-name: roll;
+  animation-duration: 60s;
+>>>>>>> 166db6e5b6e3d475aca7d002bfc4d0b8c108e2f8
   animation-iteration-count: infinite;
   animation-play-state: running;
 }
 
+<<<<<<< HEAD
 .wheel {
   -webkit-animation-name: wheel;
   -webkit-animation-duration: 20s;
@@ -146,6 +178,8 @@
     animation-timing-function: cubic-bezier(0.455, 0.03, 0.515, 0.955);
 }
 
+=======
+>>>>>>> 166db6e5b6e3d475aca7d002bfc4d0b8c108e2f8
 .shift-1 {
   -webkit-animation: shift 3.5s infinite alternate cubic-bezier(0.455, 0.03, 0.515, 0.955);
   -moz-animation: shift 3.5s infinite alternate cubic-bezier(0.455, 0.03, 0.515, 0.955);
@@ -158,6 +192,7 @@
   animation: swing 3.5s infinite alternate cubic-bezier(0.455, 0.03, 0.515, 0.955);
 }
 
+<<<<<<< HEAD
 .swing-ballon {
   -webkit-animation-name: swing-ballon;
   -webkit-animation-duration: 5s;
@@ -171,12 +206,15 @@
     animation-timing-function: cubic-bezier(0.455, 0.03, 0.515, 0.955);
   }
 
+=======
+>>>>>>> 166db6e5b6e3d475aca7d002bfc4d0b8c108e2f8
 .swing-5 {
   -webkit-animation: swing 2s infinite alternate cubic-bezier(0.455, 0.03, 0.515, 0.955);
   -moz-animation: swing 2s infinite alternate cubic-bezier(0.455, 0.03, 0.515, 0.955);
   animation: swing 2s infinite alternate cubic-bezier(0.455, 0.03, 0.515, 0.955);
 }
 
+<<<<<<< HEAD
 
 @-webkit-keyframes fade {
  0% { transform: translate(700px, 10px) scale(.4, .4);
@@ -254,6 +292,16 @@
     0% { transform: translate(300px, 100px) rotateZ(-10deg) scale(.2, .2);}
   50% { transform: translate(100px, 60px) rotateZ(20deg) scale(.4, .4);}
   100% { transform: translate(300px, 60px) rotateZ(-10deg) scale(.2, .2);}
+=======
+@-webkit-keyframes roll {
+  0% { transform: translate(-100px, 300px) scale(.3, .3);}
+  100% { transform: translate(1500px, 300px) scale(.3, .3);}
+}
+
+@keyframes roll {
+  0% { transform: translate(-100px, 300px) scale(.3, .3);}
+  100% { transform: translate(1000px, 300px) scale(.3, .3);}
+>>>>>>> 166db6e5b6e3d475aca7d002bfc4d0b8c108e2f8
 }
 
 @-webkit-keyframes swing {
