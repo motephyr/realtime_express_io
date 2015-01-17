@@ -1,0 +1,176 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Realtime Demo Entrance</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
+	<link rel="stylesheet" type="text/css" href="/css/main.css">
+	<style type="text/css">
+		body{
+			-webkit-touch-callout: none;                /* prevent callout to copy image, etc when tap to hold */
+			-webkit-user-select: none; 
+			min-height: 0px;
+		}
+
+		.button{
+			margin: 10px auto;
+			border-radius: 20px;
+			border:4px solid #ececec;
+			background: #674988;
+			position: absolute;
+		}
+
+		.buttonText{
+			color:#ececec;
+			height: 100%;
+			width: 100%;
+			font-size: 26px;
+			text-align: center;
+		}
+
+		.ui-load-mask{
+			display:    none;
+		    position:   fixed;
+		    z-index:    1000;
+		    top:        0;
+		    left:       0;
+		    height:     100%;
+		    width:      100%;
+		    background-color:#9a9a9a;
+		    font-size: 28px;
+			opacity:0.8;
+			filter: alpha(opacity=80);
+			-moz-opacity:0.8;
+		  	-khtml-opacity: 0.8;
+		  	-ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=80)";
+		}
+
+		body.loading{
+			overflow: hidden;
+		}
+		body.loading .ui-load-mask {
+    		display: block;
+		}
+
+	</style>
+
+</head>
+<body>
+	<form id="face-form" enctype="multipart/form-data" style="display:none;">
+		<input id="headFileInput" type="file" name="face" accept="image/*;capture=camera">
+	</form>
+	<canvas id="headCache"></canvas>
+	<div id="getPhoto" class="button">
+		<div id="photoText" class="buttonText">製作自己<br/>的<br/>3D人偶</div>
+	</div>
+	<div id="defaultMan" class="button">
+		<div id="defaultText" class="buttonText">直接進入</div>
+	</div>
+	<script src="/js/jquery.min.js"></script>
+	<script type='text/javascript'>
+
+		var readImage = function(file) {
+
+		    var reader = new FileReader();
+		    var image  = new Image();
+
+		    reader.readAsDataURL(file);  
+		    reader.onload = function(_file) {
+		        image.src    = _file.target.result;              // url.createObjectURL(file);
+		        image.onload = function() {
+		            var w = this.width,
+		                h = this.height;
+		            alert("width:"+w + "  height:" + h);
+
+		            var protrait = h > w;
+		            if(protrait){
+
+		            }else{
+
+		            }
+
+		        };
+		        image.onerror= function() {
+		            alert('Invalid file type: '+ file.type);
+		        };      
+		    };
+		};
+
+		$(window).load(function(){
+			//$('#getPhoto').
+			$('#getPhoto').click(function(){
+				//$('#headFileInput').trigger('click');
+				window.location.href = "./mobile3d";
+			});
+
+			$('#defaultMan').click(function(){
+				window.location.href = "./mobile";
+			});
+
+			$('#headFileInput').on('change', function(){
+				// Do jquery ajax to 3Dpypy
+				// and callback
+				if($('#headFileInput').val()){
+					//if(this.disabled) return alert('File upload not supported!');
+				    // var F = this.files;
+				    // if(F && F[0]) for(var i=0; i<F.length; i++) readImage( F[i] );
+					
+					var formData = new FormData(document.getElementById('face-form'));
+				    $.ajax({
+				      url: '/proxy/api/figurines/face',
+				      type: 'POST',
+				      processData: false,
+				      contentType: false,
+				      data: formData,
+				      success: function(data) {
+				        window.location.href = "./mobile?modelid="+data.modelId;
+				      },
+				      error: function(xhr, text, errMsg){
+				      	alert("TextStatus:"+text+ " ErrorMessage:"+errMsg);
+				      }
+				    });
+				}
+			});
+
+		});
+
+	</script>
+	<script>
+		
+		var doLayout = function(){
+			var w = $(window).width();
+			var h = $(window).height();
+			var protrait = h > w;
+			var buttonWidth = Math.min(h,w) * 0.5;
+			var buttonHeight = buttonWidth;
+
+			$('#getPhoto,#defaultMan').width(buttonWidth).height(buttonHeight);
+			if(protrait){
+				$('#getPhoto').css('margin', '20px auto');
+				$('#getPhoto').css({left:buttonWidth*0.5,top:buttonHeight*0.2});
+				$('#defaultMan').css('margin', '20px auto');
+				$('#defaultMan').css({left:buttonWidth*0.5,top:buttonHeight+buttonHeight*0.5});
+				$('#photoText').css('padding-top', buttonHeight*0.2);
+				$('#defaultText').css('padding-top', buttonHeight*0.4);
+			}else{
+				$('#getPhoto').css('margin', '20px auto');
+				$('#getPhoto').css({top:buttonHeight*0.35,left:buttonWidth*0.8});
+				$('#defaultMan').css('margin', '20px auto');
+				$('#defaultMan').css({top:buttonHeight*0.35,left:buttonWidth+buttonWidth*1.2});
+				$('#photoText').css('padding-top', buttonHeight*0.15);
+				$('#defaultText').css('padding-top', buttonHeight*0.35);
+			}
+		};
+		$(window).ready(function(){
+			doLayout();
+		});
+
+		$(window).resize(function(){
+			doLayout();
+		});
+
+
+</script>
+
+</body>
+</html>
