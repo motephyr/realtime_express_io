@@ -1,38 +1,37 @@
 #tree {
-  transform:  translate(20px, 155px) scale(.5, .5);
-}
-#table_chair {
-  transform:  translate(50px, 500px);
+  transform:  translate(20px, 300px) scale(.5, .5);
 }
 
 #triomphe-front {
-  transform:  translate(610px, 45px) scale(.35, .35);
+  transform:  translate(900px, 185px) scale(.35, .35);
 }
 
 #triomphe-back {
-  transform:  translate(680px, 29px) scale(.29, .29);
+  transform:  translate(970px, 170px) scale(.29, .29);
 }
 
 
 #sun {
-  transform:  translate(700px, 0px);
+  transform: translate(1000px, 0px);
 }
 
 #rainbow {
-  transform:  translate(700px, 10px) scale(.4, .4);
+  transform:  translate(110%, 3%) scale(.4, .4);
+  opacity: 0;
 }
 
 
 #wheel {
-   transform:  translate(300px, 20px) scale(.2, .2);
+   transform:  translate(500px, 250px) scale(.2, .2);
 }
 
 #wheelbase {
-   transform:  translate(345px, 160px) scale(.2, .2);
+   transform:  translate(495px, 285px) scale(.2, .2);
 }
 
 #ballon {
-  transform:  translate(900px, 10px) scale(.3, .3); 
+  transform:  scale(.3, .3); 
+  transform-origin: 30% 10%;
 }
 
 #airship {
@@ -40,7 +39,7 @@
 }
 
 #table_chair {
-  transform:  translate(200px, 400px) scale(.6, .6);
+  transform:  translate(200px, 500px) scale(.6, .6);
 }
 
 
@@ -91,7 +90,7 @@
   -webkit-animation-duration: 10s;
   -webkit-animation-iteration-count: infinite;
   -webkit-animation-play-state: running;
-  animation-name: fade;
+  animation-name: sun;
   animation-duration: 10s;
   animation-iteration-count: infinite;
   animation-play-state: sun;
@@ -172,11 +171,11 @@
 
 .swing-ballon {
   -webkit-animation-name: swing-ballon;
-  -webkit-animation-duration: 5s;
+  -webkit-animation-duration: 15s;
   -webkit-animation-iteration-count: infinite;
   -webkit-animation-play-state: running;
   animation-name: swing-ballon;
-  animation-duration: 5s;
+  animation-duration: 15s;
   animation-iteration-count: infinite;
   animation-play-state: running;
   -webkit-animation-timing-function: cubic-bezier(0.455, 0.03, 0.515, 0.955);
@@ -192,40 +191,40 @@
 
 
 @-webkit-keyframes fade {
- 0% { transform: translate(700px, 10px) scale(.4, .4);
+ 0% { transform: translate(1200px, 80px) scale(.4, .4);
       opacity: 0;}
- 50% { transform: translate(700px, 10px) scale(.4, .4);
+ 50% { transform: translate(1200px, 80px) scale(.4, .4);
       opacity: 1;}
-  100% { transform: translate(700px, 10px) scale(.4, .4);
+  100% { transform: translate(1200px, 80px) scale(.4, .4);
         opacity:0;}
 }
 
 @keyframes fade {
-  0% { transform: translate(700px, 10px) scale(.4, .4);
+  0% { transform: translate(1200px, 80px) scale(.4, .4);
       opacity: 0;}
- 50% { transform: translate(700px, 10px) scale(.4, .4);
+ 50% { transform: translate(1200px, 80px) scale(.4, .4);
       opacity: 1;}
-  100% { transform: translate(700px, 10px) scale(.4, .4);
+  100% { transform: translate(1200px, 80px) scale(.4, .4);
         opacity:0;}
 }
 
 
 @-webkit-keyframes sun {
-  0% { transform: translate(650px, 0px);}
-  50% { transform: translate(450px, -30px) rotateZ(25deg) scale(1.5, 1.5);}
-  100% { transform: translate(650px, 0px);}
+  0% { transform: translate(1200px, 0px);}
+  50% { transform: translate(950px, 10px) rotateZ(20deg) scale(1.5, 1.5);}
+  100% { transform: translate(1200px, 00px);}
 }
 
 @keyframes sun {
-  0% { transform: translate(650px, 0px);}
-  50% { transform: translate(450px, -30px) rotateZ(25deg) scale(1.5, 1.5);}
-  100% { transform: translate(650px, 0px);}
+ 0% { transform: translate(1100px, 10px);}
+  50% { transform: translate(900px, 10px) rotateZ(15deg) scale(1.5, 1.5);}
+  100% { transform: translate(1100px, 10px);}
 }
 
 
 @-webkit-keyframes roll {
- 0% { transform: translate(-1500px, 190px) scale(.2, .2);}
-  100% { transform: translate(1500px, 190px) scale(.2, .2);}
+ 0% { transform: translate(-1500px, 330px) scale(.2, .2);}
+  100% { transform: translate(1500px, 330px) scale(.2, .2);}
 }
 
 @keyframes roll {
@@ -234,31 +233,31 @@
 }
 
 @-webkit-keyframes wheel {
-  0% { transform: translate(300px, 50px) rotateZ(0deg) scale(.2, .2); }
-   50% { transform: translate(300px, 50px) rotateZ(180deg) scale(.2, .2); }
-  100% { transform: translate(300px, 50px) rotateZ(360deg) scale(.2, .2); }
+  0% { transform: translate(450px, 180px) rotateZ(0deg) scale(.2, .2); }
+   50% { transform: translate(450px, 180px) rotateZ(180deg) scale(.2, .2); }
+  100% { transform: translate(450px, 180px) rotateZ(360deg) scale(.2, .2); }
 }
 
 @keyframes wheel {
-  0% { transform: translate(300px, 50px) rotateZ(0deg) scale(.2, .2); }
-   50% { transform: translate(300px, 50px) rotateZ(180deg) scale(.2, .2); }
-  100% { transform: translate(300px, 50px) rotateZ(360deg) scale(.2, .2); }
+  0% { transform: translate(450px, 180px) rotateZ(0deg) scale(.2, .2); }
+   50% { transform: translate(450px, 180px) rotateZ(180deg) scale(.2, .2); }
+  100% { transform: translate(450px, 180px) rotateZ(360deg) scale(.2, .2); }
 }
 
 @-webkit-keyframes swing-ballon {
-  0% { transform: translate(650px, -50px) rotateZ(10deg) scale(.3, .3); }
-   50% { transform: translate(650px, -50px) rotateZ(-10deg) scale(.3, .3); }
-  100% { transform: translate(650px, -50px) rotateZ(10deg) scale(.3, .3); }
+  0% { transform: translate(950px, 60px) rotateZ(20deg) scale(.3, .3); }
+   50% { transform: translate(1000px, 130px) rotateZ(-10deg) scale(.3, .3); }
+  100% { transform: translate(950px, 60px) rotateZ(20deg) scale(.3, .3); }
 }
 
 @keyframes swing-ballon {
-  0% { transform: translate(650px, -50px) rotateZ(10deg) scale(.3, .3); }
-   50% { transform: translate(650px, -50px) rotateZ(-10deg) scale(.3, .3); }
-  100% { transform: translate(650px, -50px) rotateZ(10deg) scale(.3, .3); }
+ 0% { transform: translate(950px, 60px) rotateZ(20deg) scale(.3, .3); }
+   50% { transform: translate(1000px, 130px) rotateZ(-20deg) scale(.3, .3); }
+  100% { transform: translate(950px, 60px) rotateZ(20deg) scale(.3, .3); }
 }
 
 @-webkit-keyframes swing-roll {
-  0% { transform: translate(300px, 100px) rotateZ(-10deg) scale(.2, .2);}
+  0% { transform: translate(70%, 50%) rotateZ(-10deg) scale(.2, .2);}
   50% { transform: translate(100px, 60px) rotateZ(20deg) scale(.4, .4);}
   100% { transform: translate(300px, 60px) rotateZ(-10deg) scale(.2, .2);}
 }

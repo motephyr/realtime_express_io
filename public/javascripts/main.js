@@ -78,7 +78,7 @@ requirejs(['jquery',
 	    backLight.position.set( 0, 0, -1 );
 	    scene.add( backLight );
     	
-		camera.position.set(1, 1, 15);
+		camera.position.set(1, 1, 20);
 
 		camera.lookAt( new THREE.Vector3(0, 0, 0) ); 
 										 
@@ -108,7 +108,7 @@ requirejs(['jquery',
 				});
 				player.character.root.position.x = Math.uniform(-5, 5);
 				//player.character.root.position.y = (Math.random() - 0.5) * 2;
-				player.character.root.position.z = Math.uniform(5, 10);
+				player.character.root.position.z = Math.uniform(10, 13);
 
 				player.character.loadWellKnownSkin(getRandomSkin());
 				player.setNickname("人客");
@@ -138,13 +138,14 @@ requirejs(['jquery',
 					gamers.push(user_id, object);
 					object.position.x = (Math.random() - 0.5) * 3;
 					object.position.y = -0.5;
-					object.position.z =  8;
+					object.position.z =  17;
 					var s = .015;
 					object.scale.set(s, s, s);
 			        object.children.forEach(function(child) {
 			          child.material.specular = new THREE.Color( 0x000000 );
 			        });
 			        //console.log(object);
+			        console.log(gamers)
 					scene.add(object);
 				});
 			}
@@ -276,7 +277,8 @@ requirejs(['jquery',
 
 		};
 
-		(function datGUIBgChange() {
+		function datGUIBgChange() {
+			dat.GUI.toggleHide();
 			var setting = {
 				背景: "/image/Paris.png"
 			};
@@ -289,7 +291,7 @@ requirejs(['jquery',
 					埃及: "/image/pyramids_of_giza.jpg",
 
 					泰姬瑪哈陵: "/image/taj_mahal.jpg",
-					東京: "/image/tokyo.jpg"
+					京都: "/image/kyoto.jpg"
 
 				});
 
@@ -306,8 +308,9 @@ requirejs(['jquery',
 				} else { $(".deco").hide(); }
 
 			});
-		})();
-		
+		}
+		startDatGUI();
+		datGUIBgChange();
 		
 		//////////////////////////////////////////////////////////////////////////////////
 		//		render the scene						//
