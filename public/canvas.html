@@ -110,42 +110,42 @@ $(window).ready(function(){
 
 
   
-  canvas.onmousedown = function(e) {
-          //isDrawing = true;
+        canvas.onmousedown = function(e) {
           //alert('in canvas');
+          isDrawing = true;
+          CM('origin').point(location(e));
           window.realtime.socketIo.emit('down_location',location(e));
-          //CM('origin').point(location(e));
         };
         canvas.onmousemove = function(e) {
           if (isDrawing){
             window.realtime.socketIo.emit('move_location',location(e));
-            //CM('origin').line(location(e));
+            CM('origin').line(location(e));
           }
         };
         canvas.onmouseup = function() {
-          //isDrawing = false;
+          isDrawing = false;
           window.realtime.socketIo.emit('up_location');
         };
 
         canvas.ontouchstart = function(e) {
-          //isDrawing = true;
-          window.realtime.socketIo.emit('down_location',location(e));
-          //CM('origin').point(location(e));
+          isDrawing = true;
+          CM('origin').point(location(e));
+          //window.realtime.socketIo.emit('down_location',location(e));
         };
         canvas.ontouchmove = function(e) {
           if (isDrawing){
-            window.realtime.socketIo.emit('move_location',location(e));
-            //CM('origin').line(location(e));
+            //window.realtime.socketIo.emit('move_location',location(e));
+            CM('origin').line(location(e));
           }
         };
         canvas.ontouchend = function() {
-          //isDrawing = false;
+          isDrawing = false;
           window.realtime.socketIo.emit('up_location');
         };
 
         document.getElementById('clearBtn').onclick = function(){
           window.realtime.socketIo.emit('clear');
-          //CM('origin').clear();
+          CM('origin').clear();
         };
 
       });
