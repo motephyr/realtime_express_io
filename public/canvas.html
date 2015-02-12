@@ -122,6 +122,22 @@
           window.realtime.socketIo.emit('up_location');
         };
 
+        canvas.ontouchstart = function(e) {
+          //isDrawing = true;
+          window.realtime.socketIo.emit('down_location',location(e));
+          //CM('origin').point(location(e));
+        };
+        canvas.ontouchmove = function(e) {
+          if (isDrawing){
+            window.realtime.socketIo.emit('move_location',location(e));
+            //CM('origin').line(location(e));
+          }
+        };
+        canvas.ontouchend = function() {
+          //isDrawing = false;
+          window.realtime.socketIo.emit('up_location');
+        };
+
         document.getElementById('clearBtn').onclick = function(){
           window.realtime.socketIo.emit('clear');
           //CM('origin').clear();
