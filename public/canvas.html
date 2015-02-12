@@ -2,7 +2,7 @@
 <html>
 <head>
   <title></title>
-  <meta name="viewport" content="width=device-width, initial-scale=0.7, maximum-scale=0.7, user-scalable=0">
+  <meta name="viewport" content="width=device-width, initial-scale=0.6, maximum-scale=0.6, user-scalable=0">
   <style type="text/css">
     body{
       -webkit-touch-callout: none;                /* prevent callout to copy image, etc when tap to hold */
@@ -105,7 +105,10 @@ $(window).ready(function(){
   var location = function(obj){
     var left = canvas.offsetLeft;
     var top = canvas.offsetTop;
-    return {x: obj.clientX - left, y:obj.clientY - top}
+    //alert(JSON.stringify(obj));
+    var clientX = obj.clientX || obj.touches['0'].clientX;
+    var clientY = obj.clientY || obj.touches['0'].clientY;
+    return {x: clientX - left, y:clientY - top}
   }
 
 
@@ -113,39 +116,39 @@ $(window).ready(function(){
         canvas.onmousedown = function(e) {
           //alert('in canvas');
           isDrawing = true;
-          CM('origin').point(location(e));
+          //CM('origin').point(location(e));
           window.realtime.socketIo.emit('down_location',location(e));
         };
         canvas.onmousemove = function(e) {
           if (isDrawing){
             window.realtime.socketIo.emit('move_location',location(e));
-            CM('origin').line(location(e));
+            //CM('origin').line(location(e));
           }
         };
         canvas.onmouseup = function() {
-          isDrawing = false;
+          //isDrawing = false;
           window.realtime.socketIo.emit('up_location');
         };
 
         canvas.ontouchstart = function(e) {
-          isDrawing = true;
-          CM('origin').point(location(e));
-          //window.realtime.socketIo.emit('down_location',location(e));
+          //isDrawing = true;
+          //CM('origin').point(location(e));
+          window.realtime.socketIo.emit('down_location',location(e));
         };
         canvas.ontouchmove = function(e) {
           if (isDrawing){
-            //window.realtime.socketIo.emit('move_location',location(e));
-            CM('origin').line(location(e));
+            window.realtime.socketIo.emit('move_location',location(e));
+            //CM('origin').line(location(e));
           }
         };
         canvas.ontouchend = function() {
-          isDrawing = false;
+          //isDrawing = false;
           window.realtime.socketIo.emit('up_location');
         };
 
         document.getElementById('clearBtn').onclick = function(){
           window.realtime.socketIo.emit('clear');
-          CM('origin').clear();
+          //CM('origin').clear();
         };
 
       });
