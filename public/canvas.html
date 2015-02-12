@@ -2,55 +2,53 @@
 <html>
 <head>
   <title></title>
+  <meta name="viewport" content="width=device-width, initial-scale=0.7, maximum-scale=0.7, user-scalable=0">
   <style type="text/css">
-      .orgincanvas{
-  /*
-  border:solid #6E67A5;
-  */
-  background-color:gray;
-  position:relative;
-}
-</style>
-<script type="text/javascript">
-  window.realtime = {enabled: false};
-  var socketLoadScript = document.createElement('script');
+    body{
+      -webkit-touch-callout: none;                /* prevent callout to copy image, etc when tap to hold */
+      -webkit-user-select: none; 
+    }
+  </style>
+  <script type="text/javascript">
+    window.realtime = {enabled: false};
+    var socketLoadScript = document.createElement('script');
     socketLoadScript.type = 'text/javascript';
     socketLoadScript.src = "http://"+window.location.hostname+":5001/socket.io/socket.io.js";    
 
     document.getElementsByTagName('head')[0].appendChild(socketLoadScript);
-</script>
+  </script>
 </head>
 <body>
 
-      
-      <div class="jumbotron">
-        <h5>一字千金 模擬測試寫入頁面</h5>
-      </div>
-      <div style="float:left;">
-        <div style="height:30px;width:300px;padding:5px 0;">
-          <button id="clearBtn" style="font-size:15px;">Clear</button>
-          <button id="submitBtn" style="font-size:15px;">Submit</button>
-          <p id="seconds" style="float:right;"></p>
-        </div>
-        <canvas id="origin" class="orgincanvas"></canvas>
-      </div>
-      <script src="/js/jquery.min.js"></script>
-      <script src="/js/canvas-manager.js"></script>
 
-      <script>
-      $(window).load(function(){
-        CM.prop({
-          width: 500,
-          height: 500,
-          lineWidth: 15,
-          lineColor: '#333333',
-          targetZoomScale: 1,
-          backgroundImage: '/image/block-524.png'
-        });
+  <div class="jumbotron">
+    <h5>一字千金 模擬測試寫入頁面</h5>
+  </div>
+  <div style="float:left;">
+    <div style="height:30px;width:300px;padding:5px 0;">
+      <button id="clearBtn" style="font-size:15px;">Clear</button>
+      <button id="submitBtn" style="font-size:15px;">Submit</button>
+      <p id="seconds" style="float:right;"></p>
+    </div>
+    <canvas id="origin" class="orgincanvas"></canvas>
+  </div>
+  <script src="/js/jquery.min.js"></script>
+  <script src="/js/canvas-manager.js"></script>
 
-        CM.reg('origin');
+  <script>
+    $(window).load(function(){
+      CM.prop({
+        width: 500,
+        height: 500,
+        lineWidth: 15,
+        lineColor: '#333333',
+        targetZoomScale: 1,
+        backgroundImage: '/image/block-524.png'
+      });
 
-        if (typeof io != 'undefined' && io != null) {
+      CM.reg('origin');
+
+      if (typeof io != 'undefined' && io != null) {
         window.realtime.token = '291c8816b32d71664f45c3e2278967dc';
         window.realtime.userId = '';
         window.realtime.socketIo = io.connect('http://'+window.location.hostname+':5001/?_rtUserId=&_rtToken=291c8816b32d71664f45c3e2278967dc');
@@ -94,20 +92,27 @@
         });
 
       }
-      });
-      $(window).ready(function(){
-        isDrawing = false;
-        var canvas = document.getElementById('origin');
+    });
+
+$(window).ready(function(){
+  isDrawing = false;
+  var canvas = document.getElementById('origin');
+
+  document.body.addEventListener('touchmove', function(e){
+    e.preventDefault();
+  }, false);
+
+  var location = function(obj){
+    var left = canvas.offsetLeft;
+    var top = canvas.offsetTop;
+    return {x: obj.clientX - left, y:obj.clientY - top}
+  }
 
 
-        var location = function(obj){
-          var left = canvas.offsetLeft;
-          var top = canvas.offsetTop;
-          return {x: obj.clientX - left, y:obj.clientY - top}
-        }
-
-        canvas.onmousedown = function(e) {
+  
+  canvas.onmousedown = function(e) {
           //isDrawing = true;
+          //alert('in canvas');
           window.realtime.socketIo.emit('down_location',location(e));
           //CM('origin').point(location(e));
         };
@@ -145,6 +150,6 @@
 
       });
 
-      </script>
+</script>
 </body>
 </html>
