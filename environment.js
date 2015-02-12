@@ -65,6 +65,23 @@ module.exports = {
             socket.on('move_down_keyup', function(){
                 io.to(client_id["server"]).emit('move_down_keyup',{"user_id": currentSocketIoUserId});
             });
+
+            socket.on('move_location', function(e){
+                io.sockets.emit('move_location',e);
+            });
+
+            socket.on('down_location', function(e){
+                io.sockets.emit('down_location',e);
+            });
+
+            socket.on('up_location', function(){
+                io.sockets.emit('up_location');
+            });
+
+            socket.on('clear', function(){
+                io.sockets.emit('clear');
+            });
+
             socket.on('send_message', function(message){
                 message.user_id = currentSocketIoUserId;
                 io.to(client_id["server"]).emit('send_message',message);
