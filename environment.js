@@ -2,6 +2,17 @@ module.exports = {
 
     loadSocketIo: function loadSocketIo() {
 
+        var fourUserConnectionState = [false,false,false,false];
+        var setCurrentSocketIoUserId = function(){
+            for (var i = 0; i < fourUserConnectionState.length; i++){
+                if (fourUserConnectionState[i] === false){
+                    fourUserConnectionState[i] = true;
+                    return i;
+                }
+            }
+            return null;
+        };
+
         var client_id = {};
 
         var port = process.env.PORT || 5001;
@@ -23,7 +34,9 @@ module.exports = {
                     client_id[currentSocketIoUserId] = [];
                 }
                 client_id[currentSocketIoUserId].push(socket.id);
-
+                if (currentSocketIoUserId !== 'server'){
+                    client_id[currentSocketIoUserId].serial = setCurrentSocketIoUserId();
+                }
                 var mid = null;
                 if(message){
                     mid = message['model_id'];
@@ -67,19 +80,31 @@ module.exports = {
             });
 
             socket.on('move_location', function(e){
-                io.sockets.emit('move_location',e);
+                //io.sockets.emit('move_location',e);
+                e.user_id = client_id[currentSocketIoUserId].serial + 1;
+                io.to(socket.id).emit('move_location',e);
+                io.to(client_id["server"]).emit('move_location',e);
             });
 
             socket.on('down_location', function(e){
-                io.sockets.emit('down_location',e);
+                //io.sockets.emit('down_location',e);
+                e.user_id = client_id[currentSocketIoUserId].serial + 1;
+                io.to(socket.id).emit('down_location',e);
+                io.to(client_id["server"]).emit('down_location',e);
             });
 
-            socket.on('up_location', function(){
-                io.sockets.emit('up_location');
+            socket.on('up_location', function(){   
+                //io.sockets.emit('up_location');
+                io.to(socket.id).emit('up_location');
+                io.to(client_id["server"]).emit('up_location');
             });
 
             socket.on('clear', function(){
-                io.sockets.emit('clear');
+                //io.sockets.emit('clear');
+                var e = {};
+                e.user_id = client_id[currentSocketIoUserId].serial + 1;
+                io.to(socket.id).emit('clear');
+                io.to(client_id["server"]).emit('clear',e);
             });
 
             socket.on('send_message', function(message){
@@ -90,6 +115,7 @@ module.exports = {
 
             socket.on('disconnect', function(message) {
                 io.to(client_id["server"]).emit('disconnect',{"user_id": currentSocketIoUserId})
+                fourUserConnectionState[client_id[currentSocketIoUserId].serial] = false;
                 delete client_id[currentSocketIoUserId];
             });
 
