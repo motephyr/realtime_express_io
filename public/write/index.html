@@ -97,7 +97,7 @@ window.onload = function(){
   if (typeof io != 'undefined' && io != null) {
     window.realtime.token = '291c8816b32d71664f45c3e2278967dc';
     window.realtime.userId = 'client';
-    window.realtime.socketIo = io.connect('http://'+window.location.hostname+':5001/?_rtUserId='+ window.realtime.userId +'   &_rtToken=291c8816b32d71664f45c3e2278967dc');
+    window.realtime.socketIo = io.connect('http://'+window.location.hostname+':5001/?_rtUserId='+ window.realtime.userId +'   &_rtToken='+ window.realtime.token);
   }
 
   if (window.realtime.socketIo) {

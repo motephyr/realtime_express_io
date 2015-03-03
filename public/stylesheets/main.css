@@ -1,26 +1,5 @@
-body { 
-	background-color: #000;
-	min-height: 800px;
-  max-height: 1600px;
-	margin: 0;
-	overflow: hidden;
-}
-
-#canvas-wrap { position:relative; width: 100%; height: 100%;}
-#canvas-wrap canvas { position:absolute; top:0; left:0; z-index:0; height: 100%;}
-
-#overlay {
-	height: 100%;
-}
-#scene { 
-  padding: 0;
-  margin: 0;
-  height: 100%;
-}
-
-#main-background {
-
-  height: 100%;
-  background: url(/image/Paris.png) no-repeat; 
-  background-size: cover;
+* {
+  -moz-box-sizing: border-box;
+  -webkit-box-sizing: border-box;
+  box-sizing: border-box;
 }

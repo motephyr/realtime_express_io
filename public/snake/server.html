@@ -1,0 +1,83 @@
+<!doctype html>
+
+<html>
+<head>
+  <style>
+    #ground {
+      text-align: center;
+      font-family: courier;
+      font-size: 10pt;
+      font-weight: bold;
+    }
+    #score {
+      height: 2em;
+      text-align: center;
+      font-size: 150%;
+    }
+  </style>
+  <script type="text/javascript">
+    window.realtime = {enabled: false};
+    var socketLoadScript = document.createElement('script');
+    socketLoadScript.type = 'text/javascript';
+    socketLoadScript.src = "http://"+window.location.hostname+":5001/socket.io/socket.io.js";    
+
+    document.getElementsByTagName('head')[0].appendChild(socketLoadScript);
+
+    prevent = function(e) {
+      if(e.keyCode == 37 || e.keyCode == 38 || e.keyCode == 39 || e.keyCode == 40){ 
+        e.preventDefault();
+      };
+    };
+
+    updateCode = function(e) {
+      var dir = [];
+      dir[37] = 'left';
+      dir[38] = 'up';
+      dir[39] = 'right';
+      dir[40] = 'down';
+      if (window.realtime.socketIo) {
+        window.realtime.socketIo.emit('move', dir[e.keyCode]);
+      }
+    };
+  </script>
+</head>
+
+<body onkeydown="prevent(event)" onkeyup="updateCode(event)">
+	<div id="score"></div>
+	<div id="ground"></div>
+	<ul id="broadcast"></ul>
+  <script type="text/javascript">
+    window.onload = function(){
+      if (typeof io != 'undefined' && io != null) {
+        window.realtime.token = '291c8816b32d71664f45c3e2278967dc';
+        window.realtime.userId = 'server';
+        window.realtime.socketIo = io.connect('http://'+window.location.hostname+':5001/?_rtUserId='+ window.realtime.userId +'   &_rtToken=' + window.realtime.token);
+      }
+
+      window.realtime.socketIo.on('connect', function(){
+      window.realtime.socketIo.emit('realtime_user_id_connected');
+      console.log("connect");
+      });
+
+      window.realtime.socketIo.on('score', function(data) {
+        document.getElementById("score").innerHTML = data;
+      });
+
+      window.realtime.socketIo.on('announce', function(data) {
+        var msg = "<li>"+data+"</li>\n"
+        var newInnerHTML = msg + document.getElementById("broadcast").innerHTML;
+        document.getElementById("broadcast").innerHTML = newInnerHTML;
+      });
+
+      window.realtime.socketIo.on('redraw', function(map) {
+        <!-- Set callback movement to an element. -->
+        document.getElementById("ground").innerHTML="<div>" + map + "</div>";
+      });
+
+
+
+    };
+  </script>
+</body>
+
+</html>
