@@ -121,11 +121,11 @@ body {
 
 .dpad-pane {
   display: inline-block;
-  height: 2.6em;
-  margin: 6.5em 4.5em 5em;
+  height: 4em;
+  margin: 5.5em 4em 5em;
   position: relative;
   vertical-align: top;
-  width: 2.6em;
+  width: 4em;
 }
 
 .dpad-pane:before,
@@ -158,6 +158,7 @@ body {
 .dpad-hole:after {
   transform: rotate(90deg);
   -moz-transform: rotate(90deg);
+  -webkit-transform: rotate(90deg);
 }
 
 #dpad {
@@ -167,8 +168,8 @@ body {
   z-index: 1;
 }
 
-#dpad:after {
 /* dpad-pit */
+/*#dpad:after {
   background: -webkit-radial-gradient(76% 63%,circle closest-corner,hsla(0,0%,60%,.45),hsla(0,0%,10%,1) 100%);
   background: -moz-radial-gradient(76% 63%,circle closest-corner,hsla(0,0%,60%,.45),hsla(0,0%,10%,1) 100%);
   background: radial-gradient(76% 63%,circle closest-corner,hsla(0,0%,60%,.45),hsla(0,0%,10%,1) 100%);
@@ -180,11 +181,9 @@ body {
   position: absolute;
   width: 1.2em;
   z-index: 1;
-}
+}*/
 
 #dpad.up {
-  margin-top: .05em;
-  margin-left: .15em;
   transform: rotate(.4deg) scaleY(.98);
 }
 
@@ -216,17 +215,17 @@ body {
 #dpad .button {
   background-color: rgba(0,0,0,0);  /* "transparent" buttons in IE9 aren't clickable, but rgba can be used */
   border: none;
-  height: 2em;
+  height: 4em;
   padding: 0;
   position: absolute;
-  width: 2em;
+  width: 3.5em;
   z-index: 2;
+  margin: 0em 0.35em;
 }
 
 #dpad .button:before {
   border-style: solid;
   border-width: .1em;
-  content: "";
   display: block;
   height: .8em;
   margin: 0 .55em;
@@ -238,7 +237,6 @@ body {
 #dpad .button:after {
   border-style: solid;
   border-width: .1em;
-  content: "";
   display: block;
   height: .45em;
   margin: .5em .5em 0;
@@ -300,7 +298,7 @@ body {
 .menu-pane {
   display: inline-block;
   vertical-align: top;
-  width: 11.5em;
+  width: 10.5em;
   height: 100%;
   overflow: hidden;
   overflow: -moz-hidden-unscrollable;  /* normal hidden doesn't work in firefox here */
@@ -390,9 +388,10 @@ body {
 }
 
 .action-pane {
+  float: right;
   border-bottom: 1px solid transparent;
   display: inline-block;
-  margin: 2.6em 0 0 1.1em;
+  margin: 2.6em 1em 0 1.1em;
   vertical-align: top;
 }
 
@@ -415,10 +414,10 @@ body {
   display: inline-block;
   font-size: 1.5rem;
   height: 4rem;
-  line-height: 6.1em;
+  line-height: 7.1em;
   margin-left: .8rem;
   position: relative;
-  text-align: right;
+  text-align: center;
   width: 4rem;
 }
 
@@ -479,7 +478,6 @@ body {
     left: 0;
     min-width: 37em;
     position: absolute;
-    top: .75em;
     width: 37em;
   }
 
@@ -498,8 +496,8 @@ body {
   }
 
   #pad-traditional {
-    min-width: 36.5em;
-    width: 36.5em;
+    min-width: 26.5em;
+    width: 26.5em;
   }
 }
 

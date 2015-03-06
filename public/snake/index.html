@@ -33,8 +33,8 @@
         <button class="button" id="left"></button>
       </div>
     </section>
-    <section class="menu-pane">
-<!--     <div class="labels">
+<!--     <section class="menu-pane">
+    <div class="labels">
       <label class="select" for="select">Select
       </label>
       <label class="start" for="start">Start</label>
@@ -42,8 +42,8 @@
     <div class="buttons">
       <button class="button select" id="select">Select</button>
       <button class="button start" id="start">Start</button>
-    </div> -->
-  </section>
+    </div>
+  </section> -->
   <section class="action-pane">
     <div class="logo">Joystick</div>
     <div class="buttons">
@@ -65,16 +65,34 @@
  }
 
  $(function(){
-  document.getElementById("up").onclick = function(){
+
+        document.body.addEventListener('touchmove', function(e){
+        e.preventDefault();
+      }, false);
+
+  document.getElementById("up").onmousedown = function(){
     window.realtime.socketIo.emit('move', 'up');
   };
-  document.getElementById("down").onclick = function(){
+  document.getElementById("down").onmousedown = function(){
     window.realtime.socketIo.emit('move', 'down');
   };
-  document.getElementById("left").onclick = function(){
+  document.getElementById("left").onmousedown = function(){
     window.realtime.socketIo.emit('move', 'left');
   };
-  document.getElementById("right").onclick = function(){
+  document.getElementById("right").onmousedown = function(){
+    window.realtime.socketIo.emit('move', 'right');
+  };
+  
+  document.getElementById("up").ontouchend = function(){
+    window.realtime.socketIo.emit('move', 'up');
+  };
+  document.getElementById("down").ontouchend = function(){
+    window.realtime.socketIo.emit('move', 'down');
+  };
+  document.getElementById("left").ontouchend = function(){
+    window.realtime.socketIo.emit('move', 'left');
+  };
+  document.getElementById("right").ontouchend = function(){
     window.realtime.socketIo.emit('move', 'right');
   };
 

@@ -82,13 +82,13 @@ module.exports = function(io) {
 				case 0:	// Corpse
 					snake.character = "X";
 					snake.zombie = false;
-					io.sockets.emit('announce', snake.name+" hit something and became a corpse!");
+					io.sockets.emit('announce', snake.name+"撞到東西，掛點了");
 					break;
 
 				case 1:	// Zombie (Still automoves)
 					snake.zombie = true;
 					snake.character = "Z";
-					io.sockets.emit('announce', snake.name+" hit something and became a zombie!");
+					io.sockets.emit('announce', snake.name+"撞到東西，但是怨念不散，變成Working Dead了");
 					break;
 					
 				case 2: // Food
@@ -101,7 +101,7 @@ module.exports = function(io) {
 					that.snakes = _.reject(that.snakes, function(s){
 						return _.isEqual(snake, s);
 					});
-					io.sockets.emit('announce', snake.name+" hit something and became food!");
+					io.sockets.emit('announce', snake.name+"撞到東西，變成別人的食物");
 					break;
 				};
 			};
@@ -174,7 +174,7 @@ module.exports = function(io) {
 	// Auto move snakes on the map
 	this.startAutoMoving = function(opts) {
 		var that = this;
-		var interval = 250; // 0.3 seconds
+		var interval = 100; // 0.3 seconds
 		var autoMover = function() {
 			_(that.snakes).each(function(snake) {
 				if(snake.alive || snake.zombie){

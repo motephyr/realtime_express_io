@@ -24,7 +24,7 @@ module.exports = {
 
         var io = require('socket.io').listen(Number(port));
 
-        var map = new (require('./map.js'))(io);
+        var map = new (require('./app/snake/map.js'))(io);
 
         map.startAutoMoving({
             afterEachMove: function() { io.to(client_id["server"]).emit('redraw', map.toString()) }
@@ -52,7 +52,7 @@ module.exports = {
                 io.to(client_id["server"]).emit('realtime_user_id_connected',{"user_id": currentSocketIoUserId, "model_id":mid});
             });
             (function loadSnack(){
-                var Snake = require('./snake.js');
+                var Snake = require('./app/snake/snake.js');
 
                 socket.on('start', function(name){
 
