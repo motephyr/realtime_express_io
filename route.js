@@ -6,6 +6,7 @@ module.exports = {
 
     app.use('/bower_components', express.static(__dirname + '/bower_components'));
 
+    app.use('/app', express.static(__dirname + '/app'));
     app.use('/js', express.static(__dirname + '/public/javascripts'));
     app.use('/css', express.static(__dirname + '/public/stylesheets'));
     app.use('/image', express.static(__dirname + '/public/images'));
@@ -17,7 +18,7 @@ module.exports = {
     }));
 
     app.get('/', function (req, res) {
-      res.sendFile(__dirname + '/public/write/index.html');
+      res.sendFile(__dirname + '/public/snake/index.html');
     });
 
     app.get('/:project', function (req, res, next) {

@@ -8,11 +8,13 @@
       font-family: freemono,monospace;
       font-size: 10pt;
       font-weight: bold;
+      color: white;
     }
     #score {
       height: 2em;
       text-align: center;
       font-size: 150%;
+      color: white;
     }
   </style>
   <script type="text/javascript">
@@ -42,7 +44,7 @@
   </script>
 </head>
 
-<body onkeydown="prevent(event)" onkeyup="updateCode(event)">
+<body onkeydown="prevent(event)" onkeyup="updateCode(event)" style="background-color:black">
 	<div id="score"></div>
 	<div id="ground"></div>
 	<ul id="broadcast"></ul>
