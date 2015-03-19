@@ -1,5 +1,5 @@
-Realtime node.js server for the realtime-rails gem
-
-Execute 'foreman start'
+Realtime node.js server.
+First of all 'npm install -g foreman'
+and Execute 'nf start'
 
 Default port:5000 
