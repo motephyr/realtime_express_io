@@ -187,8 +187,8 @@
     }
 
 
-    var player1 = new Snake();
-    var player2 = new Snake();
+    window.player1 = new Snake();
+    window.player2 = new Snake();
 
     var hitOptions = {
       segments: true,
@@ -293,7 +293,7 @@
       if (typeof io != 'undefined' && io != null) {
         window.realtime.token = '291c8816b32d71664f45c3e2278967dc';
         window.realtime.userId = 'server';
-        window.realtime.socketIo = io.connect('http://'+window.location.hostname+':5001/?_rtUserId='+ window.realtime.userId +'   &_rtToken=' + window.realtime.token);
+        window.realtime.socketIo = io.connect('http://'+window.location.hostname+':5001/?_rtUserId='+ window.realtime.userId +'&_rtToken=' + window.realtime.token);
       }
 
       window.realtime.socketIo.on('connect', function(){
@@ -306,19 +306,41 @@
       console.log("disconnect");
     });
 
-      window.realtime.socketIo.on('redirect', function(e) {
+    var userArray = [];  //第一個是player1,第二個是player2
+    window.realtime.socketIo.on('direct', function(e) {
       // Give a nice round-trip ACK to our realtime server that we connected.
-        if (e.playerNumber === "1"){
-          player1.keyState[e.doAction] = true;
-        }else if (e.playerNumber === "2"){
-          player2.keyState[e.doAction] = true;
+      for(var k in player1.keyState){
+        player1.keyState[k] = false;
+      }
+      for(var k in player2.keyState){
+        player2.keyState[k] = false;
+      }
+
+      console.log(e.user_id);
+      if (userArray.length == 0){
+        player1.keyState[e.direct] = true;
+        userArray.push(e.user_id);
+      }else if(userArray.length == 1){
+        if (userArray[0] == e.user_id){
+          player1.keyState[e.direct] = true;
+        }else{
+          player2.keyState[e.direct] = true;
+          userArray.push(e.user_id);
         }
+
+      }else if(userArray.length == 2){
+        if (userArray[0] == e.user_id){
+          player1.keyState[e.direct] = true;
+        }else{
+          player2.keyState[e.direct] = true;
+        }
+      }
     });
 
 
-    };
+  };
 
-    
-  </script>
+
+</script>
 </body>
 </html>
