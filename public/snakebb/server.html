@@ -26,7 +26,15 @@
       
       return food;
     }
-    function Background(){
+
+    var bound = {
+      x1: 0,
+      x2: 300,
+      y1: 0,
+      y2: 150
+    };
+
+    function Background(b){
       var path = new Path();
       // Give the stroke a color
       path.style = {
@@ -38,12 +46,12 @@
       path.moveTo(start);
       // Note the plus operator on Point objects.
       // PaperScript does that for us, and much more!
-      path.lineTo(start + [ 0, 150 ]);
-      path.lineTo(start + [ 300, 150 ]);
-      path.lineTo(start + [ 300, 0 ]);
-      path.lineTo(start + [ -300, 0]);
+      path.lineTo(start + [ b.x1, b.y2 ]);
+      path.lineTo(start + [ b.x2, b.y2 ]);
+      path.lineTo(start + [ b.x2, b.y1 ]);
+      path.lineTo(start + [ -b.x2, b.y1]);
     }
-    new Background();
+    new Background(bound);
 
     var Snake = function(){
       this.path = new Path();
@@ -56,7 +64,7 @@
 
       this.string = "我";
       this.size = this.string.length;
-      this.segments = this.path.segments;
+      // this.segments = this.path.segments;
       this.start = view.center / [10, 1];
 
       this.point = this.start;
@@ -117,52 +125,80 @@
 
       move: function(){
 
+        // console.log(this.segments);
 
-        var previousPoint = new Point(this.segments[0].point);
-        this.segments[0].point = this.segments[0].point + this.direction;
+        var oldSegments = this.path.segments.slice(0);
+        // var newPoint = oldSegments[0].point + this.direction;
+        var newSegments = [{point:oldSegments[0].point + this.direction}].concat(oldSegments.slice(0,oldSegments.length - 1));
+
+        console.log(oldSegments);
+        // console.log(newPoint);
+
+        // var previousPoint = new Point(this.segments[0].point);
+        // this.segments[0].point = this.segments[0].point + this.direction;
 
         
         while (i = this.text.shift()){
           i.remove();
         }
-        for (var i = 1; i < this.size; i++) {
 
-          this.changeTextStruct(i-1);
+        this.path.removeSegments();
+        // path.add(new Point(30, 75));
 
-          var tempPoint = new Point(this.segments[i].point);
-          this.segments[i].point = new Point(previousPoint.x, previousPoint.y);
-          previousPoint = tempPoint;
+
+
+        while(segs = newSegments.shift()){
+          this.text.push(new PointText(segs.point.x - 5,segs.point.y + 5));
+          this.path.add(new Point(segs.point));
         }
 
-        this.changeTextStruct(this.size-1);
-        return this.segments[0].point;
+        for(var i = 0, len = this.text.length; i < len ;i++){
+          this.text[i].content = this.string[i];
+        }
+
+        // for (var i = 1; i < this.size; i++) {
+
+        //   this.changeTextStruct(i-1);
+
+        //   var tempPoint = new Point(this.segments[i].point);
+        //   this.segments[i].point = new Point(previousPoint.x, previousPoint.y);
+        //   previousPoint = tempPoint;
+        // }
+
+        // this.changeTextStruct(this.size-1);
+        return this.path.segments[0].point;
       },
       changeTextStruct: function(position){
-        var aa = new PointText(this.segments[position].point.x-5,this.segments[position].point.y+5);
-        aa.content = this.string[position];
-        this.text.push(aa);
+        // var aa = new PointText(this.segments[position].point.x-5,this.segments[position].point.y+5);
+        // aa.content = this.string[position];
+        // this.text.push(aa);
       },
       addText: function(item){
         this.string = this.string + item.content;
         this.size = this.string.length;
-        this.path.add(this.segments[this.size-2].point);
+        this.path.add(this.path.segments[this.size-2].point);
 
       },
       removeText: function(){
-        this.string = this.string.slice(0,this.string.length -1) ;
-        console.log(this.string);
+        var strlen = this.string.length;
+        this.string = this.string.slice(0, strlen - 1);
         this.size = this.string.length;
-        console.log(this.size);
-        this.path.removeSegment(this.size-1);
-
+        this.text[strlen - 1].remove();
+        // console.log(this.string);
+        this.path.removeSegment(strlen-1);
+        // console.log(this.size);
+      },
+      remove:function(){
+        for(;this.size;){
+          this.removeText();
+        }
+        this.path.remove();
       }
-
-
     }
 
 
-    var snake = new Snake();
-    var snake2 = new Snake();
+    var player1 = new Snake();
+    var player2 = new Snake();
 
     var hitOptions = {
       segments: true,
@@ -175,9 +211,9 @@
     function onFrame(event) {
 
       count++;
-      if (count%5===0){
-        snake.changeDirection();
-        snake2.changeDirection2();
+      if (count%20===0){
+        player1.changeDirection();
+        player2.changeDirection2();
         if  (bodies.length < 5){
           bodies.push(createFood(keyWords));
           bodies.push(createFood(notkeyWords));
@@ -185,43 +221,65 @@
           bodies.push(createFood(notkeyWords));
           bodies.push(createFood(notkeyWords));
         }
-        ok(snake);
-        ok(snake2);
+
+        // console.log(point);
+
+        var point1 = player1.move();
+        var point2 = player2.move();
+
+        hasEat(player1, point1);
+        hasEat(player2, point2);
+
+        if(isTouchWall(point1)){
+          player1.remove();
+          player1 = new Snake();
+        }
+        if(isTouchWall(point2)){
+          player2.remove();
+          player2 = new Snake();
+        }
+
+        // console.log(player1);
 
       }
     }
 
-    function ok(snake){
-        var point = snake.move();
-        for (var i=0;i<bodies.length;i++){
-          var hitResult = bodies[i].obj.hitTest(point, hitOptions);
-          if (hitResult){
-            hitResult.item.remove();
-            bodies.splice(i,1);
-            if (keyWords.indexOf(hitResult.item.content) != -1){
+    function hasEat(snake, point){
+      for (var i=0;i<bodies.length;i++){
+        var hitResult = bodies[i].obj.hitTest(point, hitOptions);
+        if (hitResult){
+          bodies.splice(i,1);
+          if (keyWords.indexOf(hitResult.item.content) != -1){
             snake.addText(hitResult.item);
-              bodies.push(createFood(keyWords));
-            }else if(boom.indexOf(hitResult.item.content) != -1){
-              snake.removeText();
-              bodies.push(createFood(boom));
-            }else{
-              snake.addText(hitResult.item);
-              bodies.push(createFood(notkeyWords));
-            }
-
+            bodies.push(createFood(keyWords));
+          }else if(boom.indexOf(hitResult.item.content) != -1){
+            snake.removeText();
+            bodies.push(createFood(boom));
+          }else{
+            snake.addText(hitResult.item);
+            bodies.push(createFood(notkeyWords));
           }
+          hitResult.item.remove();
         }
+      }
+    }
+
+    function isTouchWall(point){
+      return (point.x <= bound.x1 || point.x >= bound.x2 || point.y <= bound.y1 || point.y >= bound.y2);
     }
 
     var keyState = {};
 
 
     function onKeyDown(event) {
+      for(var k in keyState){
+        keyState[k] = false;
+      }
       keyState[event.key] = true;
     }
-    function onKeyUp(event) {
-      keyState[event.key] = false;
-    }
+    // function onKeyUp(event) {
+    //   keyState[event.key] = false;
+    // }
 
   </script>
 </head>
