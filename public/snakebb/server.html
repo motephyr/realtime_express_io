@@ -3,7 +3,16 @@
 <head>
   <!-- Load the Paper.js library -->
   <script src="/bower_components/paper/dist/paper-full.min.js"></script>
+  <script src="/bower_components/lodash/lodash.js"></script>
   <!-- Define inlined PaperScript associate it with myCanvas -->
+  <script>
+    window.realtime = {enabled: false};
+    var socketLoadScript = document.createElement('script');
+    socketLoadScript.type = 'text/javascript';
+    socketLoadScript.src = "http://"+window.location.hostname+":5001/socket.io/socket.io.js";    
+
+    document.getElementsByTagName('head')[0].appendChild(socketLoadScript);
+  </script>
   <script type="text/paperscript" canvas="myCanvas">
 
     var keyWords = "我愛布朗尼"
@@ -54,6 +63,7 @@
     new Background(bound);
 
     var Snake = function(){
+      this.keyState = {};
       this.path = new Path();
       this.path.style = {
         strokeColor: '#E4141B',
@@ -83,39 +93,19 @@
 
     Snake.prototype = {
       changeDirection: function(){
-        if (keyState['up']  === true){
+        if (this.keyState['up']  === true ){
           if (this.direction[1] != 10) { // not down
             this.newDirection = [0, -10];
           }
-        }else if (keyState['down'] === true){
+        }else if (this.keyState['down'] === true){
           if (this.direction[1] != -10) {
             this.newDirection = [0, 10];
           }
-        }else if(keyState['left']  === true){
+        }else if(this.keyState['left']  === true){
           if (this.direction[0] != 10) {
             this.newDirection = [-10, 0];
           }
-        }else if(keyState['right'] === true){
-          if (this.direction[0] != -10) {
-            this.newDirection = [10, 0];
-          }
-        }
-        this.direction = this.newDirection;
-      },
-      changeDirection2: function(){
-        if (keyState['w'] === true){
-          if (this.direction[1] != 10) { // not down
-            this.newDirection = [0, -10];
-          }
-        }else if (keyState['s'] === true){
-          if (this.direction[1] != -10) {
-            this.newDirection = [0, 10];
-          }
-        }else if(keyState['a'] === true){
-          if (this.direction[0] != 10) {
-            this.newDirection = [-10, 0];
-          }
-        }else if(keyState['d'] === true){
+        }else if(this.keyState['right'] === true){
           if (this.direction[0] != -10) {
             this.newDirection = [10, 0];
           }
@@ -131,7 +121,7 @@
         // var newPoint = oldSegments[0].point + this.direction;
         var newSegments = [{point:oldSegments[0].point + this.direction}].concat(oldSegments.slice(0,oldSegments.length - 1));
 
-        console.log(oldSegments);
+        //console.log(oldSegments);
         // console.log(newPoint);
 
         // var previousPoint = new Point(this.segments[0].point);
@@ -213,7 +203,7 @@
       count++;
       if (count%20===0){
         player1.changeDirection();
-        player2.changeDirection2();
+        player2.changeDirection();
         if  (bodies.length < 5){
           bodies.push(createFood(keyWords));
           bodies.push(createFood(notkeyWords));
@@ -268,14 +258,27 @@
       return (point.x <= bound.x1 || point.x >= bound.x2 || point.y <= bound.y1 || point.y >= bound.y2);
     }
 
-    var keyState = {};
 
 
     function onKeyDown(event) {
-      for(var k in keyState){
-        keyState[k] = false;
+      for(var k in player1.keyState){
+        player1.keyState[k] = false;
       }
-      keyState[event.key] = true;
+      for(var k in player2.keyState){
+        player2.keyState[k] = false;
+      }
+      if ('up'  === event.key || 'down'  === event.key || 'left'  === event.key|| 'right'  === event.key){
+        player1.keyState[event.key] = true;
+      }
+      if ('w'  === event.key){
+        player2.keyState['up'] = true;
+      }else  if ('s'  === event.key){
+        player2.keyState['down'] = true;
+      }else  if ('a'  === event.key){
+        player2.keyState['left'] = true;
+      }else  if ('d'  === event.key){
+        player2.keyState['right'] = true;
+      }
     }
     // function onKeyUp(event) {
     //   keyState[event.key] = false;
@@ -285,5 +288,37 @@
 </head>
 <body>
   <canvas id="myCanvas" resize></canvas>
+  <script type="text/javascript">
+    window.onload = function(){
+      if (typeof io != 'undefined' && io != null) {
+        window.realtime.token = '291c8816b32d71664f45c3e2278967dc';
+        window.realtime.userId = 'server';
+        window.realtime.socketIo = io.connect('http://'+window.location.hostname+':5001/?_rtUserId='+ window.realtime.userId +'   &_rtToken=' + window.realtime.token);
+      }
+
+      window.realtime.socketIo.on('connect', function(){
+        window.realtime.socketIo.emit('realtime_user_id_connected');
+        console.log("connect");
+      });
+
+      window.realtime.socketIo.on('disconnect', function() {
+      // Give a nice round-trip ACK to our realtime server that we connected.
+      console.log("disconnect");
+    });
+
+      window.realtime.socketIo.on('redirect', function(e) {
+      // Give a nice round-trip ACK to our realtime server that we connected.
+        if (e.playerNumber === "1"){
+          player1.keyState[e.doAction] = true;
+        }else if (e.playerNumber === "2"){
+          player2.keyState[e.doAction] = true;
+        }
+    });
+
+
+    };
+
+    
+  </script>
 </body>
 </html>
