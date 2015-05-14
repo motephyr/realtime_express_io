@@ -20,6 +20,7 @@
     "underscore": "~1.7.0",
     "threex.text": "*",
     "dat.gui": "*",
-    "blueimp-canvas-to-blob": "*"
+    "blueimp-canvas-to-blob": "*",
+    "paper": "*"
   }
 }

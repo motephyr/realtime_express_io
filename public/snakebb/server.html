@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <!-- Load the Paper.js library -->
+  <script src="/bower_components/paper/dist/paper-full.min.js"></script>
+  <!-- Define inlined PaperScript associate it with myCanvas -->
+  <script type="text/paperscript" canvas="myCanvas">
+
+    var keyWords = "我愛布朗尼"
+    var notkeyWords = "JOFDSAFDSF"
+    var boom = "炸"
+
+    function randomInt(min,max) {
+      return Math.floor(Math.random()*(max-min+1)+min);
+    }
+
+    var Food = function(center,words){
+      this.obj = new PointText(new Point(0, 0));
+      this.obj.content = words[randomInt(0,words.length-1)];
+      this.obj.position = center;
+    }
+
+    var createFood = function(words){
+      var food = new Food([Math.round(Math.random()*view.bounds.right/10)*10, Math.round(Math.random()*view.bounds.height/10)*10],words);
+
+      
+      return food;
+    }
+    function Background(){
+      var path = new Path();
+      // Give the stroke a color
+      path.style = {
+        strokeColor: 'black',
+        strokeWidth: 10,
+      };
+      var start = new Point(0, 0);
+      // Move to start and draw a line from there
+      path.moveTo(start);
+      // Note the plus operator on Point objects.
+      // PaperScript does that for us, and much more!
+      path.lineTo(start + [ 0, 150 ]);
+      path.lineTo(start + [ 300, 150 ]);
+      path.lineTo(start + [ 300, 0 ]);
+      path.lineTo(start + [ -300, 0]);
+    }
+    new Background();
+
+    var Snake = function(){
+      this.path = new Path();
+      this.path.style = {
+        strokeColor: '#E4141B',
+        strokeWidth: 10,
+        strokeCap: 'square'
+      };
+
+
+      this.string = "我";
+      this.size = this.string.length;
+      this.segments = this.path.segments;
+      this.start = view.center / [10, 1];
+
+      this.point = this.start;
+      this.direction = [0, 10];
+      this.newDirection = this.direction;
+      this.text = [];
+
+
+      // start
+      for (var i = 0; i < this.size; i++) {
+
+        this.path.add(new Point(1 * 10, 0));
+      }
+
+    }
+
+    Snake.prototype = {
+      changeDirection: function(){
+        if (keyState['up']  === true){
+          if (this.direction[1] != 10) { // not down
+            this.newDirection = [0, -10];
+          }
+        }else if (keyState['down'] === true){
+          if (this.direction[1] != -10) {
+            this.newDirection = [0, 10];
+          }
+        }else if(keyState['left']  === true){
+          if (this.direction[0] != 10) {
+            this.newDirection = [-10, 0];
+          }
+        }else if(keyState['right'] === true){
+          if (this.direction[0] != -10) {
+            this.newDirection = [10, 0];
+          }
+        }
+        this.direction = this.newDirection;
+      },
+      changeDirection2: function(){
+        if (keyState['w'] === true){
+          if (this.direction[1] != 10) { // not down
+            this.newDirection = [0, -10];
+          }
+        }else if (keyState['s'] === true){
+          if (this.direction[1] != -10) {
+            this.newDirection = [0, 10];
+          }
+        }else if(keyState['a'] === true){
+          if (this.direction[0] != 10) {
+            this.newDirection = [-10, 0];
+          }
+        }else if(keyState['d'] === true){
+          if (this.direction[0] != -10) {
+            this.newDirection = [10, 0];
+          }
+        }
+        this.direction = this.newDirection;
+      },
+
+      move: function(){
+
+
+        var previousPoint = new Point(this.segments[0].point);
+        this.segments[0].point = this.segments[0].point + this.direction;
+
+        
+        while (i = this.text.shift()){
+          i.remove();
+        }
+        for (var i = 1; i < this.size; i++) {
+
+          this.changeTextStruct(i-1);
+
+          var tempPoint = new Point(this.segments[i].point);
+          this.segments[i].point = new Point(previousPoint.x, previousPoint.y);
+          previousPoint = tempPoint;
+        }
+
+        this.changeTextStruct(this.size-1);
+        return this.segments[0].point;
+      },
+      changeTextStruct: function(position){
+        var aa = new PointText(this.segments[position].point.x-5,this.segments[position].point.y+5);
+        aa.content = this.string[position];
+        this.text.push(aa);
+      },
+      addText: function(item){
+        this.string = this.string + item.content;
+        this.size = this.string.length;
+        this.path.add(this.segments[this.size-2].point);
+
+      },
+      removeText: function(){
+        this.string = this.string.slice(0,this.string.length -1) ;
+        console.log(this.string);
+        this.size = this.string.length;
+        console.log(this.size);
+        this.path.removeSegment(this.size-1);
+
+      }
+
+
+    }
+
+
+    var snake = new Snake();
+    var snake2 = new Snake();
+
+    var hitOptions = {
+      segments: true,
+      stroke: false,
+      fill: true
+    };
+    var bodies = [];
+
+    var count = 0;
+    function onFrame(event) {
+
+      count++;
+      if (count%5===0){
+        snake.changeDirection();
+        snake2.changeDirection2();
+        if  (bodies.length < 5){
+          bodies.push(createFood(keyWords));
+          bodies.push(createFood(notkeyWords));
+          bodies.push(createFood(boom));
+          bodies.push(createFood(notkeyWords));
+          bodies.push(createFood(notkeyWords));
+        }
+        ok(snake);
+        ok(snake2);
+
+      }
+    }
+
+    function ok(snake){
+        var point = snake.move();
+        for (var i=0;i<bodies.length;i++){
+          var hitResult = bodies[i].obj.hitTest(point, hitOptions);
+          if (hitResult){
+            hitResult.item.remove();
+            bodies.splice(i,1);
+            if (keyWords.indexOf(hitResult.item.content) != -1){
+            snake.addText(hitResult.item);
+              bodies.push(createFood(keyWords));
+            }else if(boom.indexOf(hitResult.item.content) != -1){
+              snake.removeText();
+              bodies.push(createFood(boom));
+            }else{
+              snake.addText(hitResult.item);
+              bodies.push(createFood(notkeyWords));
+            }
+
+          }
+        }
+    }
+
+    var keyState = {};
+
+
+    function onKeyDown(event) {
+      keyState[event.key] = true;
+    }
+    function onKeyUp(event) {
+      keyState[event.key] = false;
+    }
+
+  </script>
+</head>
+<body>
+  <canvas id="myCanvas" resize></canvas>
+</body>
+</html>
