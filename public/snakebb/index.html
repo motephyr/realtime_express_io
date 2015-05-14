@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+  <title></title>
+
+
+  <link href="css/style.css" rel="stylesheet">
+  <link rel="stylesheet" href="css/main.css">
+  <link rel="stylesheet" href="css/modal.css">
+  <link rel="stylesheet" href="css/controller.css">
+  <script type="text/javascript">
+    window.realtime = {enabled: false};
+    var socketLoadScript = document.createElement('script');
+    socketLoadScript.type = 'text/javascript';
+    socketLoadScript.src = "http://"+window.location.hostname+":5001/socket.io/socket.io.js";    
+
+    document.getElementsByTagName('head')[0].appendChild(socketLoadScript);
+  </script>
+</head>
+<body ng-app="starter">
+  <div class="debug"></div>
+  <figure id="pad-traditional">
+    <div class="cord"></div>
+    <section class="dpad-pane">
+      <div class="dpad-hole"></div>
+      <div id="dpad">
+        <canvas height="150" id="dpad-body" width="150"></canvas>
+        <button class="button" id="up"></button>
+        <button class="button" id="right"></button>
+        <button class="button" id="down"></button>
+        <button class="button" id="left"></button>
+      </div>
+    </section>
+<!--     <section class="menu-pane">
+    <div class="labels">
+      <label class="select" for="select">Select
+      </label>
+      <label class="start" for="start">Start</label>
+    </div>
+    <div class="buttons">
+      <button class="button select" id="select">Select</button>
+      <button class="button start" id="start">Start</button>
+    </div>
+  </section> -->
+  <section class="action-pane">
+    <div class="logo">Joystick</div>
+    <div class="buttons">
+      <label class="label">
+        B <button class="button" id="b"></button>
+      </label>
+      <label class="label">
+        A <button class="button" id="a"></button>
+      </label>
+    </div>
+  </section>
+</figure>
+<script src="/js/jquery.min.js"></script>
+
+<script type="text/javascript">
+
+  window.shouldRotateToOrientation = function(degrees) {
+   return true;
+ }
+
+ $(function(){
+
+        document.body.addEventListener('touchmove', function(e){
+        e.preventDefault();
+      }, false);
+
+  // document.getElementById("up").onmousedown = function(){
+  //   window.realtime.socketIo.emit('move', 'up');
+  // };
+  // document.getElementById("down").onmousedown = function(){
+  //   window.realtime.socketIo.emit('move', 'down');
+  // };
+  // document.getElementById("left").onmousedown = function(){
+  //   window.realtime.socketIo.emit('move', 'left');
+  // };
+  // document.getElementById("right").onmousedown = function(){
+  //   window.realtime.socketIo.emit('move', 'right');
+  // };
+  
+  document.getElementById("up").ontouchend = function(){
+    window.realtime.socketIo.emit('direct', {user_id:user_id, direct:'up'});
+  };
+  document.getElementById("down").ontouchend = function(){
+    window.realtime.socketIo.emit('direct', {user_id:user_id, direct:'down'});
+  };
+  document.getElementById("left").ontouchend = function(){
+    window.realtime.socketIo.emit('direct', {user_id:user_id, direct:'left'});
+  };
+  document.getElementById("right").ontouchend = function(){
+    window.realtime.socketIo.emit('direct', {user_id:user_id, direct:'right'});
+  };
+
+  document.getElementById("b").onclick = function(){
+    console.log('b');
+  };
+  document.getElementById("a").onclick = function(){
+    console.log('a');
+  };
+
+});
+
+ window.onload = function(){
+
+  if (typeof io != 'undefined' && io != null) {
+    window.realtime.token = '291c8816b32d71664f45c3e2278967dc';
+    window.realtime.userId = 'client';
+    window.realtime.socketIo = io.connect('http://'+window.location.hostname+':5001/?_rtUserId='+ window.realtime.userId +'   &_rtToken='+ window.realtime.token);
+  }
+
+  if (window.realtime.socketIo) {
+
+    window.realtime.enabled = true;
+
+    window.realtime.socketIo.on('connect', function() {
+      // Give a nice round-trip ACK to our realtime server that we connected.
+      window.realtime.socketIo.emit('realtime_user_id_connected');
+      console.log("connect");
+    });
+
+    window.realtime.socketIo.on('realtime_user_id_connected',function(message){
+      //window.realtime.socketIo.emit('start',message.user_id);
+    });
+
+    window.realtime.socketIo.on('disconnect', function() {
+      // Give a nice round-trip ACK to our realtime server that we connected.
+      console.log("disconnect");
+    });
+
+
+  }
+
+
+}
+</script>
+
+</body>
+</html>

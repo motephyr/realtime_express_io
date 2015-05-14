@@ -51,6 +51,11 @@ module.exports = {
                 io.to(socket.id).emit('realtime_user_id_connected',{"user_id": currentSocketIoUserId, "model_id":mid});
                 io.to(client_id["server"]).emit('realtime_user_id_connected',{"user_id": currentSocketIoUserId, "model_id":mid});
             });
+            (function loadSnackbb(){
+                socket.on('direct', function(key) {
+                    io.to(client_id["server"]).emit('direct', key);
+                });
+            })();
             (function loadSnack(){
                 var Snake = require('./app/snake/snake.js');
 
