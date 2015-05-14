@@ -2,6 +2,7 @@
 <html>
 <head>
   <!-- Load the Paper.js library -->
+  <script src="/bower_components/jquery/dist/jquery.min.js"></script>
   <script src="/bower_components/paper/dist/paper-full.min.js"></script>
   <!-- Define inlined PaperScript associate it with myCanvas -->
   <script type="text/paperscript" canvas="myCanvas">
@@ -128,24 +129,19 @@
         // console.log(this.segments);
 
         var oldSegments = this.path.segments.slice(0);
-        // var newPoint = oldSegments[0].point + this.direction;
         var newSegments = [{point:oldSegments[0].point + this.direction}].concat(oldSegments.slice(0,oldSegments.length - 1));
 
-        console.log(oldSegments);
+        // console.log(oldSegments);
         // console.log(newPoint);
 
         // var previousPoint = new Point(this.segments[0].point);
         // this.segments[0].point = this.segments[0].point + this.direction;
-
         
         while (i = this.text.shift()){
           i.remove();
         }
 
         this.path.removeSegments();
-        // path.add(new Point(30, 75));
-
-
 
         while(segs = newSegments.shift()){
           this.text.push(new PointText(segs.point.x - 5,segs.point.y + 5));
@@ -281,9 +277,79 @@
     //   keyState[event.key] = false;
     // }
 
+    // var Manager = function(){
+    //   this.currentIndex = -1;
+    //   this.currentObject = null;
+    //   this.repeat = true;
+    //   this.items = [];
+    // };
+
+    // Manager.prototype.add = function(obj){
+    //   this.items.push(obj);
+    // };
+
+    // Manager.prototype.doAnimation = function(){
+    //   if(this.items.length){
+    //     if(this.currentIndex == -1 || ){
+    //       this.currentIndex = 0;
+    //     }  
+    //     this.currentObject = this.items[this.currentIndex];
+    //   }
+    // };
+
+    var animateDefine = {
+      startLeft: 20,
+      endLeft: 240
+    }
+
+    var secondStamp = 0;
+
+    var mobj = $(moonImg);
+    var sobj = $(sunImg);
+
+    setInterval(function(){
+
+      if(secondStamp == 0){
+        sobj.show();
+        sobj.css({left:animateDefine.startLeft});
+        sobj.animate({left:animateDefine.endLeft}, 40000);
+      }else if(secondStamp == 40){
+        sobj.stop();
+        sobj.hide();
+
+        mobj.show();
+        mobj.css({left:animateDefine.startLeft});
+        mobj.animate({left:animateDefine.endLeft}, 40000);
+      }else if(secondStamp == 80){
+        mobj.stop();
+        mobj.hide();
+      }
+
+      if(secondStamp == 80){
+        secondStamp = 0;
+      }else{
+        secondStamp++;  
+      }
+
+      // secondStamp = Math.ceil(secondStamp * 10) / 10;
+      
+      console.log(secondStamp);  
+      
+    },1000);
+
+    
+
+
+
   </script>
 </head>
 <body>
-  <canvas id="myCanvas" resize></canvas>
+  <div style="width:500px;height:500px;">
+    <div style="height:300px;position:relative;">
+      <img id="sunImg" src="sun.png" width="50" height="50" style="position:absolute;left:0px;top:10px;display:none;" />
+      <img id="moonImg" src="moon.png" width="50" height="50" style="position:absolute;left:0px;top:30px;display:none;" />
+    </div>
+    <canvas id="myCanvas" resize></canvas>
+  </div>
 </body>
 </html>
