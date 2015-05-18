@@ -16,23 +16,42 @@
   </script>
   <script type="text/paperscript" canvas="myCanvas">
 
-    var keyWords = "我愛布朗尼"
-    var notkeyWords = "JOFDSAFDSF"
-    var boom = "炸"
+    var questionArray = 0;
 
-    function randomInt(min,max) {
-      return Math.floor(Math.random()*(max-min+1)+min);
+    var keyWords0 = "我愛老梗方程式";
+    var keyWords1 = "我愛天衍創客";
+    var keyWords2 = "我愛布萊克貝爾";
+    var keyWords = keyWords0;
+    var notkeyWords = "人啡太戶火玻畢窗陽國學手機燈瑰發電大水璃眼花類咖展書沙玫生英鏡";
+    var boom = "炸";
+    //var ham = new Raster('/image/snakebb/漢堡.png');
+    //var rocket = new Raster('/image/snakebb/火箭.png');
+
+    var Food = function(words){
+      var getWord = words[_.random(0, words.length-1)];
+      var raster = new Raster('/image/snakebb/字/'+getWord+'.png');
+      raster.content = getWord;
+      return raster;
     }
 
-    var Food = function(center,words){
-      this.obj = new PointText(new Point(0, 0));
-      this.obj.content = words[randomInt(0,words.length-1)];
-      this.obj.position = center;
-    }
+
 
     var createFood = function(words){
-      var food = new Food([Math.round(Math.random()*view.bounds.right/10)*10, Math.round(Math.random()*view.bounds.height/10)*10],words);
-
+      var food;
+      if (words == '炸'){
+        food = new Raster('/image/snakebb/炸彈.png');
+        food.content = '炸';
+      }else if (typeof words === 'string'){
+        food = new Food(words);
+      }
+      //visible避免出現時放大問題
+      food.visible = false;
+      food.on('load', function() {
+        food.size = new Size(10, 10);
+        food.visible = true;
+      });
+      food.position = [(Math.round(Math.random()*view.bounds.right/10) - 1)*10, 
+                       (Math.round(Math.random()*view.bounds.height/10) -1)*10];
       
       return food;
     }
@@ -41,17 +60,19 @@
       x1: 0,
       x2: 300,
       y1: 0,
-      y2: 150
+      y2: 200
     };
 
     function Background(b){
       var path = new Path();
       // Give the stroke a color
       path.style = {
-        strokeColor: 'black',
-        strokeWidth: 10,
+        strokeColor: '#40A836',
+        strokeWidth: 1,
       };
-      var start = new Point(0, 0);
+      var startx = 0
+      var starty = 0;
+      var start = new Point(startx, starty);
       // Move to start and draw a line from there
       path.moveTo(start);
       // Note the plus operator on Point objects.
@@ -60,14 +81,35 @@
       path.lineTo(start + [ b.x2, b.y2 ]);
       path.lineTo(start + [ b.x2, b.y1 ]);
       path.lineTo(start + [ -b.x2, b.y1]);
+      for (var i=0;i<b.y2/10;i++){
+        path.moveTo(start);
+        path.lineTo(start + [ 0, i*10 ]);
+        path.lineTo(start + [ 300, i*10 ]);
+        path.lineTo(start + [ 0, i*10 ]);
+      }
+      for (var j=0;j<b.x2/10;j++){
+        path.moveTo(start);
+        path.lineTo(start + [ j*10, 0 ]);
+        path.lineTo(start + [ j*10, 200 ]);
+        path.lineTo(start + [ j*10, 0 ]);
+      }
+        // path.moveTo(new Point(0,0));
+        // path.lineTo(new Point(0,0) + [ 0, 10 ]);
+        // path.lineTo(new Point(0,0) + [ 300, 10 ]);
+        // path.lineTo(new Point(0,0) + [ 0, 10 ]);
+        // path.moveTo(new Point(0,0));
+        // path.lineTo(new Point(0,0) + [ 0, 20 ]);
+        // path.lineTo(new Point(0,0) + [ 300, 20 ]);
+        // path.lineTo(new Point(0,0) + [ 0, 20 ]);
+
     }
     new Background(bound);
 
-    var Snake = function(){
+    var Snake = function(color){
       this.keyState = {};
       this.path = new Path();
       this.path.style = {
-        strokeColor: '#E4141B',
+        strokeColor: color,
         strokeWidth: 10,
         strokeCap: 'square'
       };
@@ -182,8 +224,8 @@
     }
 
 
-    window.player1 = new Snake();
-    window.player2 = new Snake();
+    window.player1 = new Snake('#E4141B');
+    window.player2 = new Snake('#FFFFFF');
 
     var hitOptions = {
       segments: true,
@@ -231,14 +273,17 @@
 
     function hasEat(snake, point){
       for (var i=0;i<bodies.length;i++){
-        var hitResult = bodies[i].obj.hitTest(point, hitOptions);
+        var hitResult = bodies[i].hitTest(point, hitOptions);
         if (hitResult){
           bodies.splice(i,1);
+          console.log(hitResult.item.content);
           if (keyWords.indexOf(hitResult.item.content) != -1){
             snake.addText(hitResult.item);
             bodies.push(createFood(keyWords));
           }else if(boom.indexOf(hitResult.item.content) != -1){
-            snake.removeText();
+            if (snake.size != 1){
+              snake.removeText();
+            }
             bodies.push(createFood(boom));
           }else{
             snake.addText(hitResult.item);
@@ -308,23 +353,61 @@
 
     var mobj = $(moonImg);
     var sobj = $(sunImg);
+    var mf1obj = $(moonFlower1);
+    var sf1obj = $(sunFlower1);
+    var mf2obj = $(moonFlower2);
+    var sf2obj = $(sunFlower2);
+    var mglass = $(moonGlass);
+    var sglass = $(sunGlass);
+
+    var showSunObject = function(){
+      $('.background').css('background-image',"url('/image/snakebb/白天.png')");
+      sobj.show();
+      sf1obj.show();
+      sf2obj.show();
+      sglass.show();
+    }
+
+    var hideSunObject = function(){
+      sobj.hide();
+      sf1obj.hide();
+      sf2obj.hide();
+      sglass.hide();
+    }
+
+    var showMoonObject = function(){
+      $('.background').css('background-image',"url('/image/snakebb/夜晚.png')");
+      mobj.show();
+      mf1obj.show();
+      mf2obj.show();
+      mglass.show();
+    }
+
+    var hideMoonObject = function(){
+      mobj.hide();
+      mf1obj.hide();
+      mf2obj.hide();
+      mglass.hide();
+    }
+
 
     setInterval(function(){
 
       if(secondStamp == 0){
-        sobj.show();
+        showSunObject();
+        hideMoonObject();
         sobj.css({left:animateDefine.startLeft});
         sobj.animate({left:animateDefine.endLeft}, 40000);
       }else if(secondStamp == 40){
         sobj.stop();
-        sobj.hide();
+        hideSunObject();
 
-        mobj.show();
+        showMoonObject();
         mobj.css({left:animateDefine.startLeft});
         mobj.animate({left:animateDefine.endLeft}, 40000);
       }else if(secondStamp == 80){
         mobj.stop();
-        mobj.hide();
+        hideMoonObject();
       }
 
       if(secondStamp == 80){
@@ -335,7 +418,7 @@
 
       // secondStamp = Math.ceil(secondStamp * 10) / 10;
       
-      console.log(secondStamp);  
+      //console.log(secondStamp);  
       
     },1000);
 
@@ -344,15 +427,77 @@
 
 
   </script>
+  <style>
+    body{
+      background-color: white;
+    }
+    .background {
+      margin: 0px auto;
+      width:622.25px;
+      height:696px;
+      position:relative;
+
+    }
+
+    .background img {
+      position:absolute;
+    }
+
+    .background .sun img {
+      top:10px;display:none;
+    }
+
+    .background .moon img {
+      top:30px;display:none;
+    }
+
+    .background .flower1 img{
+      top:400px; 
+      z-index: 1;
+    }
+
+    .background .flower2 img{
+      top:400px;
+      right:0px;
+      z-index: 1; 
+    }
+
+    .background .glass img{
+      top:496px;
+      z-index: 1; 
+    }
+
+    #myCanvas {
+      background-color: white;
+      position:absolute;
+      top:150px;
+      left:10px;
+    }
+  </style>
 </head>
 <body>
 
-  <div style="width:500px;height:500px;">
-    <div style="height:300px;position:relative;">
-      <img id="sunImg" src="sun.png" width="50" height="50" style="position:absolute;left:0px;top:10px;display:none;" />
-      <img id="moonImg" src="moon.png" width="50" height="50" style="position:absolute;left:0px;top:30px;display:none;" />
+  <div class="background">
+    <div class="sun">
+      <img id="sunImg" src="/image/snakebb/太陽.png" width="50" height="50" />
     </div>
-    <canvas id="myCanvas" resize></canvas>
+    <div class="moon">
+      <img id="moonImg" src="/image/snakebb/月亮.png" width="50" height="50"  />
+    </div>
+    <div class="flower1">
+      <img id="sunFlower1" src="/image/snakebb/白天花1.png" width="50"  />
+      <img id="moonFlower1" src="/image/snakebb/夜晚花1.png" width="50"  />
+    </div>
+    <div class="flower2">
+      <img id="sunFlower2" src="/image/snakebb/白天花2.png" width="50"  />
+      <img id="moonFlower2" src="/image/snakebb/夜晚花2.png" width="50"  />
+    </div>
+    <div class="glass">
+      <img id="sunGlass" src="/image/snakebb/白天草.png" height="200" width="622.25"  />
+      <img id="moonGlass" src="/image/snakebb/夜晚草.png" height="200" width="622.25"  />
+    </div>
+
+    <canvas id="myCanvas" height="200" resize></canvas>
   </div>
 
   <script type="text/javascript">
@@ -407,7 +552,7 @@
 
   };
 
-  </script>
+</script>
 
 </body>
 </html>
