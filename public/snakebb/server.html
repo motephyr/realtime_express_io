@@ -27,33 +27,11 @@
     //var ham = new Raster('/image/snakebb/漢堡.png');
     //var rocket = new Raster('/image/snakebb/火箭.png');
 
+
     var Food = function(words){
-      var getWord = words[_.random(0, words.length-1)];
-      var raster = new Raster('/image/snakebb/字/'+getWord+'.png');
-      raster.content = getWord;
-      return raster;
-    }
-
-
-
-    var createFood = function(words){
-      var food;
-      if (words == '炸'){
-        food = new Raster('/image/snakebb/炸彈.png');
-        food.content = '炸';
-      }else if (typeof words === 'string'){
-        food = new Food(words);
-      }
-      //visible避免出現時放大問題
-      food.visible = false;
-      food.on('load', function() {
-        food.size = new Size(10, 10);
-        food.visible = true;
-      });
-      food.position = [(Math.round(Math.random()*view.bounds.right/10) - 1)*10, 
-                       (Math.round(Math.random()*view.bounds.height/10) -1)*10];
-      
-      return food;
+      var text = new PointText(new Point(0, 0));
+      text.content = words[_.random(0, words.length-1)];
+      return text;
     }
 
     var bound = {
@@ -62,6 +40,33 @@
       y1: 0,
       y2: 200
     };
+
+
+
+    var createFood = function(words){
+      var food;
+      var x = Math.round(Math.random()*(bound.x2-10)/10 + 1)*10;
+      var y = Math.round(Math.random()*(bound.y2-10)/10 + 1)*10;
+      var position = [x, y];
+      if (words == '炸'){
+        food = new Raster('/image/snakebb/炸彈.png');
+        food.content = '炸';
+        food.visible = false;
+        food.on('load', function() {
+          food.size = new Size(10, 10);
+          food.visible = true;
+        });
+        
+      }else if (typeof words === 'string'){
+        food = new Food(words);
+      }
+      food.position = position;
+      //visible避免出現時放大問題
+
+      
+      return food;
+    }
+
 
     function Background(b){
       var path = new Path();
@@ -93,14 +98,6 @@
         path.lineTo(start + [ j*10, 200 ]);
         path.lineTo(start + [ j*10, 0 ]);
       }
-        // path.moveTo(new Point(0,0));
-        // path.lineTo(new Point(0,0) + [ 0, 10 ]);
-        // path.lineTo(new Point(0,0) + [ 300, 10 ]);
-        // path.lineTo(new Point(0,0) + [ 0, 10 ]);
-        // path.moveTo(new Point(0,0));
-        // path.lineTo(new Point(0,0) + [ 0, 20 ]);
-        // path.lineTo(new Point(0,0) + [ 300, 20 ]);
-        // path.lineTo(new Point(0,0) + [ 0, 20 ]);
 
     }
     new Background(bound);
