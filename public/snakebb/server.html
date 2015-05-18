@@ -16,24 +16,6 @@
   </script>
   <script type="text/paperscript" canvas="myCanvas">
 
-    var questionArray = 0;
-
-    var keyWords0 = "我愛老梗方程式";
-    var keyWords1 = "我愛天衍創客";
-    var keyWords2 = "我愛布萊克貝爾";
-    var keyWords = keyWords0;
-    var notkeyWords = "人啡太戶火玻畢窗陽國學手機燈瑰發電大水璃眼花類咖展書沙玫生英鏡";
-    var boom = "炸";
-    //var ham = new Raster('/image/snakebb/漢堡.png');
-    //var rocket = new Raster('/image/snakebb/火箭.png');
-
-
-    var Food = function(words){
-      var text = new PointText(new Point(0, 0));
-      text.content = words[_.random(0, words.length-1)];
-      return text;
-    }
-
     var bound = {
       x1: 0,
       x2: 300,
@@ -41,66 +23,31 @@
       y2: 200
     };
 
+    var keyWords0 = "我愛老梗方程式";
+    var keyWords1 = "我愛天衍創客";
+    var keyWords2 = "我愛布萊克貝爾";
+    var keyWords = keyWords0;
+    var notkeyWords = "人啡太戶火玻畢窗陽國學手機燈瑰發電大水璃眼花類咖展書沙玫生英鏡";
+    var boom = "炸";
 
-
-    var createFood = function(words){
-      var food;
-      var x = Math.round(Math.random()*(bound.x2-10)/10 + 1)*10;
-      var y = Math.round(Math.random()*(bound.y2-10)/10 + 1)*10;
-      var position = [x, y];
-      if (words == '炸'){
-        food = new Raster('/image/snakebb/炸彈.png');
-        food.content = '炸';
-        food.visible = false;
-        food.on('load', function() {
-          food.size = new Size(10, 10);
-          food.visible = true;
-        });
-        
-      }else if (typeof words === 'string'){
-        food = new Food(words);
-      }
-      food.position = position;
-      //visible避免出現時放大問題
-
-      
+    //var ham = new Raster('/image/snakebb/漢堡.png');
+    //var rocket = new Raster('/image/snakebb/火箭.png');
+    var Boom = function(words){
+      var food = new Raster('/image/snakebb/炸彈.png');
+      food.content = boom;
+      food.visible = false;
+      food.on('load', function() {
+        food.size = new Size(10, 10);
+        food.visible = true;
+      });
       return food;
     }
 
-
-    function Background(b){
-      var path = new Path();
-      // Give the stroke a color
-      path.style = {
-        strokeColor: '#40A836',
-        strokeWidth: 1,
-      };
-      var startx = 0
-      var starty = 0;
-      var start = new Point(startx, starty);
-      // Move to start and draw a line from there
-      path.moveTo(start);
-      // Note the plus operator on Point objects.
-      // PaperScript does that for us, and much more!
-      path.lineTo(start + [ b.x1, b.y2 ]);
-      path.lineTo(start + [ b.x2, b.y2 ]);
-      path.lineTo(start + [ b.x2, b.y1 ]);
-      path.lineTo(start + [ -b.x2, b.y1]);
-      for (var i=0;i<b.y2/10;i++){
-        path.moveTo(start);
-        path.lineTo(start + [ 0, i*10 ]);
-        path.lineTo(start + [ 300, i*10 ]);
-        path.lineTo(start + [ 0, i*10 ]);
-      }
-      for (var j=0;j<b.x2/10;j++){
-        path.moveTo(start);
-        path.lineTo(start + [ j*10, 0 ]);
-        path.lineTo(start + [ j*10, 200 ]);
-        path.lineTo(start + [ j*10, 0 ]);
-      }
-
+    var Food = function(words){
+      var text = new PointText(new Point(0, 0));
+      text.content = words[_.random(0, words.length-1)];
+      return text;
     }
-    new Background(bound);
 
     var Snake = function(color){
       this.keyState = {};
@@ -192,6 +139,34 @@
         // this.changeTextStruct(this.size-1);
         return this.path.segments[0].point;
       },
+      hasEat: function(point){
+        var hitOptions = {
+          segments: true,
+          stroke: false,
+          fill: true
+        };
+
+        for (var i=0;i<bodies.length;i++){
+          var hitResult = bodies[i].hitTest(point, hitOptions);
+          if (hitResult){
+            bodies.splice(i,1);
+            console.log(hitResult.item.content);
+            if (keyWords.indexOf(hitResult.item.content) != -1){
+              this.addText(hitResult.item);
+              bodies.push(createFood(keyWords));
+            }else if(boom.indexOf(hitResult.item.content) != -1){
+              if (this.size != 1){
+                this.removeText();
+              }
+              bodies.push(createFood(boom));
+            }else{
+              this.addText(hitResult.item);
+              bodies.push(createFood(notkeyWords));
+            }
+            hitResult.item.remove();
+          }
+        }
+      },
       changeTextStruct: function(position){
         // var aa = new PointText(this.segments[position].point.x-5,this.segments[position].point.y+5);
         // aa.content = this.string[position];
@@ -220,24 +195,21 @@
       }
     }
 
+    function isTouchWall(point){
+      return (point.x <= bound.x1 || point.x >= bound.x2 || point.y <= bound.y1 || point.y >= bound.y2);
+    }
 
-    window.player1 = new Snake('#E4141B');
-    window.player2 = new Snake('#FFFFFF');
+    //Game
 
-    var hitOptions = {
-      segments: true,
-      stroke: false,
-      fill: true
-    };
     var bodies = [];
+    var player1 = new Snake('#E4141B');
+    var player2 = new Snake('#FFFFFF');
 
     var count = 0;
     function onFrame(event) {
 
       count++;
       if (count%20===0){
-        player1.changeDirection();
-        player2.changeDirection();
         if  (bodies.length < 5){
           bodies.push(createFood(keyWords));
           bodies.push(createFood(notkeyWords));
@@ -246,13 +218,16 @@
           bodies.push(createFood(notkeyWords));
         }
 
+        player1.changeDirection();
+        player2.changeDirection();
+
         // console.log(point);
 
         var point1 = player1.move();
         var point2 = player2.move();
 
-        hasEat(player1, point1);
-        hasEat(player2, point2);
+        player1.hasEat(point1);
+        player2.hasEat(point2);
 
         if(isTouchWall(point1)){
           player1.remove();
@@ -267,35 +242,6 @@
 
       }
     }
-
-    function hasEat(snake, point){
-      for (var i=0;i<bodies.length;i++){
-        var hitResult = bodies[i].hitTest(point, hitOptions);
-        if (hitResult){
-          bodies.splice(i,1);
-          console.log(hitResult.item.content);
-          if (keyWords.indexOf(hitResult.item.content) != -1){
-            snake.addText(hitResult.item);
-            bodies.push(createFood(keyWords));
-          }else if(boom.indexOf(hitResult.item.content) != -1){
-            if (snake.size != 1){
-              snake.removeText();
-            }
-            bodies.push(createFood(boom));
-          }else{
-            snake.addText(hitResult.item);
-            bodies.push(createFood(notkeyWords));
-          }
-          hitResult.item.remove();
-        }
-      }
-    }
-
-    function isTouchWall(point){
-      return (point.x <= bound.x1 || point.x >= bound.x2 || point.y <= bound.y1 || point.y >= bound.y2);
-    }
-
-
 
     function onKeyDown(event) {
       for(var k in player1.keyState){
@@ -317,29 +263,57 @@
         player2.keyState['right'] = true;
       }
     }
-    // function onKeyUp(event) {
-    //   keyState[event.key] = false;
-    // }
+    var createFood = function(words){
+      var food;
+      var x = Math.round(Math.random()*(bound.x2-10)/10 + 1)*10;
+      var y = Math.round(Math.random()*(bound.y2-10)/10 + 1)*10;
+      var position = [x, y];
+      if (words == '炸'){
+        food = new Boom(words);
+      }else if (typeof words === 'string'){
+        food = new Food(words);
+      }
+      food.position = position;
+      //visible避免出現時放大問題
 
-    // var Manager = function(){
-    //   this.currentIndex = -1;
-    //   this.currentObject = null;
-    //   this.repeat = true;
-    //   this.items = [];
-    // };
+      
+      return food;
+    }
 
-    // Manager.prototype.add = function(obj){
-    //   this.items.push(obj);
-    // };
+    function Background(b){
+      var path = new Path();
+      // Give the stroke a color
+      path.style = {
+        strokeColor: '#40A836',
+        strokeWidth: 1,
+      };
+      var startx = 0
+      var starty = 0;
+      var start = new Point(startx, starty);
+      // Move to start and draw a line from there
+      path.moveTo(start);
+      // Note the plus operator on Point objects.
+      // PaperScript does that for us, and much more!
+      path.lineTo(start + [ b.x1, b.y2 ]);
+      path.lineTo(start + [ b.x2, b.y2 ]);
+      path.lineTo(start + [ b.x2, b.y1 ]);
+      path.lineTo(start + [ -b.x2, b.y1]);
+      for (var i=0;i<b.y2/10;i++){
+        path.moveTo(start);
+        path.lineTo(start + [ 0, i*10 ]);
+        path.lineTo(start + [ 300, i*10 ]);
+        path.lineTo(start + [ 0, i*10 ]);
+      }
+      for (var j=0;j<b.x2/10;j++){
+        path.moveTo(start);
+        path.lineTo(start + [ j*10, 0 ]);
+        path.lineTo(start + [ j*10, 200 ]);
+        path.lineTo(start + [ j*10, 0 ]);
+      }
 
-    // Manager.prototype.doAnimation = function(){
-    //   if(this.items.length){
-    //     if(this.currentIndex == -1 || ){
-    //       this.currentIndex = 0;
-    //     }  
-    //     this.currentObject = this.items[this.currentIndex];
-    //   }
-    // };
+    }
+    new Background(bound);
+
 
     var animateDefine = {
       startLeft: 20,
