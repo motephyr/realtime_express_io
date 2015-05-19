@@ -416,24 +416,30 @@
     }
 
     function onKeyDown(event) {
-      for(var k in player1.keyState){
-        player1.keyState[k] = false;
-      }
-      for(var k in player2.keyState){
-        player2.keyState[k] = false;
-      }
+      
+      
       if ('up'  === event.key || 'down'  === event.key || 'left'  === event.key|| 'right'  === event.key){
+        for(var k in player1.keyState){
+          player1.keyState[k] = false;
+        }
         player1.keyState[event.key] = true;
       }
-      if ('w'  === event.key){
-        player2.keyState['up'] = true;
-      }else  if ('s'  === event.key){
-        player2.keyState['down'] = true;
-      }else  if ('a'  === event.key){
-        player2.keyState['left'] = true;
-      }else  if ('d'  === event.key){
-        player2.keyState['right'] = true;
+      
+      if('w' === event.key || 's'  === event.key || 'a'  === event.key || 'd'  === event.key){
+        for(var k in player2.keyState){
+          player2.keyState[k] = false;
+        }
+        if ('w'  === event.key){
+          player2.keyState['up'] = true;
+        }else  if ('s'  === event.key){
+          player2.keyState['down'] = true;
+        }else  if ('a'  === event.key){
+          player2.keyState['left'] = true;
+        }else  if ('d'  === event.key){
+          player2.keyState['right'] = true;
+        }  
       }
+      
     }
     var createFood = function(words){
       var food;
@@ -610,29 +616,44 @@
       var userArray = [];  //第一個是player1,第二個是player2
       window.realtime.socketIo.on('direct', function(e) {
         // Give a nice round-trip ACK to our realtime server that we connected.
-        for(var k in player1.keyState){
-          player1.keyState[k] = false;
-        }
-        for(var k in player2.keyState){
-          player2.keyState[k] = false;
-        }
+        // for(var k in player1.keyState){
+        //   player1.keyState[k] = false;
+        // }
+        // for(var k in player2.keyState){
+        //   player2.keyState[k] = false;
+        // }
 
         console.log(e.user_id);
         if (userArray.length == 0){
+          for(var k in player1.keyState){
+            player1.keyState[k] = false;
+          }
           player1.keyState[e.direct] = true;
           userArray.push(e.user_id);
         }else if(userArray.length == 1){
           if (userArray[0] == e.user_id){
+            for(var k in player1.keyState){
+              player1.keyState[k] = false;
+            }
             player1.keyState[e.direct] = true;
           }else{
+            for(var k in player2.keyState){
+              player2.keyState[k] = false;
+            }
             player2.keyState[e.direct] = true;
             userArray.push(e.user_id);
           }
 
         }else if(userArray.length == 2){
           if (userArray[0] == e.user_id){
+            for(var k in player1.keyState){
+              player1.keyState[k] = false;
+            }
             player1.keyState[e.direct] = true;
           }else{
+            for(var k in player2.keyState){
+              player2.keyState[k] = false;
+            }
             player2.keyState[e.direct] = true;
           }
         }
