@@ -8,9 +8,6 @@
   <script src="/bower_components/lodash/lodash.js"></script>
   <!-- Define inlined PaperScript associate it with myCanvas -->
   <script>
-
-    window.sceneWidth = 0;
-
     window.realtime = {enabled: false};
     var socketLoadScript = document.createElement('script');
     socketLoadScript.type = 'text/javascript';
@@ -18,10 +15,103 @@
 
     document.getElementsByTagName('head')[0].appendChild(socketLoadScript);
   </script>
-  <script type="text/paperscript" canvas="myCanvas">
-    var w = $(window).width();
-    var blockSize = Math.ceil(w / 30);
+  <style>
+    html {
+      position: relative;
+      min-width: 960px;
+      min-height: 540px;
+      height: 100%;
+    }
 
+    body{
+      background-color: white;
+      padding: 0px;
+      margin: 0px;
+      height:100%;
+    }
+    .background {
+      margin: 0px auto;
+
+      /*width:89%;*/
+      height:100%;
+      background-size: 100% auto;
+      background-repeat: no-repeat;
+      position:relative;
+
+    }
+
+    .background img {
+      position:absolute;
+    }
+
+    .background .sun img {
+      top:10px;display:none;
+    }
+
+    .background .moon img {
+      top:30px;display:none;
+    }
+
+    .background .flower1 img{
+      top:60%; 
+      z-index: 1;
+    }
+
+    .background .flower2 img{
+      top:60%;
+      right:0px;
+      z-index: 1; 
+    }
+
+    .background .glass img{
+      z-index: 1; 
+      bottom: 0px;
+    }
+
+    #myCanvas {
+      background-color: white;
+      position:absolute;
+      top:150px;
+      left:10px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="background">
+    <div class="sun">
+      <img id="sunImg" src="/image/snakebb/太陽.png" width="50" height="50" />
+    </div>
+    <div class="moon">
+      <img id="moonImg" src="/image/snakebb/月亮.png" width="50" height="50"  />
+    </div>
+    <div class="flower1">
+      <img id="sunFlower1" src="/image/snakebb/白天花1.png" width="50"  />
+      <img id="moonFlower1" src="/image/snakebb/夜晚花1.png" width="50"  />
+    </div>
+    <div class="flower2">
+      <img id="sunFlower2" src="/image/snakebb/白天花2.png" width="50"  />
+      <img id="moonFlower2" src="/image/snakebb/夜晚花2.png" width="50"  />
+    </div>
+    <div class="glass">
+      <img id="sunGlass" src="/image/snakebb/白天草.png" height="auto" width="100%"  />
+      <img id="moonGlass" src="/image/snakebb/夜晚草.png" height="auto" width="100%"  />
+    </div>
+
+    <canvas id="myCanvas" resize></canvas>
+  </div>
+  <script type="text/javascript">
+    window.backgroundWidth = $(".background").height()*0.89;
+    window.sceneWidth = window.backgroundWidth;
+    $("#myCanvas").width(sceneWidth);
+    $("#myCanvas").height(sceneWidth * 2 / 3);
+  </script>
+
+  <script type="text/paperscript" canvas="myCanvas">
+  
+    console.log("paper"+sceneWidth);
+    var w = sceneWidth;
+    var blockSize = Math.ceil(w / 30);
     var boundWidth = w;
     var boundHeight = w * 2 / 3;
 
@@ -67,6 +157,13 @@
     var Food = function(words){
       var text = new PointText(new Point(0, 0));
       text.content = words[_.random(0, words.length-1)];
+      text.style = {
+          fontFamily: 'Courier New',
+          fontWeight: 'bold',
+          fontSize: blockSize,
+          fillColor: 'black',
+          justification: 'center'
+      };
       return text;
     }
 
@@ -94,7 +191,7 @@
       // start
       for (var i = 0; i < this.size; i++) {
 
-        this.path.add(new Point(1 * blockSize, 0));
+        this.path.add(new Point(1 * blockSize, -(blockSize*0.1)  ));
       }
 
     }
@@ -140,7 +237,15 @@
         this.path.removeSegments();
 
         while(segs = newSegments.shift()){
-          this.text.push(new PointText(segs.point.x - blockSize/2,segs.point.y + blockSize/2));
+          var textObj = new PointText(segs.point.x,segs.point.y + blockSize/2);
+          textObj.style = {
+              fontFamily: 'Courier New',
+              fontWeight: 'bold',
+              fontSize: blockSize,
+              fillColor: 'black',
+              justification: 'center'
+          };
+          this.text.push(textObj);
           this.path.add(new Point(segs.point));
         }
 
@@ -421,112 +526,17 @@
         secondStamp++;  
       }
 
-      // secondStamp = Math.ceil(secondStamp * 10) / 10;
-      
-      //console.log(secondStamp);  
-      
     },1000);
-
-    
-
-
-
   </script>
-  <style>
-    html {
-      position: relative;
-      min-width: 960px;
-      min-height: 540px;
-      height: 100%;
-    }
-
-    body{
-      background-color: white;
-      padding: 0px;
-      margin: 0px;
-      height:100%;
-    }
-    .background {
-      margin: 0px auto;
-
-      /*width:89%;*/
-      height:100%;
-      background-size: 100% auto;
-      background-repeat: no-repeat;
-      position:relative;
-
-    }
-
-    .background img {
-      position:absolute;
-    }
-
-    .background .sun img {
-      top:10px;display:none;
-    }
-
-    .background .moon img {
-      top:30px;display:none;
-    }
-
-    .background .flower1 img{
-      top:60%; 
-      z-index: 1;
-    }
-
-    .background .flower2 img{
-      top:60%;
-      right:0px;
-      z-index: 1; 
-    }
-
-    .background .glass img{
-      z-index: 1; 
-      bottom: 0px;
-    }
-
-    #myCanvas {
-      background-color: white;
-      position:absolute;
-      top:150px;
-      left:10px;
-    }
-  </style>
-</head>
-<body>
-
-  <div class="background">
-    <div class="sun">
-      <img id="sunImg" src="/image/snakebb/太陽.png" width="50" height="50" />
-    </div>
-    <div class="moon">
-      <img id="moonImg" src="/image/snakebb/月亮.png" width="50" height="50"  />
-    </div>
-    <div class="flower1">
-      <img id="sunFlower1" src="/image/snakebb/白天花1.png" width="50"  />
-      <img id="moonFlower1" src="/image/snakebb/夜晚花1.png" width="50"  />
-    </div>
-    <div class="flower2">
-      <img id="sunFlower2" src="/image/snakebb/白天花2.png" width="50"  />
-      <img id="moonFlower2" src="/image/snakebb/夜晚花2.png" width="50"  />
-    </div>
-    <div class="glass">
-      <img id="sunGlass" src="/image/snakebb/白天草.png" height="auto" width="100%"  />
-      <img id="moonGlass" src="/image/snakebb/夜晚草.png" height="auto" width="100%"  />
-    </div>
-
-    <canvas id="myCanvas" resize></canvas>
-  </div>
-
   <script type="text/javascript">
     
-    window.sceneWidth = $(".background").height()*0.89;
-    $("#myCanvas").width(sceneWidth);
-    $("#myCanvas").width(sceneWidth * 2 / 3);
-
     var resizeHandler = function(){
-      var w = window.sceneWidth = $(".background").height()*0.89;
+      console.log("resize");
+      var w = window.backgroundWidth = $(".background").height()*0.89;
+      var sw = window.sceneWidth = w * 0.95;
       $(".background").width(w);
+      $("#myCanvas").width(sw);
+      $("#myCanvas").height(sw * 2 / 3);
       // handle the changes of sun and moon during resizing.
       animateDefine.endLeft = w * 0.9;
       if(secondStamp > 0 && secondStamp < 40){
@@ -543,6 +553,7 @@
      
     };
     window.onload = function(){
+      console.log("onload");
       if (typeof io != 'undefined' && io != null) {
         window.realtime.token = '291c8816b32d71664f45c3e2278967dc';
         window.realtime.userId = 'server';
@@ -555,45 +566,44 @@
       });
 
       window.realtime.socketIo.on('disconnect', function() {
-      // Give a nice round-trip ACK to our realtime server that we connected.
-      console.log("disconnect");
-    });
+        // Give a nice round-trip ACK to our realtime server that we connected.
+        console.log("disconnect");
+      });
 
-    var userArray = [];  //第一個是player1,第二個是player2
-    window.realtime.socketIo.on('direct', function(e) {
-      // Give a nice round-trip ACK to our realtime server that we connected.
-      for(var k in player1.keyState){
-        player1.keyState[k] = false;
-      }
-      for(var k in player2.keyState){
-        player2.keyState[k] = false;
-      }
+      var userArray = [];  //第一個是player1,第二個是player2
+      window.realtime.socketIo.on('direct', function(e) {
+        // Give a nice round-trip ACK to our realtime server that we connected.
+        for(var k in player1.keyState){
+          player1.keyState[k] = false;
+        }
+        for(var k in player2.keyState){
+          player2.keyState[k] = false;
+        }
 
-      console.log(e.user_id);
-      if (userArray.length == 0){
-        player1.keyState[e.direct] = true;
-        userArray.push(e.user_id);
-      }else if(userArray.length == 1){
-        if (userArray[0] == e.user_id){
+        console.log(e.user_id);
+        if (userArray.length == 0){
           player1.keyState[e.direct] = true;
-        }else{
-          player2.keyState[e.direct] = true;
           userArray.push(e.user_id);
+        }else if(userArray.length == 1){
+          if (userArray[0] == e.user_id){
+            player1.keyState[e.direct] = true;
+          }else{
+            player2.keyState[e.direct] = true;
+            userArray.push(e.user_id);
+          }
+
+        }else if(userArray.length == 2){
+          if (userArray[0] == e.user_id){
+            player1.keyState[e.direct] = true;
+          }else{
+            player2.keyState[e.direct] = true;
+          }
         }
+      });
 
-      }else if(userArray.length == 2){
-        if (userArray[0] == e.user_id){
-          player1.keyState[e.direct] = true;
-        }else{
-          player2.keyState[e.direct] = true;
-        }
-      }
-    });
+      resizeHandler();
 
-
-    resizeHandler();
-
-  };
+    };
 
   $(window).resize(function(){
     resizeHandler();
