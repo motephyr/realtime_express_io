@@ -38,19 +38,31 @@
     var keyWords = keyWords0;
     var notkeyWords = "人啡太戶火玻畢窗陽國學手機燈瑰發電大水璃眼花類咖展書沙玫生英鏡";
     var boom = "炸";
+    var ham = "漢";
+    var rocket = "火";
 
-    //var ham = new Raster('/image/snakebb/漢堡.png');
-    //var rocket = new Raster('/image/snakebb/火箭.png');
-    var Boom = function(words){
-      var food = new Raster('/image/snakebb/炸彈.png');
-      food.content = boom;
+    var genFood = function(photo_file,word){
+      var food = new Raster(photo_file);
+      food.content = word;
       food.visible = false;
       food.on('load', function() {
         food.size = new Size(blockSize, blockSize);
         food.visible = true;
       });
       return food;
-    }
+    };
+
+    var Rocket = function(){
+      return genFood('/image/snakebb/火箭.png',rocket);
+    };
+
+    var Ham = function(){
+      return genFood('/image/snakebb/漢堡.png',ham);
+    };
+
+    var Boom = function(){
+      return genFood('/image/snakebb/炸彈.png',boom);
+    };
 
     var Food = function(words){
       var text = new PointText(new Point(0, 0));
@@ -168,6 +180,12 @@
                 this.removeText();
               }
               bodies.push(createFood(boom));
+            }else if(ham.indexOf(hitResult.item.content) != -1){
+              slowRate += 2;
+              bodies.push(createFood(ham));
+            }else if(rocket.indexOf(hitResult.item.content) != -1){
+              slowRate -= 2;
+              bodies.push(createFood(rocket));
             }else{
               this.addText(hitResult.item);
               bodies.push(createFood(notkeyWords));
@@ -215,14 +233,17 @@
     var player2 = new Snake('#FFFFFF');
 
     var count = 0;
+    var slowRate = 15;
     function onFrame(event) {
 
       count++;
-      if (count%20===0){
+      if (count%slowRate===0){
         if  (bodies.length < 5){
           bodies.push(createFood(keyWords));
           bodies.push(createFood(notkeyWords));
           bodies.push(createFood(boom));
+          bodies.push(createFood(ham));
+          bodies.push(createFood(rocket));
           bodies.push(createFood(notkeyWords));
           bodies.push(createFood(notkeyWords));
         }
@@ -277,8 +298,12 @@
       var x = Math.round(Math.random()*(bound.x2-blockSize)/blockSize + 1)*blockSize;
       var y = Math.round(Math.random()*(bound.y2-blockSize)/blockSize + 1)*blockSize;
       var position = [x, y];
-      if (words == '炸'){
-        food = new Boom(words);
+      if (words == boom){
+        food = new Boom();
+      }else if (words == ham){
+        food = new Ham();
+      }else if (words == rocket){
+        food = new Rocket();
       }else if (typeof words === 'string'){
         food = new Food(words);
       }
