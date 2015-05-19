@@ -110,7 +110,7 @@
   if (typeof io != 'undefined' && io != null) {
     window.realtime.token = '291c8816b32d71664f45c3e2278967dc';
     window.realtime.userId = 'client';
-    window.realtime.socketIo = io.connect('http://'+window.location.hostname+':5001/?_rtUserId='+ window.realtime.userId +'   &_rtToken='+ window.realtime.token);
+    window.realtime.socketIo = io.connect('http://'+window.location.hostname+':5001/?_rtUserId='+ window.realtime.userId +'&_rtToken='+ window.realtime.token);
   }
 
   if (window.realtime.socketIo) {
@@ -124,7 +124,8 @@
     });
 
     window.realtime.socketIo.on('realtime_user_id_connected',function(message){
-      //window.realtime.socketIo.emit('start',message.user_id);
+      window.realtime.socketIo.emit('start',message.user_id);
+      user_id = message.user_id
     });
 
     window.realtime.socketIo.on('disconnect', function() {
