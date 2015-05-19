@@ -2,11 +2,15 @@
 <html>
 <head>
   <!-- Load the Paper.js library -->
+  <meta name="viewport" content="width=device-width,height=device-height, initial-scale=1">
   <script src="/bower_components/jquery/dist/jquery.min.js"></script>
   <script src="/bower_components/paper/dist/paper-full.min.js"></script>
   <script src="/bower_components/lodash/lodash.js"></script>
   <!-- Define inlined PaperScript associate it with myCanvas -->
   <script>
+
+    window.sceneWidth = 0;
+
     window.realtime = {enabled: false};
     var socketLoadScript = document.createElement('script');
     socketLoadScript.type = 'text/javascript';
@@ -15,12 +19,17 @@
     document.getElementsByTagName('head')[0].appendChild(socketLoadScript);
   </script>
   <script type="text/paperscript" canvas="myCanvas">
+    var w = $(window).width();
+    var blockSize = Math.ceil(w / 30);
+
+    var boundWidth = w;
+    var boundHeight = w * 2 / 3;
 
     var bound = {
       x1: 0,
-      x2: 300,
+      x2: boundWidth,
       y1: 0,
-      y2: 200
+      y2: boundHeight
     };
 
     var keyWords0 = "我愛老梗方程式";
@@ -37,7 +46,7 @@
       food.content = boom;
       food.visible = false;
       food.on('load', function() {
-        food.size = new Size(10, 10);
+        food.size = new Size(blockSize, blockSize);
         food.visible = true;
       });
       return food;
@@ -62,10 +71,10 @@
       this.string = "我";
       this.size = this.string.length;
       // this.segments = this.path.segments;
-      this.start = view.center / [10, 1];
+      this.start = view.center / [blockSize, 1];
 
       this.point = this.start;
-      this.direction = [0, 10];
+      this.direction = [0, blockSize];
       this.newDirection = this.direction;
       this.text = [];
 
@@ -73,7 +82,7 @@
       // start
       for (var i = 0; i < this.size; i++) {
 
-        this.path.add(new Point(1 * 10, 0));
+        this.path.add(new Point(1 * blockSize, 0));
       }
 
     }
@@ -81,20 +90,20 @@
     Snake.prototype = {
       changeDirection: function(){
         if (this.keyState['up']  === true ){
-          if (this.direction[1] != 10) { // not down
-            this.newDirection = [0, -10];
+          if (this.direction[1] != blockSize) { // not down
+            this.newDirection = [0, -blockSize];
           }
         }else if (this.keyState['down'] === true){
-          if (this.direction[1] != -10) {
-            this.newDirection = [0, 10];
+          if (this.direction[1] != -blockSize) {
+            this.newDirection = [0, blockSize];
           }
         }else if(this.keyState['left']  === true){
-          if (this.direction[0] != 10) {
-            this.newDirection = [-10, 0];
+          if (this.direction[0] != blockSize) {
+            this.newDirection = [-blockSize, 0];
           }
         }else if(this.keyState['right'] === true){
-          if (this.direction[0] != -10) {
-            this.newDirection = [10, 0];
+          if (this.direction[0] != -blockSize) {
+            this.newDirection = [blockSize, 0];
           }
         }
         this.direction = this.newDirection;
@@ -119,7 +128,7 @@
         this.path.removeSegments();
 
         while(segs = newSegments.shift()){
-          this.text.push(new PointText(segs.point.x - 5,segs.point.y + 5));
+          this.text.push(new PointText(segs.point.x - blockSize/2,segs.point.y + blockSize/2));
           this.path.add(new Point(segs.point));
         }
 
@@ -265,8 +274,8 @@
     }
     var createFood = function(words){
       var food;
-      var x = Math.round(Math.random()*(bound.x2-10)/10 + 1)*10;
-      var y = Math.round(Math.random()*(bound.y2-10)/10 + 1)*10;
+      var x = Math.round(Math.random()*(bound.x2-blockSize)/blockSize + 1)*blockSize;
+      var y = Math.round(Math.random()*(bound.y2-blockSize)/blockSize + 1)*blockSize;
       var position = [x, y];
       if (words == '炸'){
         food = new Boom(words);
@@ -298,32 +307,32 @@
       path.lineTo(start + [ b.x2, b.y2 ]);
       path.lineTo(start + [ b.x2, b.y1 ]);
       path.lineTo(start + [ -b.x2, b.y1]);
-      for (var i=0;i<b.y2/10;i++){
+      for (var i=0;i<b.y2/blockSize;i++){
         path.moveTo(start);
-        path.lineTo(start + [ 0, i*10 ]);
-        path.lineTo(start + [ 300, i*10 ]);
-        path.lineTo(start + [ 0, i*10 ]);
+        path.lineTo(start + [ 0, i*blockSize ]);
+        path.lineTo(start + [ boundWidth, i*blockSize ]);
+        path.lineTo(start + [ 0, i*blockSize ]);
       }
-      for (var j=0;j<b.x2/10;j++){
+      for (var j=0;j<b.x2/blockSize;j++){
         path.moveTo(start);
-        path.lineTo(start + [ j*10, 0 ]);
-        path.lineTo(start + [ j*10, 200 ]);
-        path.lineTo(start + [ j*10, 0 ]);
+        path.lineTo(start + [ j*blockSize, 0 ]);
+        path.lineTo(start + [ j*blockSize, boundHeight ]);
+        path.lineTo(start + [ j*blockSize, 0 ]);
       }
 
     }
     new Background(bound);
 
 
-    var animateDefine = {
+    window.animateDefine = {
       startLeft: 20,
       endLeft: 240
     }
 
-    var secondStamp = 0;
+    window.secondStamp = 0;
 
-    var mobj = $(moonImg);
-    var sobj = $(sunImg);
+    window.mobj = $(moonImg);
+    window.sobj = $(sunImg);
     var mf1obj = $(moonFlower1);
     var sf1obj = $(sunFlower1);
     var mf2obj = $(moonFlower2);
@@ -399,13 +408,26 @@
 
   </script>
   <style>
+    html {
+      position: relative;
+      min-width: 960px;
+      min-height: 540px;
+      height: 100%;
+    }
+
     body{
       background-color: white;
+      padding: 0px;
+      margin: 0px;
+      height:100%;
     }
     .background {
       margin: 0px auto;
-      width:622.25px;
-      height:696px;
+
+      /*width:89%;*/
+      height:100%;
+      background-size: 100% auto;
+      background-repeat: no-repeat;
       position:relative;
 
     }
@@ -423,19 +445,19 @@
     }
 
     .background .flower1 img{
-      top:400px; 
+      top:60%; 
       z-index: 1;
     }
 
     .background .flower2 img{
-      top:400px;
+      top:60%;
       right:0px;
       z-index: 1; 
     }
 
     .background .glass img{
-      top:496px;
       z-index: 1; 
+      bottom: 0px;
     }
 
     #myCanvas {
@@ -464,14 +486,37 @@
       <img id="moonFlower2" src="/image/snakebb/夜晚花2.png" width="50"  />
     </div>
     <div class="glass">
-      <img id="sunGlass" src="/image/snakebb/白天草.png" height="200" width="622.25"  />
-      <img id="moonGlass" src="/image/snakebb/夜晚草.png" height="200" width="622.25"  />
+      <img id="sunGlass" src="/image/snakebb/白天草.png" height="auto" width="100%"  />
+      <img id="moonGlass" src="/image/snakebb/夜晚草.png" height="auto" width="100%"  />
     </div>
 
-    <canvas id="myCanvas" height="200" resize></canvas>
+    <canvas id="myCanvas" resize></canvas>
   </div>
 
   <script type="text/javascript">
+    
+    window.sceneWidth = $(".background").height()*0.89;
+    $("#myCanvas").width(sceneWidth);
+    $("#myCanvas").width(sceneWidth * 2 / 3);
+
+    var resizeHandler = function(){
+      var w = window.sceneWidth = $(".background").height()*0.89;
+      $(".background").width(w);
+      // handle the changes of sun and moon during resizing.
+      animateDefine.endLeft = w * 0.9;
+      if(secondStamp > 0 && secondStamp < 40){
+        var remains = 40 - secondStamp;
+        sobj.stop();
+        sobj.css({left:(animateDefine.endLeft - animateDefine.startLeft) * ((40-remains) / 40)});
+        sobj.animate({left:animateDefine.endLeft}, remains * 1000);
+      }else if(secondStamp > 40 && secondStamp < 80){
+        var remains = 80 - secondStamp;
+        mobj.stop();
+        mobj.css({left:(animateDefine.endLeft - animateDefine.startLeft) * ((80-remains) / 40)});
+        mobj.animate({left:animateDefine.endLeft}, remains * 1000);
+      }
+     
+    };
     window.onload = function(){
       if (typeof io != 'undefined' && io != null) {
         window.realtime.token = '291c8816b32d71664f45c3e2278967dc';
@@ -521,7 +566,13 @@
     });
 
 
+    resizeHandler();
+
   };
+
+  $(window).resize(function(){
+    resizeHandler();
+  });
 
 </script>
 
