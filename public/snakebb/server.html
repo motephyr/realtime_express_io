@@ -11,7 +11,7 @@
     window.realtime = {enabled: false};
     var socketLoadScript = document.createElement('script');
     socketLoadScript.type = 'text/javascript';
-    socketLoadScript.src = "http://"+window.location.hostname+":5001/socket.io/socket.io.js";    
+    socketLoadScript.src = "http://"+window.location.hostname+":5001/socket.io/socket.io.js";
 
     document.getElementsByTagName('head')[0].appendChild(socketLoadScript);
   </script>
@@ -53,18 +53,18 @@
     }
 
     .background .flower1 img{
-      top:60%; 
+      top:60%;
       z-index: 1;
     }
 
     .background .flower2 img{
       top:60%;
       right:0px;
-      z-index: 1; 
+      z-index: 1;
     }
 
     .background .glass img{
-      z-index: 1; 
+      z-index: 1;
       bottom: 0px;
     }
 
@@ -98,7 +98,7 @@
       <img id="moonGlass" src="/image/snakebb/夜晚草.png" height="auto" width="100%"  />
     </div>
 
-    <canvas id="myCanvas" resize></canvas>
+    <canvas id="myCanvas" resize style="left: 20px"></canvas>
   </div>
   <script type="text/javascript">
     window.backgroundWidth = $(".background").height()*0.89;
@@ -108,6 +108,12 @@
   </script>
 
   <script type="text/paperscript" canvas="myCanvas">
+  function getParameterByName(name) {
+    name = name.replace(/[\[]/, "\\[").replace(/[\]]/, "\\]");
+    var regex = new RegExp("[\\?&]" + name + "=([^&#]*)"),
+        results = regex.exec(location.search);
+    return results === null ? "" : decodeURIComponent(results[1].replace(/\+/g, " "));
+}
 
     console.log("paper"+sceneWidth);
     var w = sceneWidth;
@@ -122,11 +128,10 @@
       y2: boundHeight
     };
 
-    var keyWords0 = "我愛老梗方程式";
-    var keyWords1 = "我愛天衍創客";
-    var keyWords2 = "我愛布萊克貝爾";
-    var keyWords = keyWords0;
-    var notkeyWords = "人啡太戶火玻畢窗陽國學手機燈瑰發電大水璃眼花類咖展書沙玫生英鏡";
+    var keyWordsArray = ["我愛老梗方程式","我們愛天衍創客","我愛布萊克貝爾"];
+
+    var keyWords = (getParameterByName("question")) ? keyWordsArray[getParameterByName("question")] : keyWordsArray[0];
+    var notkeyWords = "人啡太戶玻畢窗陽國學手機燈瑰發電大水璃眼花類咖展書沙玫生英鏡";
     var boom = "炸";
     var ham = "漢";
     var rocket = "火";
@@ -134,42 +139,38 @@
     var genFood = function(photo_file,word){
       var food = new Raster(photo_file);
       food.content = word;
-      food.visible = false;
-      food.on('load', function() {
-        food.size = new Size(blockSize*1.5, blockSize*1.5);
-        food.visible = true;
-      });
+
       return food;
     };
 
     var GreenHead = function(){
-      return genFood('/image/snakebb/綠蛇.png',"");
+      return genFood('/image/snakebb/小綠蛇.png',"");
     };
     var GreenBody = function(){
-      return genFood('/image/snakebb/綠蛇身體.png',"");
+      return genFood('/image/snakebb/小綠蛇身體.png',"");
     };
     var OrangeHead = function(){
-      return genFood('/image/snakebb/橘蛇.png',"");
+      return genFood('/image/snakebb/小橘蛇.png',"");
     };
     var OrangeBody = function(){
-      return genFood('/image/snakebb/橘蛇身體.png',"");
+      return genFood('/image/snakebb/小橘蛇身體.png',"");
     };
 
     var Rocket = function(){
-      return genFood('/image/snakebb/火箭.png',rocket);
+      return genFood('/image/snakebb/小火箭.png',rocket);
     };
 
     var Ham = function(){
-      return genFood('/image/snakebb/漢堡.png',ham);
+      return genFood('/image/snakebb/小漢堡.png',ham);
     };
 
     var Boom = function(){
-      return genFood('/image/snakebb/炸彈.png',boom);
+      return genFood('/image/snakebb/小炸彈.png',boom);
     };
 
     var Food = function(words){
       var text = new PointText(new Point(0, 0));
-      text.content = words[_.random(0, words.length-1)];
+      text.content = words;
       text.style = {
         fontFamily: 'Courier New',
         fontWeight: 'bold',
@@ -190,7 +191,7 @@
       };
 
 
-      this.string = "我";
+      this.string = " ";
       this.size = this.string.length;
       // this.segments = this.path.segments;
       this.start = view.center / [blockSize, 1];
@@ -242,7 +243,7 @@
 
         // var previousPoint = new Point(this.segments[0].point);
         // this.segments[0].point = this.segments[0].point + this.direction;
-        
+
         while (i = this.text.shift()){
           i.textObj.remove();
           i.imageObj.remove();
@@ -315,17 +316,20 @@
             console.log(hitResult.item.content);
             if (keyWords.indexOf(hitResult.item.content) != -1){
               this.addText(hitResult.item);
-              bodies.push(createFood(keyWords));
+              bodies.push(createFood(hitResult.item.content));
             }else if(boom.indexOf(hitResult.item.content) != -1){
               if (this.size != 1){
                 this.removeText();
               }
               bodies.push(createFood(boom));
             }else if(ham.indexOf(hitResult.item.content) != -1){
-              slowRate += 2;
+              slowRate += 1;
               bodies.push(createFood(ham));
             }else if(rocket.indexOf(hitResult.item.content) != -1){
-              slowRate -= 2;
+              slowRate -= 1;
+              if (slowRate == 0){
+                slowRate = 1;
+              }
               bodies.push(createFood(rocket));
             }else{
               this.addText(hitResult.item);
@@ -381,13 +385,14 @@
       count++;
       if (count%slowRate===0){
         if  (bodies.length < 5){
-          bodies.push(createFood(keyWords));
-          bodies.push(createFood(notkeyWords));
+          for (var key in keyWords){
+            bodies.push(createFood(keyWords[key]));
+          }
+
           bodies.push(createFood(boom));
           bodies.push(createFood(ham));
           bodies.push(createFood(rocket));
-          bodies.push(createFood(notkeyWords));
-          bodies.push(createFood(notkeyWords));
+
         }
 
         player1.changeDirection();
@@ -416,15 +421,15 @@
     }
 
     function onKeyDown(event) {
-      
-      
+
+
       if ('up'  === event.key || 'down'  === event.key || 'left'  === event.key|| 'right'  === event.key){
         for(var k in player1.keyState){
           player1.keyState[k] = false;
         }
         player1.keyState[event.key] = true;
       }
-      
+
       if('w' === event.key || 's'  === event.key || 'a'  === event.key || 'd'  === event.key){
         for(var k in player2.keyState){
           player2.keyState[k] = false;
@@ -437,14 +442,18 @@
           player2.keyState['left'] = true;
         }else  if ('d'  === event.key){
           player2.keyState['right'] = true;
-        }  
+        }
       }
-      
+
     }
     var createFood = function(words){
       var food;
-      var x = Math.round(Math.random()*(bound.x2-blockSize)/blockSize + 1)*blockSize;
-      var y = Math.round(Math.random()*(bound.y2-blockSize)/blockSize + 1)*blockSize;
+      var tempblockcountx = Math.round(Math.random()*(bound.x2-blockSize)/blockSize + 1);
+      var tempblockcounty = Math.round(Math.random()*(bound.y2-blockSize)/blockSize + 1);
+      tempblockcounty = (tempblockcounty >= 19)? 18 : tempblockcounty;
+      tempblockcountx = (tempblockcountx >= 29)? 28 : tempblockcountx;
+      var x = tempblockcountx*blockSize;
+      var y = tempblockcounty*blockSize;
       var position = [x, y];
       if (words == boom){
         food = new Boom();
@@ -458,7 +467,7 @@
       food.position = position;
       //visible避免出現時放大問題
 
-      
+
       return food;
     }
 
@@ -566,7 +575,7 @@
       if(secondStamp == 80){
         secondStamp = 0;
       }else{
-        secondStamp++;  
+        secondStamp++;
       }
 
     },1000);
