@@ -12,7 +12,7 @@
   <link rel="stylesheet" href="css/controller.css">
   <style>
     body{
-      position: relative;
+      /*position: relative;*/
       width: 100%;
       height:100%;
       background-color: black;
@@ -31,6 +31,10 @@
       height: 30px;
       width:100px;
     }
+    .activeRegion{
+      position: relative;
+      background-color: #503493;
+    }
   </style>
   <script type="text/javascript">
     window.realtime = {enabled: false};
@@ -43,7 +47,9 @@
 </head>
 <body>
   <div class="debugText"></div>
-  <canvas id="joyCanvas"></canvas>
+  <div id="joyRegion" class="activeRegion">
+    <canvas id="joyCanvas"></canvas>
+  </div>
   <!-- <figure id="pad-traditional">
     <div class="cord"></div>
     <section class="dpad-pane">
@@ -110,6 +116,8 @@
     boundy2: 4.5 / 7,
     doAction:function(x, y){
       var self = this;
+      // console.log("inputX:"+ x + " compareX:" + self.width * self.boundx1);
+      // console.log("inputY:"+ y + " compareY:" + self.height * self.boundy1);
       if (x < self.width * self.boundx1){
         if(y > self.height * self.boundy1 && y < self.height * self.boundy2){
           // left
@@ -188,10 +196,20 @@
 
    $(function(){
 
-      var w = actionObj.width = $(window).width();
-      var h = actionObj.height = $(window).height();
-      var size = Math.min(w,h) * 0.3;
+      var w = $(window).width();
+      var h = $(window).height();
+      var regionSize = Math.min(w, h);
+      var size = regionSize * 0.3;
       var canvasDom = document.getElementById('joyCanvas');
+      var regionDom = document.getElementById('joyRegion');
+
+      $(".activeRegion").width(regionSize);
+      $(".activeRegion").height(regionSize);
+      $(".activeRegion").css({left:0,top:(h-regionSize)/2});
+
+      actionObj.width = regionSize;
+      actionObj.height = regionSize;
+
       canvasDom.width = size;
       canvasDom.height = size;
       
@@ -204,7 +222,7 @@
       // canvasContext.fill();
       // context.lineWidth = 5;
       // canvasContext.strokeStyle = '#003300';
-      canvasContext.lineWidth = size / 10;
+      canvasContext.lineWidth = size / 12;
       canvasContext.lineCap = "round";
       canvasContext.strokeStyle = "#ececec";
       canvasContext.stroke();
@@ -218,53 +236,71 @@
         // e.preventDefault();
         // holdFlag = true;
         var position = e.touches[0];
-        curX = position.clientX;
-        curY = position.clientY;
+        // console.log(position);
+        curX = position.clientX-regionDom.offsetLeft;
+        curY = position.clientY-regionDom.offsetTop;
+        // console.log(regionDom.offsetTop);
+        // console.log(curY-regionDom.offsetTop);
         // console.log(position.clientX + "," + position.clientY);
-        $(canvasDom).css({left:curX-size/2,top:curY-size/2});
+        // $(canvasDom).css({left:curX-size/2,top:curY-size/2});
         // actionObj.doAction(curX, curY);
+        $(canvasDom).css({left:curX-size/2,top:curY-size/2});
       });
       canvasDom.addEventListener('touchend', function(e){
         // e.preventDefault();
         holdFlag = false;
-        $(canvasDom).css({left:(w-size)/2,top: h/2-size });
+        $(canvasDom).css({left:(regionSize-size)/2,top: (regionSize-size)/2 });
+        // $(canvasDom).css({left:(w-size)/2,top: h/2-size });
       });
 
-      document.body.addEventListener('touchstart', function(e){
+      regionDom.addEventListener('touchstart', function(e){
         holdFlag = true;
         stampCheck = (new Date()).getTime();
         var position = e.touches[0];
-        curX = cachedX = position.clientX;
-        curY = cachedY = position.clientY;
+        curX = cachedX = position.clientX-regionDom.offsetLeft;
+        curY = cachedY = position.clientY-regionDom.offsetTop;
         // console.log(position);
+        // $(canvasDom).css({left:curX-size/2,top:curY-size/2});
         $(canvasDom).css({left:curX-size/2,top:curY-size/2});
       });
 
-      document.body.addEventListener('touchmove', function(e){
+      regionDom.addEventListener('touchmove', function(e){
         var position = e.touches[0];
-        curX = position.clientX;
-        curY = position.clientY;
+        curX = position.clientX-regionDom.offsetLeft;
+        curY = position.clientY-regionDom.offsetTop;
         $(canvasDom).css({left:curX-size/2,top:curY-size/2});
+        // $(canvasDom).css({left:curX-size/2,top:curY-size/2});
         // actionObj.doAction(curX, curY);
-        e.preventDefault();
-      }, false);
+        // e.preventDefault();
+      });
 
-      document.body.addEventListener('touchend', function(e){
+      regionDom.addEventListener('touchend', function(e){
         holdFlag = false;
         var position = e.touches[0];
-        $(canvasDom).css({left:(w-size)/2,top: h/2-size });
+        // $(canvasDom).css({left:(w-size)/2,top: h/2-size });
+        $(canvasDom).css({left:(regionSize-size)/2,top: (regionSize-size)/2 });
         if ((new Date()).getTime() - stampCheck <= 300){
           // means tap
           actionObj.doAction(curX, curY);
         }
       });
-      $(canvasDom).css({left:(w-size)/2,top: h/2-size });
+      // $(canvasDom).css({left:(w-size)/2,top: h/2-size });
+      $(canvasDom).css({left:(regionSize-size)/2,top: (regionSize-size)/2 });
 
       setInterval(function(){
         if(curX && curY && holdFlag){
           actionObj.doAction(curX, curY);
         }
       },100);
+
+      document.body.addEventListener('touchmove', function(e){
+        // var position = e.touches[0];
+        // curX = position.clientX;
+        // curY = position.clientY;
+        // $(canvasDom).css({left:curX-size/2,top:curY-size/2});
+        // actionObj.doAction(curX, curY);
+        e.preventDefault();
+      }, false);
 
     // document.getElementById("up").onmousedown = function(){
     //   window.realtime.socketIo.emit('move', 'up');
