@@ -74,10 +74,14 @@
       top:150px;
       left:10px;
     }
+
+    #greenWin,#orangeWin {
+      position:absolute;
+      display: none;
+    }
   </style>
 </head>
 <body>
-
   <div class="background">
     <div class="sun">
       <img id="sunImg" src="/image/snakebb/太陽.png" width="50" height="50" />
@@ -99,21 +103,32 @@
     </div>
 
     <canvas id="myCanvas" resize style="left: 20px"></canvas>
+    <img id="greenWin" src="/image/snakebb/綠蛇贏.png"  />
+    <img id="orangeWin" src="/image/snakebb/橘蛇贏.png" />
   </div>
+
+
+  <span id="sound"></span>
+
   <script type="text/javascript">
     window.backgroundWidth = $(".background").height()*0.89;
     window.sceneWidth = window.backgroundWidth;
+    var rate = 1;
     $("#myCanvas").width(sceneWidth);
     $("#myCanvas").height(sceneWidth * 2 / 3);
+    $("#greenWin").width(sceneWidth*rate);
+    $("#greenWin").height(sceneWidth*rate);
+    $("#orangeWin").width(sceneWidth*rate);
+    $("#orangeWin").height(sceneWidth*rate);
   </script>
 
   <script type="text/paperscript" canvas="myCanvas">
-  function getParameterByName(name) {
-    name = name.replace(/[\[]/, "\\[").replace(/[\]]/, "\\]");
-    var regex = new RegExp("[\\?&]" + name + "=([^&#]*)"),
-        results = regex.exec(location.search);
-    return results === null ? "" : decodeURIComponent(results[1].replace(/\+/g, " "));
-}
+    function getParameterByName(name) {
+      name = name.replace(/[\[]/, "\\[").replace(/[\]]/, "\\]");
+      var regex = new RegExp("[\\?&]" + name + "=([^&#]*)"),
+      results = regex.exec(location.search);
+      return results === null ? "" : decodeURIComponent(results[1].replace(/\+/g, " "));
+    }
 
     console.log("paper"+sceneWidth);
     var w = sceneWidth;
@@ -193,490 +208,523 @@
 
       this.string = " ";
       this.size = this.string.length;
-      // this.segments = this.path.segments;
-      this.start = view.center / [blockSize, 1];
+// this.segments = this.path.segments;
+this.start = view.center / [blockSize, 1];
 
-      this.point = this.start;
-      this.direction = [0, blockSize];
-      this.newDirection = this.direction;
-      this.text = [];
+this.point = this.start;
+this.direction = [0, blockSize];
+this.newDirection = this.direction;
+this.text = [];
 
 
-      // start
-      for (var i = 0; i < this.size; i++) {
+// start
+for (var i = 0; i < this.size; i++) {
 
-        this.path.add(new Point(1 * blockSize, -(blockSize*0.1)  ));
-      }
+  this.path.add(new Point(1 * blockSize, -(blockSize*0.1)  ));
+}
 
+}
+
+Snake.prototype = {
+  changeDirection: function(){
+    if (this.keyState['up']  === true ){
+if (this.direction[1] != blockSize) { // not down
+  this.newDirection = [0, -blockSize];
+}
+}else if (this.keyState['down'] === true){
+  if (this.direction[1] != -blockSize) {
+    this.newDirection = [0, blockSize];
+  }
+}else if(this.keyState['left']  === true){
+  if (this.direction[0] != blockSize) {
+    this.newDirection = [-blockSize, 0];
+  }
+}else if(this.keyState['right'] === true){
+  if (this.direction[0] != -blockSize) {
+    this.newDirection = [blockSize, 0];
+  }
+}
+this.direction = this.newDirection;
+},
+
+move: function(){
+
+// console.log(this.segments);
+
+var oldSegments = this.path.segments.slice(0);
+var newSegments = [{point:oldSegments[0].point + this.direction}].concat(oldSegments.slice(0,oldSegments.length - 1));
+
+// console.log(newPoint);
+
+// var previousPoint = new Point(this.segments[0].point);
+// this.segments[0].point = this.segments[0].point + this.direction;
+
+while (i = this.text.shift()){
+  i.textObj.remove();
+  i.imageObj.remove();
+}
+
+this.path.removeSegments();
+
+
+for(var j=0;j<newSegments.length ;j++){
+
+  segs = newSegments[j];
+  var head,body;
+  if (this.id == 'player1'){
+    if (j==0){
+      head = new GreenHead();
+    }else{
+      body = new GreenBody();
     }
+  }
+  if (this.id == 'player2'){
+    if (j==0){
+      head = new OrangeHead();
+    }else{
+      body = new OrangeBody();
+    }
+  }
+  var imageObj = (j == 0) ? head: body;
 
-    Snake.prototype = {
-      changeDirection: function(){
-        if (this.keyState['up']  === true ){
-          if (this.direction[1] != blockSize) { // not down
-            this.newDirection = [0, -blockSize];
-          }
-        }else if (this.keyState['down'] === true){
-          if (this.direction[1] != -blockSize) {
-            this.newDirection = [0, blockSize];
-          }
-        }else if(this.keyState['left']  === true){
-          if (this.direction[0] != blockSize) {
-            this.newDirection = [-blockSize, 0];
-          }
-        }else if(this.keyState['right'] === true){
-          if (this.direction[0] != -blockSize) {
-            this.newDirection = [blockSize, 0];
-          }
-        }
-        this.direction = this.newDirection;
-      },
+  imageObj.position = new Point(segs.point.x,segs.point.y);
+  var textObj = new PointText(segs.point.x,segs.point.y + blockSize/2);
+  textObj.style = {
+    fontFamily: 'Courier New',
+    fontWeight: 'bold',
+    fontSize: blockSize,
+    fillColor: 'black',
+    justification: 'center'
+  };
+  var obj = {textObj:textObj,imageObj:imageObj};
+  this.text.push(obj);
+  this.path.add(new Point(segs.point));
+}
 
-      move: function(){
+for(var i = 0, len = this.text.length; i < len ;i++){
+  this.text[i].textObj.content = this.string[i];
+}
 
-        // console.log(this.segments);
+// for (var i = 1; i < this.size; i++) {
 
-        var oldSegments = this.path.segments.slice(0);
-        var newSegments = [{point:oldSegments[0].point + this.direction}].concat(oldSegments.slice(0,oldSegments.length - 1));
+//   this.changeTextStruct(i-1);
 
-        // console.log(newPoint);
+//   var tempPoint = new Point(this.segments[i].point);
+//   this.segments[i].point = new Point(previousPoint.x, previousPoint.y);
+//   previousPoint = tempPoint;
+// }
 
-        // var previousPoint = new Point(this.segments[0].point);
-        // this.segments[0].point = this.segments[0].point + this.direction;
+// this.changeTextStruct(this.size-1);
+return this.path.segments[0].point;
+},
+hasEat: function(point){
+  var hitOptions = {
+    segments: true,
+    stroke: false,
+    fill: true
+  };
 
-        while (i = this.text.shift()){
-          i.textObj.remove();
-          i.imageObj.remove();
-        }
-
-        this.path.removeSegments();
-
-
-        for(var j=0;j<newSegments.length ;j++){
-
-          segs = newSegments[j];
-          var head,body;
-          if (this.id == 'player1'){
-            if (j==0){
-              head = new GreenHead();
-            }else{
-              body = new GreenBody();
-            }
-          }
-          if (this.id == 'player2'){
-            if (j==0){
-              head = new OrangeHead();
-            }else{
-              body = new OrangeBody();
-            }
-          }
-          var imageObj = (j == 0) ? head: body;
-
-          imageObj.position = new Point(segs.point.x,segs.point.y);
-          var textObj = new PointText(segs.point.x,segs.point.y + blockSize/2);
-          textObj.style = {
-            fontFamily: 'Courier New',
-            fontWeight: 'bold',
-            fontSize: blockSize,
-            fillColor: 'black',
-            justification: 'center'
-          };
-          var obj = {textObj:textObj,imageObj:imageObj};
-          this.text.push(obj);
-          this.path.add(new Point(segs.point));
-        }
-
-        for(var i = 0, len = this.text.length; i < len ;i++){
-          this.text[i].textObj.content = this.string[i];
-        }
-
-        // for (var i = 1; i < this.size; i++) {
-
-        //   this.changeTextStruct(i-1);
-
-        //   var tempPoint = new Point(this.segments[i].point);
-        //   this.segments[i].point = new Point(previousPoint.x, previousPoint.y);
-        //   previousPoint = tempPoint;
-        // }
-
-        // this.changeTextStruct(this.size-1);
-        return this.path.segments[0].point;
-      },
-      hasEat: function(point){
-        var hitOptions = {
-          segments: true,
-          stroke: false,
-          fill: true
-        };
-
-        for (var i=0;i<bodies.length;i++){
-          var hitResult = bodies[i].hitTest(point, hitOptions);
-          if (hitResult){
-            bodies.splice(i,1);
-            console.log(hitResult.item.content);
-            if (keyWords.indexOf(hitResult.item.content) != -1){
-              this.addText(hitResult.item);
-              bodies.push(createFood(hitResult.item.content));
-            }else if(boom.indexOf(hitResult.item.content) != -1){
-              if (this.size != 1){
-                this.removeText();
-              }
-              bodies.push(createFood(boom));
-            }else if(ham.indexOf(hitResult.item.content) != -1){
-              slowRate += 1;
-              bodies.push(createFood(ham));
-            }else if(rocket.indexOf(hitResult.item.content) != -1){
-              slowRate -= 1;
-              if (slowRate == 0){
-                slowRate = 1;
-              }
-              bodies.push(createFood(rocket));
-            }else{
-              this.addText(hitResult.item);
-              bodies.push(createFood(notkeyWords));
-            }
-            hitResult.item.remove();
-          }
-        }
-      },
-      changeTextStruct: function(position){
-        // var aa = new PointText(this.segments[position].point.x-5,this.segments[position].point.y+5);
-        // aa.content = this.string[position];
-        // this.text.push(aa);
-      },
-      addText: function(item){
-        this.string = this.string + item.content;
-        this.size = this.string.length;
-        this.path.add(this.path.segments[this.size-2].point);
-
-      },
-      removeText: function(){
-        var strlen = this.string.length;
-        this.string = this.string.slice(0, strlen - 1);
-        this.size = this.string.length;
-        this.text[strlen - 1].imageObj.remove();
-        this.text[strlen - 1].textObj.remove();
-        // console.log(this.string);
-        this.path.removeSegment(strlen-1);
-        // console.log(this.size);
-      },
-      remove:function(){
-        for(;this.size;){
+  for (var i=0;i<bodies.length;i++){
+    var hitResult = bodies[i].hitTest(point, hitOptions);
+    if (hitResult){
+      playEat('/image/snakebb/eat.mp3');
+      bodies.splice(i,1);
+      console.log(hitResult.item.content);
+      if (keyWords.indexOf(hitResult.item.content) != -1){
+        this.addText(hitResult.item);
+        bodies.push(createFood(hitResult.item.content));
+      }else if(boom.indexOf(hitResult.item.content) != -1){
+        if (this.size != 1){
           this.removeText();
         }
-        this.path.remove();
-      }
-    }
-
-    function isTouchWall(point){
-      return (point.x <= bound.x1 || point.x >= bound.x2 || point.y <= bound.y1 || point.y >= bound.y2);
-    }
-
-    //Game
-
-    var bodies = [];
-    window.player1 = new Snake('player1');
-    window.player2 = new Snake('player2');
-
-    var count = 0;
-    var slowRate = 15;
-    function onFrame(event) {
-
-      count++;
-      if (count%slowRate===0){
-        if  (bodies.length < 5){
-          for (var key in keyWords){
-            bodies.push(createFood(keyWords[key]));
-          }
-
-          bodies.push(createFood(boom));
-          bodies.push(createFood(ham));
-          bodies.push(createFood(rocket));
-
+        bodies.push(createFood(boom));
+      }else if(ham.indexOf(hitResult.item.content) != -1){
+        slowRate += 1;
+        bodies.push(createFood(ham));
+      }else if(rocket.indexOf(hitResult.item.content) != -1){
+        slowRate -= 1;
+        if (slowRate == 0){
+          slowRate = 1;
         }
-
-        player1.changeDirection();
-        player2.changeDirection();
-
-        // console.log(point);
-
-        var point1 = player1.move();
-        var point2 = player2.move();
-
-        player1.hasEat(point1);
-        player2.hasEat(point2);
-
-        if(isTouchWall(point1)){
-          player1.remove();
-          player1 = new Snake('player1');
-        }
-        if(isTouchWall(point2)){
-          player2.remove();
-          player2 = new Snake('player2');
-        }
-
-        // console.log(player1);
-
-      }
-    }
-
-    function onKeyDown(event) {
-
-
-      if ('up'  === event.key || 'down'  === event.key || 'left'  === event.key|| 'right'  === event.key){
-        for(var k in player1.keyState){
-          player1.keyState[k] = false;
-        }
-        player1.keyState[event.key] = true;
-      }
-
-      if('w' === event.key || 's'  === event.key || 'a'  === event.key || 'd'  === event.key){
-        for(var k in player2.keyState){
-          player2.keyState[k] = false;
-        }
-        if ('w'  === event.key){
-          player2.keyState['up'] = true;
-        }else  if ('s'  === event.key){
-          player2.keyState['down'] = true;
-        }else  if ('a'  === event.key){
-          player2.keyState['left'] = true;
-        }else  if ('d'  === event.key){
-          player2.keyState['right'] = true;
-        }
-      }
-
-    }
-    var createFood = function(words){
-      var food;
-      var tempblockcountx = Math.round(Math.random()*(bound.x2-blockSize)/blockSize + 1);
-      var tempblockcounty = Math.round(Math.random()*(bound.y2-blockSize)/blockSize + 1);
-      tempblockcounty = (tempblockcounty >= 19)? 18 : tempblockcounty;
-      tempblockcountx = (tempblockcountx >= 29)? 28 : tempblockcountx;
-      var x = tempblockcountx*blockSize;
-      var y = tempblockcounty*blockSize;
-      var position = [x, y];
-      if (words == boom){
-        food = new Boom();
-      }else if (words == ham){
-        food = new Ham();
-      }else if (words == rocket){
-        food = new Rocket();
-      }else if (typeof words === 'string'){
-        food = new Food(words);
-      }
-      food.position = position;
-      //visible避免出現時放大問題
-
-
-      return food;
-    }
-
-    function Background(b){
-      var path = new Path();
-      // Give the stroke a color
-      path.style = {
-        strokeColor: '#40A836',
-        strokeWidth: 1,
-      };
-      var startx = 0
-      var starty = 0;
-      var start = new Point(startx, starty);
-      // Move to start and draw a line from there
-      path.moveTo(start);
-      // Note the plus operator on Point objects.
-      // PaperScript does that for us, and much more!
-      path.lineTo(start + [ b.x1, b.y2 ]);
-      path.lineTo(start + [ b.x2, b.y2 ]);
-      path.lineTo(start + [ b.x2, b.y1 ]);
-      path.lineTo(start + [ -b.x2, b.y1]);
-      for (var i=0;i<b.y2/blockSize;i++){
-        path.moveTo(start);
-        path.lineTo(start + [ 0, i*blockSize ]);
-        path.lineTo(start + [ boundWidth, i*blockSize ]);
-        path.lineTo(start + [ 0, i*blockSize ]);
-      }
-      for (var j=0;j<b.x2/blockSize;j++){
-        path.moveTo(start);
-        path.lineTo(start + [ j*blockSize, 0 ]);
-        path.lineTo(start + [ j*blockSize, boundHeight ]);
-        path.lineTo(start + [ j*blockSize, 0 ]);
-      }
-
-    }
-    new Background(bound);
-
-
-    window.animateDefine = {
-      startLeft: 20,
-      endLeft: 240
-    }
-
-    window.secondStamp = 0;
-
-    window.mobj = $(moonImg);
-    window.sobj = $(sunImg);
-    var mf1obj = $(moonFlower1);
-    var sf1obj = $(sunFlower1);
-    var mf2obj = $(moonFlower2);
-    var sf2obj = $(sunFlower2);
-    var mglass = $(moonGlass);
-    var sglass = $(sunGlass);
-
-    var showSunObject = function(){
-      $('.background').css('background-image',"url('/image/snakebb/白天.png')");
-      sobj.show();
-      sf1obj.show();
-      sf2obj.show();
-      sglass.show();
-    }
-
-    var hideSunObject = function(){
-      sobj.hide();
-      sf1obj.hide();
-      sf2obj.hide();
-      sglass.hide();
-    }
-
-    var showMoonObject = function(){
-      $('.background').css('background-image',"url('/image/snakebb/夜晚.png')");
-      mobj.show();
-      mf1obj.show();
-      mf2obj.show();
-      mglass.show();
-    }
-
-    var hideMoonObject = function(){
-      mobj.hide();
-      mf1obj.hide();
-      mf2obj.hide();
-      mglass.hide();
-    }
-
-
-    setInterval(function(){
-
-      if(secondStamp == 0){
-        showSunObject();
-        hideMoonObject();
-        sobj.css({left:animateDefine.startLeft});
-        sobj.animate({left:animateDefine.endLeft}, 40000);
-      }else if(secondStamp == 40){
-        sobj.stop();
-        hideSunObject();
-
-        showMoonObject();
-        mobj.css({left:animateDefine.startLeft});
-        mobj.animate({left:animateDefine.endLeft}, 40000);
-      }else if(secondStamp == 80){
-        mobj.stop();
-        hideMoonObject();
-      }
-
-      if(secondStamp == 80){
-        secondStamp = 0;
+        bodies.push(createFood(rocket));
       }else{
-        secondStamp++;
+        this.addText(hitResult.item);
+        bodies.push(createFood(notkeyWords));
+      }
+      hitResult.item.remove();
+    }
+  }
+},
+changeTextStruct: function(position){
+// var aa = new PointText(this.segments[position].point.x-5,this.segments[position].point.y+5);
+// aa.content = this.string[position];
+// this.text.push(aa);
+},
+addText: function(item){
+  this.string = this.string + item.content;
+  this.size = this.string.length;
+  this.path.add(this.path.segments[this.size-2].point);
+
+},
+removeText: function(){
+  var strlen = this.string.length;
+  this.string = this.string.slice(0, strlen - 1);
+  this.size = this.string.length;
+  this.text[strlen - 1].imageObj.remove();
+  this.text[strlen - 1].textObj.remove();
+// console.log(this.string);
+this.path.removeSegment(strlen-1);
+// console.log(this.size);
+},
+remove:function(){
+  for(;this.size;){
+    this.removeText();
+  }
+  this.path.remove();
+}
+}
+
+function isTouchWall(point){
+  return (point.x <= bound.x1 || point.x >= bound.x2 || point.y <= bound.y1 || point.y >= bound.y2);
+}
+
+function isWin(player,imgid){
+  var falseflag1 = 0;
+  for (var key in keyWords){
+    var font = keyWords[key];
+
+    if (!player.string.includes(font)){
+      falseflag1 = 1;
+    }
+  }
+  if (falseflag1 == 0){
+    setTimeout(function(){
+      $(imgid).show();
+    }, 1000);
+  }
+}
+
+function playEat(surl) {
+
+  document.getElementById("sound").innerHTML =
+
+  "<embed src='" + surl + "' hidden=true autostart=true loop=false>";
+
+}
+//Game
+
+var bodies = [];
+window.player1 = new Snake('player1');
+window.player2 = new Snake('player2');
+
+var count = 0;
+var slowRate = 15;
+function onFrame(event) {
+
+  count++;
+  if (count%slowRate===0){
+    if  (bodies.length < 5){
+      for (var key in keyWords){
+        bodies.push(createFood(keyWords[key]));
       }
 
-    },1000);
-  </script>
-  <script type="text/javascript">
+      bodies.push(createFood(boom));
+      bodies.push(createFood(ham));
+      bodies.push(createFood(rocket));
 
-    var resizeHandler = function(){
-      console.log("resize");
-      var w = window.backgroundWidth = $(".background").height()*0.89;
-      var sw = window.sceneWidth = w * 0.95;
-      $(".background").width(w);
-      $("#myCanvas").width(sw);
-      $("#myCanvas").height(sw * 2 / 3);
-      // handle the changes of sun and moon during resizing.
-      animateDefine.endLeft = w * 0.9;
-      if(secondStamp > 0 && secondStamp < 40){
-        var remains = 40 - secondStamp;
-        sobj.stop();
-        sobj.css({left:(animateDefine.endLeft - animateDefine.startLeft) * ((40-remains) / 40)});
-        sobj.animate({left:animateDefine.endLeft}, remains * 1000);
-      }else if(secondStamp > 40 && secondStamp < 80){
-        var remains = 80 - secondStamp;
-        mobj.stop();
-        mobj.css({left:(animateDefine.endLeft - animateDefine.startLeft) * ((80-remains) / 40)});
-        mobj.animate({left:animateDefine.endLeft}, remains * 1000);
-      }
+    }
 
-    };
-    window.onload = function(){
-      console.log("onload");
-      if (typeof io != 'undefined' && io != null) {
-        window.realtime.token = '291c8816b32d71664f45c3e2278967dc';
-        window.realtime.userId = 'server';
-        window.realtime.socketIo = io.connect('http://'+window.location.hostname+':5001/?_rtUserId='+ window.realtime.userId +'&_rtToken=' + window.realtime.token);
-      }
+    player1.changeDirection();
+    player2.changeDirection();
 
-      window.realtime.socketIo.on('connect', function(){
-        window.realtime.socketIo.emit('realtime_user_id_connected');
-        console.log("connect");
-      });
+// console.log(point);
 
-      window.realtime.socketIo.on('disconnect', function() {
-        // Give a nice round-trip ACK to our realtime server that we connected.
-        console.log("disconnect");
-      });
+var point1 = player1.move();
+var point2 = player2.move();
 
-      var userArray = [];  //第一個是player1,第二個是player2
-      window.realtime.socketIo.on('direct', function(e) {
-        // Give a nice round-trip ACK to our realtime server that we connected.
-        // for(var k in player1.keyState){
-        //   player1.keyState[k] = false;
-        // }
-        // for(var k in player2.keyState){
-        //   player2.keyState[k] = false;
-        // }
+player1.hasEat(point1);
+player2.hasEat(point2);
 
-        console.log(e.user_id);
-        if (userArray.length == 0){
-          for(var k in player1.keyState){
-            player1.keyState[k] = false;
-          }
-          player1.keyState[e.direct] = true;
-          userArray.push(e.user_id);
-        }else if(userArray.length == 1){
-          if (userArray[0] == e.user_id){
-            for(var k in player1.keyState){
-              player1.keyState[k] = false;
-            }
-            player1.keyState[e.direct] = true;
-          }else{
-            for(var k in player2.keyState){
-              player2.keyState[k] = false;
-            }
-            player2.keyState[e.direct] = true;
-            userArray.push(e.user_id);
-          }
+if(isTouchWall(point1)){
+  player1.remove();
+  player1 = new Snake('player1');
+}
+if(isTouchWall(point2)){
+  player2.remove();
+  player2 = new Snake('player2');
+}
 
-        }else if(userArray.length == 2){
-          if (userArray[0] == e.user_id){
-            for(var k in player1.keyState){
-              player1.keyState[k] = false;
-            }
-            player1.keyState[e.direct] = true;
-          }else{
-            for(var k in player2.keyState){
-              player2.keyState[k] = false;
-            }
-            player2.keyState[e.direct] = true;
-          }
-        }
-      });
+isWin(player1,"#greenWin");
+isWin(player2,"#orangeWin");
+// for (var key in keyWords){
+//   var font = keyWords[key];
+//   if (!player2.string.includes(font)){
+//     return;
+//   }
+//   //$("#orangeWin").show();
+// }
+// console.log(player1);
 
-      resizeHandler();
+}
+}
 
-    };
+function onKeyDown(event) {
 
-    $(window).resize(function(){
-      resizeHandler();
-    });
 
-  </script>
+  if ('up'  === event.key || 'down'  === event.key || 'left'  === event.key|| 'right'  === event.key){
+    for(var k in player1.keyState){
+      player1.keyState[k] = false;
+    }
+    player1.keyState[event.key] = true;
+  }
+
+  if('w' === event.key || 's'  === event.key || 'a'  === event.key || 'd'  === event.key){
+    for(var k in player2.keyState){
+      player2.keyState[k] = false;
+    }
+    if ('w'  === event.key){
+      player2.keyState['up'] = true;
+    }else  if ('s'  === event.key){
+      player2.keyState['down'] = true;
+    }else  if ('a'  === event.key){
+      player2.keyState['left'] = true;
+    }else  if ('d'  === event.key){
+      player2.keyState['right'] = true;
+    }
+  }
+
+}
+var createFood = function(words){
+  var food;
+  var tempblockcountx = Math.round(Math.random()*(bound.x2-blockSize)/blockSize + 1);
+  var tempblockcounty = Math.round(Math.random()*(bound.y2-blockSize)/blockSize + 1);
+  tempblockcounty = (tempblockcounty >= 19)? 18 : tempblockcounty;
+  tempblockcountx = (tempblockcountx >= 29)? 28 : tempblockcountx;
+  var x = tempblockcountx*blockSize;
+  var y = tempblockcounty*blockSize;
+  var position = [x, y];
+  if (words == boom){
+    food = new Boom();
+  }else if (words == ham){
+    food = new Ham();
+  }else if (words == rocket){
+    food = new Rocket();
+  }else if (typeof words === 'string'){
+    food = new Food(words);
+  }
+  food.position = position;
+//visible避免出現時放大問題
+
+
+return food;
+}
+
+function Background(b){
+  var path = new Path();
+// Give the stroke a color
+path.style = {
+  strokeColor: '#40A836',
+  strokeWidth: 1,
+};
+var startx = 0
+var starty = 0;
+var start = new Point(startx, starty);
+// Move to start and draw a line from there
+path.moveTo(start);
+// Note the plus operator on Point objects.
+// PaperScript does that for us, and much more!
+path.lineTo(start + [ b.x1, b.y2 ]);
+path.lineTo(start + [ b.x2, b.y2 ]);
+path.lineTo(start + [ b.x2, b.y1 ]);
+path.lineTo(start + [ -b.x2, b.y1]);
+for (var i=0;i<b.y2/blockSize;i++){
+  path.moveTo(start);
+  path.lineTo(start + [ 0, i*blockSize ]);
+  path.lineTo(start + [ boundWidth, i*blockSize ]);
+  path.lineTo(start + [ 0, i*blockSize ]);
+}
+for (var j=0;j<b.x2/blockSize;j++){
+  path.moveTo(start);
+  path.lineTo(start + [ j*blockSize, 0 ]);
+  path.lineTo(start + [ j*blockSize, boundHeight ]);
+  path.lineTo(start + [ j*blockSize, 0 ]);
+}
+
+}
+new Background(bound);
+
+
+window.animateDefine = {
+  startLeft: 20,
+  endLeft: 240
+}
+
+window.secondStamp = 0;
+
+window.mobj = $(moonImg);
+window.sobj = $(sunImg);
+var mf1obj = $(moonFlower1);
+var sf1obj = $(sunFlower1);
+var mf2obj = $(moonFlower2);
+var sf2obj = $(sunFlower2);
+var mglass = $(moonGlass);
+var sglass = $(sunGlass);
+
+var showSunObject = function(){
+  $('.background').css('background-image',"url('/image/snakebb/白天.png')");
+  sobj.show();
+  sf1obj.show();
+  sf2obj.show();
+  sglass.show();
+}
+
+var hideSunObject = function(){
+  sobj.hide();
+  sf1obj.hide();
+  sf2obj.hide();
+  sglass.hide();
+}
+
+var showMoonObject = function(){
+  $('.background').css('background-image',"url('/image/snakebb/夜晚.png')");
+  mobj.show();
+  mf1obj.show();
+  mf2obj.show();
+  mglass.show();
+}
+
+var hideMoonObject = function(){
+  mobj.hide();
+  mf1obj.hide();
+  mf2obj.hide();
+  mglass.hide();
+}
+
+
+setInterval(function(){
+
+  if(secondStamp == 0){
+    showSunObject();
+    hideMoonObject();
+    sobj.css({left:animateDefine.startLeft});
+    sobj.animate({left:animateDefine.endLeft}, 40000);
+  }else if(secondStamp == 40){
+    sobj.stop();
+    hideSunObject();
+
+    showMoonObject();
+    mobj.css({left:animateDefine.startLeft});
+    mobj.animate({left:animateDefine.endLeft}, 40000);
+  }else if(secondStamp == 80){
+    mobj.stop();
+    hideMoonObject();
+  }
+
+  if(secondStamp == 80){
+    secondStamp = 0;
+  }else{
+    secondStamp++;
+  }
+
+},1000);
+</script>
+<script type="text/javascript">
+
+  var resizeHandler = function(){
+    console.log("resize");
+    var w = window.backgroundWidth = $(".background").height()*0.89;
+    var sw = window.sceneWidth = w * 0.95;
+    $(".background").width(w);
+    $("#myCanvas").width(sw);
+    $("#myCanvas").height(sw * 2 / 3);
+  // handle the changes of sun and moon during resizing.
+  animateDefine.endLeft = w * 0.9;
+  if(secondStamp > 0 && secondStamp < 40){
+    var remains = 40 - secondStamp;
+    sobj.stop();
+    sobj.css({left:(animateDefine.endLeft - animateDefine.startLeft) * ((40-remains) / 40)});
+    sobj.animate({left:animateDefine.endLeft}, remains * 1000);
+  }else if(secondStamp > 40 && secondStamp < 80){
+    var remains = 80 - secondStamp;
+    mobj.stop();
+    mobj.css({left:(animateDefine.endLeft - animateDefine.startLeft) * ((80-remains) / 40)});
+    mobj.animate({left:animateDefine.endLeft}, remains * 1000);
+  }
+
+};
+window.onload = function(){
+  console.log("onload");
+  if (typeof io != 'undefined' && io != null) {
+    window.realtime.token = '291c8816b32d71664f45c3e2278967dc';
+    window.realtime.userId = 'server';
+    window.realtime.socketIo = io.connect('http://'+window.location.hostname+':5001/?_rtUserId='+ window.realtime.userId +'&_rtToken=' + window.realtime.token);
+  }
+
+  window.realtime.socketIo.on('connect', function(){
+    window.realtime.socketIo.emit('realtime_user_id_connected');
+    console.log("connect");
+  });
+
+  window.realtime.socketIo.on('disconnect', function() {
+// Give a nice round-trip ACK to our realtime server that we connected.
+console.log("disconnect");
+});
+
+var userArray = [];  //第一個是player1,第二個是player2
+window.realtime.socketIo.on('direct', function(e) {
+// Give a nice round-trip ACK to our realtime server that we connected.
+// for(var k in player1.keyState){
+//   player1.keyState[k] = false;
+// }
+// for(var k in player2.keyState){
+//   player2.keyState[k] = false;
+// }
+
+console.log(e.user_id);
+if (userArray.length == 0){
+  for(var k in player1.keyState){
+    player1.keyState[k] = false;
+  }
+  player1.keyState[e.direct] = true;
+  userArray.push(e.user_id);
+}else if(userArray.length == 1){
+  if (userArray[0] == e.user_id){
+    for(var k in player1.keyState){
+      player1.keyState[k] = false;
+    }
+    player1.keyState[e.direct] = true;
+  }else{
+    for(var k in player2.keyState){
+      player2.keyState[k] = false;
+    }
+    player2.keyState[e.direct] = true;
+    userArray.push(e.user_id);
+  }
+
+}else if(userArray.length == 2){
+  if (userArray[0] == e.user_id){
+    for(var k in player1.keyState){
+      player1.keyState[k] = false;
+    }
+    player1.keyState[e.direct] = true;
+  }else{
+    for(var k in player2.keyState){
+      player2.keyState[k] = false;
+    }
+    player2.keyState[e.direct] = true;
+  }
+}
+});
+
+resizeHandler();
+
+};
+
+$(window).resize(function(){
+  resizeHandler();
+});
+
+</script>
 
 </body>
 </html>
