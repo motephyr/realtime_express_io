@@ -389,15 +389,8 @@ function isTouchWall(point){
 }
 
 function isWin(player,imgid){
-  var falseflag1 = 0;
-  for (var key in keyWords){
-    var font = keyWords[key];
 
-    if (!player.string.includes(font)){
-      falseflag1 = 1;
-    }
-  }
-  if (falseflag1 == 0){
+  if (player.string.includes(keyWords)){
     setTimeout(function(){
       $(imgid).show();
     }, 1000);
