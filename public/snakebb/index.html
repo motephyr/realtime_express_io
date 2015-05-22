@@ -203,6 +203,9 @@
       var canvasDom = document.getElementById('joyCanvas');
       var regionDom = document.getElementById('joyRegion');
 
+      var leftRange = [0,regionSize-size];
+      var topRange = [0,regionSize-size];
+
       $(".activeRegion").width(regionSize);
       $(".activeRegion").height(regionSize);
       $(".activeRegion").css({left:0,top:(h-regionSize)/2});
@@ -239,12 +242,12 @@
         // console.log(position);
         curX = position.clientX-regionDom.offsetLeft;
         curY = position.clientY-regionDom.offsetTop;
-        // console.log(regionDom.offsetTop);
-        // console.log(curY-regionDom.offsetTop);
-        // console.log(position.clientX + "," + position.clientY);
-        // $(canvasDom).css({left:curX-size/2,top:curY-size/2});
-        // actionObj.doAction(curX, curY);
-        $(canvasDom).css({left:curX-size/2,top:curY-size/2});
+
+        var passLeft = curX - size / 2;
+        var passTop = curY - size / 2;
+        passLeft = Math.min(Math.max(passLeft, leftRange[0]),leftRange[1]);
+        passTop = Math.min(Math.max(passTop, topRange[0]),topRange[1]);
+        $(canvasDom).css({left: passLeft,top: passTop});
       });
       canvasDom.addEventListener('touchend', function(e){
         // e.preventDefault();
@@ -261,16 +264,24 @@
         curY = cachedY = position.clientY-regionDom.offsetTop;
         // console.log(position);
         // $(canvasDom).css({left:curX-size/2,top:curY-size/2});
-        $(canvasDom).css({left:curX-size/2,top:curY-size/2});
+        // $(canvasDom).css({left:curX-size/2,top:curY-size/2});
+        var passLeft = curX - size / 2;
+        var passTop = curY - size / 2;
+        passLeft = Math.min(Math.max(passLeft, leftRange[0]),leftRange[1]);
+        passTop = Math.min(Math.max(passTop, topRange[0]),topRange[1]);
+        $(canvasDom).css({left: passLeft,top: passTop});
       });
 
       regionDom.addEventListener('touchmove', function(e){
         var position = e.touches[0];
         curX = position.clientX-regionDom.offsetLeft;
         curY = position.clientY-regionDom.offsetTop;
-        $(canvasDom).css({left:curX-size/2,top:curY-size/2});
-        // $(canvasDom).css({left:curX-size/2,top:curY-size/2});
-        // actionObj.doAction(curX, curY);
+
+        var passLeft = curX - size / 2;
+        var passTop = curY - size / 2;
+        passLeft = Math.min(Math.max(passLeft, leftRange[0]),leftRange[1]);
+        passTop = Math.min(Math.max(passTop, topRange[0]),topRange[1]);
+        $(canvasDom).css({left: passLeft,top: passTop});
         // e.preventDefault();
       });
 
