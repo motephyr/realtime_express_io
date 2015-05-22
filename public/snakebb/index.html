@@ -110,38 +110,129 @@
     // limitTime:200,
     // isPassing:false,
     debugCount:0,
-    boundx1: 2.5 / 7,
-    boundx2: 4.5 / 7,
-    boundy1: 2.5 / 7,
-    boundy2: 4.5 / 7,
+    // boundx1: 2.5 / 7,
+    // boundx2: 4.5 / 7,
+    // boundy1: 2.5 / 7,
+    // boundy2: 4.5 / 7,
+    xBoundScale: 0.2,
+    yBoundScale: 0.2,
+    centerRegionPoints: [],
+    leftRegionPoints: [],
+    rightRegionPoints: [],
+    upRegionPoints: [],
+    downRegionPoints: [],
+    hasCompiled: false,
+    compileRegions:function(){
+      var self = this;
+      var leftBound = self.width * (1 - self.xBoundScale) / 2;
+      var topBound = self.height * (1 - self.yBoundScale) / 2;
+      var rightBound = leftBound + self.width * self.xBoundScale;
+      var bottomBound = topBound + self.height * self.yBoundScale;
+
+      self.leftBound = leftBound;
+      self.topBound = topBound;
+      self.rightBound = rightBound;
+      self.bottomBound = bottomBound;
+
+      // left region
+      self.leftRegionPoints.push({x:0.0,y:0.0});
+      self.leftRegionPoints.push({x:leftBound,y:topBound});
+      self.leftRegionPoints.push({x:leftBound,y:bottomBound});
+      self.leftRegionPoints.push({x:0.0,y:self.height});
+
+      // right region
+      self.rightRegionPoints.push({x:self.width,y:0.0});
+      self.rightRegionPoints.push({x:rightBound,y:topBound});
+      self.rightRegionPoints.push({x:rightBound,y:bottomBound});
+      self.rightRegionPoints.push({x:self.width,y:self.height});
+
+      // up region
+      self.upRegionPoints.push({x:0.0,y:0.0});
+      self.upRegionPoints.push({x:leftBound,y:topBound});
+      self.upRegionPoints.push({x:rightBound,y:topBound});
+      self.upRegionPoints.push({x:self.width,y:0.0});
+
+      // down region
+      self.downRegionPoints.push({x:0.0,y:self.height});
+      self.downRegionPoints.push({x:leftBound,y:bottomBound});
+      self.downRegionPoints.push({x:rightBound,y:bottomBound});
+      self.downRegionPoints.push({x:self.width,y:self.height});
+
+      // center region
+      self.centerRegionPoints.push({x:leftBound,y:topBound});
+      self.centerRegionPoints.push({x:rightBound,y:topBound});
+      self.centerRegionPoints.push({x:rightBound,y:bottomBound});
+      self.centerRegionPoints.push({x:leftBound,y:bottomBound});
+
+      self.hasCompiled = true;
+    },
+    checkInRegion:function(points, x, y){
+      var point = {x: x, y: y};
+      var i, j, nvert = points.length;
+      var c = false;
+      for(var i = 0, j = nvert - 1; i < nvert; j = i++){
+        if( ( (points[i].y >= point.y ) != (points[j].y >= point.y) ) 
+          && (point.x <= (points[j].x - points[i].x) * (point.y - points[i].y) / (points[j].y - points[i].y) + points[i].x) )
+          c = !c;
+      }
+      return c;
+    },
     doAction:function(x, y){
       var self = this;
+      if(!self.hasCompiled){
+        self.compileRegions();
+      }
       // console.log("inputX:"+ x + " compareX:" + self.width * self.boundx1);
       // console.log("inputY:"+ y + " compareY:" + self.height * self.boundy1);
-      if (x < self.width * self.boundx1){
-        if(y > self.height * self.boundy1 && y < self.height * self.boundy2){
-          // left
-          self.passAction("left");
-        }
-      }else if(x > self.width * self.boundx2){
-        if(y > self.height * self.boundy1 && y < self.height * self.boundy2){
-          // right
-          self.passAction("right");
+
+      // if (x < self.width * self.boundx1){
+      //   if(y > self.height * self.boundy1 && y < self.height * self.boundy2){
+      //     // left
+      //     self.passAction("left");
+      //   }
+      // }else if(x > self.width * self.boundx2){
+      //   if(y > self.height * self.boundy1 && y < self.height * self.boundy2){
+      //     // right
+      //     self.passAction("right");
+      //   }
+      // }
+
+      if(!self.checkInRegion(self.centerRegionPoints,x,y)){
+        // console.log("not center");
+        if(x <= self.width / 2){
+          if(self.checkInRegion(self.leftRegionPoints,x,y)){
+            self.passAction("left");
+          }else{
+            if(y <= self.height / 2){
+              self.passAction("up");
+            }else{
+              self.passAction("down");
+            }
+          }
+        }else{
+          if(self.checkInRegion(self.rightRegionPoints,x,y)){
+            self.passAction("right");
+          }else{
+            if(y <= self.height / 2){
+              self.passAction("up");
+            }else{
+              self.passAction("down");
+            }
+          }
         }
       }
 
-      if(y < self.height * self.boundy1){
-        if (x > self.width * self.boundx1 && x < self.width * self.boundx2){
-          // up
-          self.passAction("up");
-        }
-      }else if(y > self.height * self.boundy2){
-        if (x > self.width * self.boundx1 && x < self.width * self.boundx2){
-          // down
-          self.passAction("down");
-        }
-      }
-
+      // if(y < self.height * self.boundy1){
+      //   if (x > self.width * self.boundx1 && x < self.width * self.boundx2){
+      //     // up
+      //     self.passAction("up");
+      //   }
+      // }else if(y > self.height * self.boundy2){
+      //   if (x > self.width * self.boundx1 && x < self.width * self.boundx2){
+      //     // down
+      //     self.passAction("down");
+      //   }
+      // }
 
 
 

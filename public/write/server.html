@@ -5,7 +5,7 @@
   <style type="text/css">
     body{
       -webkit-touch-callout: none;                /* prevent callout to copy image, etc when tap to hold */
-      -webkit-user-select: none; 
+      -webkit-user-select: none;
       background-color: antiquewhite;
     }
 
@@ -41,7 +41,7 @@
     window.realtime = {enabled: false};
     var socketLoadScript = document.createElement('script');
     socketLoadScript.type = 'text/javascript';
-    socketLoadScript.src = "http://"+window.location.hostname+":5001/socket.io/socket.io.js";    
+    socketLoadScript.src = "http://"+window.location.hostname+":5001/socket.io/socket.io.js";
 
     document.getElementsByTagName('head')[0].appendChild(socketLoadScript);
   </script>
@@ -59,8 +59,8 @@
     <div id="player_number" class="player_number_4">
       <canvas id="origin1" class="origincanvas"></canvas>
       <canvas id="origin2" class="origincanvas"></canvas>
-      <canvas id="origin3" class="origincanvas"></canvas> 
-      <canvas id="origin4" class="origincanvas"></canvas> 
+      <canvas id="origin3" class="origincanvas"></canvas>
+      <canvas id="origin4" class="origincanvas"></canvas>
     </div>
   </div>
 
@@ -133,7 +133,9 @@ window.onload = function(){
   if (typeof io != 'undefined' && io != null) {
     window.realtime.token = '291c8816b32d71664f45c3e2278967dc';
     window.realtime.userId = 'server';
-    window.realtime.socketIo = io.connect('http://'+window.location.hostname+':5001/?_rtUserId='+ window.realtime.userId +'&_rtToken='+ window.realtime.token);
+    window.realtime.socketIo = io.connect(
+      'http://'+window.location.hostname+':5001/?_rtUserId='+ window.realtime.userId +'&_rtToken='+ window.realtime.token
+      );
   }
 
   if (window.realtime.socketIo) {

@@ -21,12 +21,12 @@
     window.realtime = {enabled: false};
     var socketLoadScript = document.createElement('script');
     socketLoadScript.type = 'text/javascript';
-    socketLoadScript.src = "http://"+window.location.hostname+":5001/socket.io/socket.io.js";    
+    socketLoadScript.src = "http://"+window.location.hostname+":5001/socket.io/socket.io.js";
 
     document.getElementsByTagName('head')[0].appendChild(socketLoadScript);
 
     prevent = function(e) {
-      if(e.keyCode == 37 || e.keyCode == 38 || e.keyCode == 39 || e.keyCode == 40){ 
+      if(e.keyCode == 37 || e.keyCode == 38 || e.keyCode == 39 || e.keyCode == 40){
         e.preventDefault();
       };
     };
@@ -53,7 +53,9 @@
       if (typeof io != 'undefined' && io != null) {
         window.realtime.token = '291c8816b32d71664f45c3e2278967dc';
         window.realtime.userId = 'server';
-        window.realtime.socketIo = io.connect('http://'+window.location.hostname+':5001/?_rtUserId='+ window.realtime.userId +'   &_rtToken=' + window.realtime.token);
+        window.realtime.socketIo = io.connect(
+          'http://'+window.location.hostname+':5001/?_rtUserId='+ window.realtime.userId +'&_rtToken=' + window.realtime.token
+          );
       }
 
       window.realtime.socketIo.on('connect', function(){
