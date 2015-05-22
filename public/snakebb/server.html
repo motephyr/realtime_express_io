@@ -109,106 +109,106 @@
 
 
   <span id="sound"></span>
-  <audio id="audio1" src="/image/snakebb/background.mp3" controls preload="auto" autoplay autobuffer loop></audio>
+<!--   <audio id="audio1" src="/image/snakebb/background.mp3" controls preload="auto" autoplay autobuffer loop></audio>
+-->
+<script type="text/javascript">
+  window.backgroundWidth = $(".background").height()*0.89;
+  window.sceneWidth = window.backgroundWidth;
+  var rate = 1;
+  $("#myCanvas").width(sceneWidth);
+  $("#myCanvas").height(sceneWidth * 2 / 3);
+  $("#greenWin").width(sceneWidth*rate);
+  $("#greenWin").height(sceneWidth*rate);
+  $("#orangeWin").width(sceneWidth*rate);
+  $("#orangeWin").height(sceneWidth*rate);
+</script>
 
-  <script type="text/javascript">
-    window.backgroundWidth = $(".background").height()*0.89;
-    window.sceneWidth = window.backgroundWidth;
-    var rate = 1;
-    $("#myCanvas").width(sceneWidth);
-    $("#myCanvas").height(sceneWidth * 2 / 3);
-    $("#greenWin").width(sceneWidth*rate);
-    $("#greenWin").height(sceneWidth*rate);
-    $("#orangeWin").width(sceneWidth*rate);
-    $("#orangeWin").height(sceneWidth*rate);
-  </script>
+<script type="text/paperscript" canvas="myCanvas">
+  function getParameterByName(name) {
+    name = name.replace(/[\[]/, "\\[").replace(/[\]]/, "\\]");
+    var regex = new RegExp("[\\?&]" + name + "=([^&#]*)"),
+    results = regex.exec(location.search);
+    return results === null ? "" : decodeURIComponent(results[1].replace(/\+/g, " "));
+  }
 
-  <script type="text/paperscript" canvas="myCanvas">
-    function getParameterByName(name) {
-      name = name.replace(/[\[]/, "\\[").replace(/[\]]/, "\\]");
-      var regex = new RegExp("[\\?&]" + name + "=([^&#]*)"),
-      results = regex.exec(location.search);
-      return results === null ? "" : decodeURIComponent(results[1].replace(/\+/g, " "));
-    }
+  console.log("paper"+sceneWidth);
+  var w = sceneWidth;
+  var blockSize = Math.ceil(w / 30);
+  var boundWidth = w;
+  var boundHeight = w * 2 / 3;
 
-    console.log("paper"+sceneWidth);
-    var w = sceneWidth;
-    var blockSize = Math.ceil(w / 30);
-    var boundWidth = w;
-    var boundHeight = w * 2 / 3;
+  var bound = {
+    x1: 0,
+    x2: boundWidth,
+    y1: 0,
+    y2: boundHeight
+  };
 
-    var bound = {
-      x1: 0,
-      x2: boundWidth,
-      y1: 0,
-      y2: boundHeight
+  var keyWordsArray = ["我愛老梗方程式","我愛天衍創客","我愛布萊克貝爾"];
+
+  var keyWords = keyWordsArray[_.random(0, 2)];
+  var notkeyWords = "人啡太戶玻畢窗陽國學手機燈瑰發電大水璃眼花類咖展書沙玫生英鏡";
+  var boom = "炸";
+  var ham = "漢";
+  var rocket = "火";
+
+  var genFood = function(photo_file,word){
+    var food = new Raster(photo_file);
+    food.content = word;
+
+    return food;
+  };
+
+  var GreenHead = function(){
+    return genFood('/image/snakebb/小綠蛇.png',"");
+  };
+  var GreenBody = function(){
+    return genFood('/image/snakebb/小綠蛇身體.png',"");
+  };
+  var OrangeHead = function(){
+    return genFood('/image/snakebb/小橘蛇.png',"");
+  };
+  var OrangeBody = function(){
+    return genFood('/image/snakebb/小橘蛇身體.png',"");
+  };
+
+  var Rocket = function(){
+    return genFood('/image/snakebb/小火箭.png',rocket);
+  };
+
+  var Ham = function(){
+    return genFood('/image/snakebb/小漢堡.png',ham);
+  };
+
+  var Boom = function(){
+    return genFood('/image/snakebb/小炸彈.png',boom);
+  };
+
+  var Food = function(words){
+    var text = new PointText(new Point(0, 0));
+    text.content = words;
+    text.style = {
+      fontFamily: 'Courier New',
+      fontWeight: 'bold',
+      fontSize: blockSize,
+      fillColor: 'black',
+      justification: 'center'
+    };
+    return text;
+  }
+
+  var Snake = function(id){
+    this.id = id;
+    this.keyState = {};
+    this.path = new Path();
+    this.path.style = {
+      strokeWidth: 10,
+      strokeCap: 'square'
     };
 
-    var keyWordsArray = ["我愛老梗方程式","我們愛天衍創客","我愛布萊克貝爾"];
 
-    var keyWords = (getParameterByName("question")) ? keyWordsArray[getParameterByName("question")] : keyWordsArray[0];
-    var notkeyWords = "人啡太戶玻畢窗陽國學手機燈瑰發電大水璃眼花類咖展書沙玫生英鏡";
-    var boom = "炸";
-    var ham = "漢";
-    var rocket = "火";
-
-    var genFood = function(photo_file,word){
-      var food = new Raster(photo_file);
-      food.content = word;
-
-      return food;
-    };
-
-    var GreenHead = function(){
-      return genFood('/image/snakebb/小綠蛇.png',"");
-    };
-    var GreenBody = function(){
-      return genFood('/image/snakebb/小綠蛇身體.png',"");
-    };
-    var OrangeHead = function(){
-      return genFood('/image/snakebb/小橘蛇.png',"");
-    };
-    var OrangeBody = function(){
-      return genFood('/image/snakebb/小橘蛇身體.png',"");
-    };
-
-    var Rocket = function(){
-      return genFood('/image/snakebb/小火箭.png',rocket);
-    };
-
-    var Ham = function(){
-      return genFood('/image/snakebb/小漢堡.png',ham);
-    };
-
-    var Boom = function(){
-      return genFood('/image/snakebb/小炸彈.png',boom);
-    };
-
-    var Food = function(words){
-      var text = new PointText(new Point(0, 0));
-      text.content = words;
-      text.style = {
-        fontFamily: 'Courier New',
-        fontWeight: 'bold',
-        fontSize: blockSize,
-        fillColor: 'black',
-        justification: 'center'
-      };
-      return text;
-    }
-
-    var Snake = function(id){
-      this.id = id;
-      this.keyState = {};
-      this.path = new Path();
-      this.path.style = {
-        strokeWidth: 10,
-        strokeCap: 'square'
-      };
-
-
-      this.string = " ";
-      this.size = this.string.length;
+    this.string = " ";
+    this.size = this.string.length;
 // this.segments = this.path.segments;
 this.start = view.center / [blockSize, 1];
 
@@ -488,15 +488,32 @@ function onKeyDown(event) {
   }
 
 }
-var createFood = function(words){
-  var food;
+
+var nowFoodArray = [];
+var getRandomXY = function(){
   var tempblockcountx = Math.round(Math.random()*(bound.x2-blockSize)/blockSize + 1);
   var tempblockcounty = Math.round(Math.random()*(bound.y2-blockSize)/blockSize + 1);
   tempblockcounty = (tempblockcounty >= 19)? 18 : tempblockcounty;
   tempblockcountx = (tempblockcountx >= 29)? 28 : tempblockcountx;
   var x = tempblockcountx*blockSize;
   var y = tempblockcounty*blockSize;
-  var position = [x, y];
+  return [x,y];
+}
+
+var getNotContainsPosition = function(position){
+  var hasthesamepoint = _.filter(nowFoodArray, function(n) {
+    return (n[0] == position[0]) && (n[1] == position[1]);
+  });
+  if (hasthesamepoint.length != 0){
+    console.log(hasthesamepoint);
+    return getNotContainsPosition(getRandomXY());
+  }else{
+    return position;
+  }
+
+}
+var createFood = function(words){
+  var food;
   if (words == boom){
     food = new Boom();
   }else if (words == ham){
@@ -506,12 +523,15 @@ var createFood = function(words){
   }else if (typeof words === 'string'){
     food = new Food(words);
   }
+
+  var position = getNotContainsPosition(getRandomXY());
+
+  nowFoodArray.push(position);
   food.position = position;
-//visible避免出現時放大問題
 
-
-return food;
+  return food;
 }
+
 
 function Background(b){
   var path = new Path();
