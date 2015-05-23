@@ -1,0 +1,744 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <!-- Load the Paper.js library -->
+  <meta name="viewport" content="width=device-width,height=device-height, initial-scale=1">
+  <script src="/bower_components/jquery/dist/jquery.min.js"></script>
+  <script src="/bower_components/paper/dist/paper-full.min.js"></script>
+  <script src="/bower_components/lodash/lodash.js"></script>
+  <!-- Define inlined PaperScript associate it with myCanvas -->
+  <script>
+    window.realtime = {enabled: false};
+    var socketLoadScript = document.createElement('script');
+    socketLoadScript.type = 'text/javascript';
+    socketLoadScript.src = "http://"+window.location.hostname+":5001/socket.io/socket.io.js";
+
+    document.getElementsByTagName('head')[0].appendChild(socketLoadScript);
+  </script>
+  <style>
+    html {
+      position: relative;
+      min-width: 960px;
+      min-height: 540px;
+      height: 100%;
+    }
+
+    body{
+      background-color: black;
+      padding: 0px;
+      margin: 0px;
+      height:100%;
+    }
+    .background {
+      margin: 0px auto;
+
+      /*width:89%;*/
+      height:100%;
+      background-size: 100% auto;
+      background-repeat: no-repeat;
+      position:relative;
+
+    }
+
+    .background img {
+      position:absolute;
+    }
+
+    .background .sun img {
+      top:10px;display:none;
+    }
+
+    .background .moon img {
+      top:30px;display:none;
+    }
+
+    .background .flower1 img{
+      top:60%;
+      z-index: 1;
+    }
+
+    .background .flower2 img{
+      top:60%;
+      right:0px;
+      z-index: 1;
+    }
+
+    .background .glass img{
+      z-index: 1;
+      bottom: 0px;
+    }
+
+    #myCanvas {
+      background-color: white;
+      position:absolute;
+      top:150px;
+      left:10px;
+    }
+
+    #greenWin,#orangeWin {
+      position:absolute;
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="background">
+    <div class="sun">
+      <img id="sunImg" src="/image/snakebb/太陽.png" width="50" height="50" />
+    </div>
+    <div class="moon">
+      <img id="moonImg" src="/image/snakebb/月亮.png" width="50" height="50"  />
+    </div>
+    <div class="flower1">
+      <img id="sunFlower1" src="/image/snakebb/白天花1.png" width="50"  />
+      <img id="moonFlower1" src="/image/snakebb/夜晚花1.png" width="50"  />
+    </div>
+    <div class="flower2">
+      <img id="sunFlower2" src="/image/snakebb/白天花2.png" width="50"  />
+      <img id="moonFlower2" src="/image/snakebb/夜晚花2.png" width="50"  />
+    </div>
+    <div class="glass">
+      <img id="sunGlass" src="/image/snakebb/白天草.png" height="auto" width="100%"  />
+      <img id="moonGlass" src="/image/snakebb/夜晚草.png" height="auto" width="100%"  />
+    </div>
+
+    <canvas id="myCanvas" resize style="left: 20px"></canvas>
+    <img id="greenWin" src="/image/snakebb/綠蛇贏.png"  />
+    <img id="orangeWin" src="/image/snakebb/橘蛇贏.png" />
+  </div>
+
+
+  <span id="sound"></span>
+<!--   <audio id="audio1" src="/image/snakebb/background.mp3" controls preload="auto" autoplay autobuffer loop></audio>
+-->
+<script type="text/javascript">
+  window.backgroundWidth = $(".background").height()*0.89;
+  window.sceneWidth = window.backgroundWidth;
+  var rate = 1;
+  $("#myCanvas").width(sceneWidth);
+  $("#myCanvas").height(sceneWidth * 2 / 3);
+  $("#greenWin").width(sceneWidth*rate);
+  $("#greenWin").height(sceneWidth*rate);
+  $("#orangeWin").width(sceneWidth*rate);
+  $("#orangeWin").height(sceneWidth*rate);
+</script>
+
+<script type="text/paperscript" canvas="myCanvas">
+  function getParameterByName(name) {
+    name = name.replace(/[\[]/, "\\[").replace(/[\]]/, "\\]");
+    var regex = new RegExp("[\\?&]" + name + "=([^&#]*)"),
+    results = regex.exec(location.search);
+    return results === null ? "" : decodeURIComponent(results[1].replace(/\+/g, " "));
+  }
+
+  console.log("paper"+sceneWidth);
+  var w = sceneWidth;
+  var blockSize = Math.ceil(w / 30);
+  var boundWidth = w;
+  var boundHeight = w * 2 / 3;
+
+  var bound = {
+    x1: 0,
+    x2: boundWidth,
+    y1: 0,
+    y2: boundHeight
+  };
+
+  var keyWordsArray = ["我愛老梗方程式","我愛天衍創客","我愛布萊克貝爾"];
+
+  var keyWords = keyWordsArray[_.random(0, 2)];
+  var notkeyWords = "人啡太戶玻畢窗陽國學手機燈瑰發電大水璃眼花類咖展書沙玫生英鏡";
+  var boom = "炸";
+  var ham = "漢";
+  var rocket = "火";
+
+  var genFood = function(photo_file,word){
+    var food = new Raster(photo_file);
+    food.content = word;
+
+    return food;
+  };
+
+  var GreenHead = function(){
+    return genFood('/image/snakebb/小綠蛇.png',"");
+  };
+  var GreenBody = function(){
+    return genFood('/image/snakebb/小綠蛇身體.png',"");
+  };
+  var OrangeHead = function(){
+    return genFood('/image/snakebb/小橘蛇.png',"");
+  };
+  var OrangeBody = function(){
+    return genFood('/image/snakebb/小橘蛇身體.png',"");
+  };
+
+  var Rocket = function(){
+    return genFood('/image/snakebb/小火箭.png',rocket);
+  };
+
+  var Ham = function(){
+    return genFood('/image/snakebb/小漢堡.png',ham);
+  };
+
+  var Boom = function(){
+    return genFood('/image/snakebb/小炸彈.png',boom);
+  };
+
+  var Food = function(words){
+    var text = new PointText(new Point(0, 0));
+    text.content = words;
+    text.style = {
+      fontFamily: 'Courier New',
+      fontWeight: 'bold',
+      fontSize: blockSize,
+      fillColor: 'black',
+      justification: 'center'
+    };
+    return text;
+  }
+
+  var Snake = function(id){
+    this.id = id;
+    this.keyState = {};
+    this.path = new Path();
+    this.path.style = {
+      strokeWidth: 10,
+      strokeCap: 'square'
+    };
+
+
+    this.string = " ";
+    this.size = this.string.length;
+// this.segments = this.path.segments;
+this.start = view.center / [blockSize, 1];
+
+this.point = this.start;
+this.direction = [0, blockSize];
+this.newDirection = this.direction;
+this.text = [];
+
+
+// start
+for (var i = 0; i < this.size; i++) {
+
+  this.path.add(new Point(1 * blockSize, -(blockSize*0.1)  ));
+}
+
+}
+
+Snake.prototype = {
+  changeDirection: function(){
+    if (this.keyState['up']  === true ){
+if (this.direction[1] != blockSize) { // not down
+  this.newDirection = [0, -blockSize];
+}
+}else if (this.keyState['down'] === true){
+  if (this.direction[1] != -blockSize) {
+    this.newDirection = [0, blockSize];
+  }
+}else if(this.keyState['left']  === true){
+  if (this.direction[0] != blockSize) {
+    this.newDirection = [-blockSize, 0];
+  }
+}else if(this.keyState['right'] === true){
+  if (this.direction[0] != -blockSize) {
+    this.newDirection = [blockSize, 0];
+  }
+}
+this.direction = this.newDirection;
+},
+
+move: function(){
+
+// console.log(this.segments);
+
+var oldSegments = this.path.segments.slice(0);
+var newSegments = [{point:oldSegments[0].point + this.direction}].concat(oldSegments.slice(0,oldSegments.length - 1));
+
+// console.log(newPoint);
+
+// var previousPoint = new Point(this.segments[0].point);
+// this.segments[0].point = this.segments[0].point + this.direction;
+
+while (i = this.text.shift()){
+  i.textObj.remove();
+  i.imageObj.remove();
+}
+
+this.path.removeSegments();
+
+
+for(var j=0;j<newSegments.length ;j++){
+
+  segs = newSegments[j];
+  var head,body;
+  if (this.id == 'player1'){
+    if (j==0){
+      head = new GreenHead();
+    }else{
+      body = new GreenBody();
+    }
+  }
+  if (this.id == 'player2'){
+    if (j==0){
+      head = new OrangeHead();
+    }else{
+      body = new OrangeBody();
+    }
+  }
+  var imageObj = (j == 0) ? head: body;
+
+  imageObj.position = new Point(segs.point.x,segs.point.y);
+  var textObj = new PointText(segs.point.x,segs.point.y + blockSize/2);
+  textObj.style = {
+    fontFamily: 'Courier New',
+    fontWeight: 'bold',
+    fontSize: blockSize,
+    fillColor: 'black',
+    justification: 'center'
+  };
+  var obj = {textObj:textObj,imageObj:imageObj};
+  this.text.push(obj);
+  this.path.add(new Point(segs.point));
+}
+
+for(var i = 0, len = this.text.length; i < len ;i++){
+  this.text[i].textObj.content = this.string[i];
+}
+
+// for (var i = 1; i < this.size; i++) {
+
+//   this.changeTextStruct(i-1);
+
+//   var tempPoint = new Point(this.segments[i].point);
+//   this.segments[i].point = new Point(previousPoint.x, previousPoint.y);
+//   previousPoint = tempPoint;
+// }
+
+// this.changeTextStruct(this.size-1);
+return this.path.segments[0].point;
+},
+hasEat: function(point){
+  var hitOptions = {
+    segments: true,
+    stroke: false,
+    fill: true
+  };
+
+  for (var i=0;i<bodies.length;i++){
+    var hitResult = bodies[i].hitTest(point, hitOptions);
+    if (hitResult){
+      playEat('/image/snakebb/eat.mp3');
+      bodies.splice(i,1);
+      console.log(hitResult.item.content);
+      if (keyWords.indexOf(hitResult.item.content) != -1){
+        this.addText(hitResult.item);
+        bodies.push(createFood(hitResult.item.content));
+      }else if(boom.indexOf(hitResult.item.content) != -1){
+        if (this.size != 1){
+          this.removeText();
+        }
+        bodies.push(createFood(boom));
+      }else if(ham.indexOf(hitResult.item.content) != -1){
+        slowRate += 1;
+        bodies.push(createFood(ham));
+      }else if(rocket.indexOf(hitResult.item.content) != -1){
+        slowRate -= 1;
+        if (slowRate == 0){
+          slowRate = 1;
+        }
+        bodies.push(createFood(rocket));
+      }else{
+        this.addText(hitResult.item);
+        bodies.push(createFood(notkeyWords));
+      }
+      hitResult.item.remove();
+    }
+  }
+},
+changeTextStruct: function(position){
+// var aa = new PointText(this.segments[position].point.x-5,this.segments[position].point.y+5);
+// aa.content = this.string[position];
+// this.text.push(aa);
+},
+addText: function(item){
+  this.string = this.string + item.content;
+  this.size = this.string.length;
+  this.path.add(this.path.segments[this.size-2].point);
+
+},
+removeText: function(){
+  var strlen = this.string.length;
+  this.string = this.string.slice(0, strlen - 1);
+  this.size = this.string.length;
+  this.text[strlen - 1].imageObj.remove();
+  this.text[strlen - 1].textObj.remove();
+// console.log(this.string);
+this.path.removeSegment(strlen-1);
+// console.log(this.size);
+},
+remove:function(){
+  for(;this.size;){
+    this.removeText();
+  }
+  this.path.remove();
+}
+}
+
+function isTouchWall(point){
+  return (point.x <= bound.x1 || point.x >= bound.x2 || point.y <= bound.y1 || point.y >= bound.y2);
+}
+
+function isWin(player,imgid){
+
+  if (player.string.includes(keyWords)){
+    setTimeout(function(){
+      $(imgid).show();
+    }, 1000);
+  }
+}
+
+function playEat(surl) {
+
+  document.getElementById("sound").innerHTML =
+
+  "<embed src='" + surl + "' hidden=true autostart=true loop=false>";
+
+}
+//Game
+
+var bodies = [];
+window.player1 = new Snake('player1');
+window.player2 = new Snake('player2');
+
+var count = 0;
+var slowRate = 25;
+function onFrame(event) {
+
+  count++;
+  if (count%slowRate===0){
+    if  (bodies.length < 5){
+      for (var key in keyWords){
+        bodies.push(createFood(keyWords[key]));
+      }
+
+      bodies.push(createFood(boom));
+      bodies.push(createFood(ham));
+      bodies.push(createFood(rocket));
+
+    }
+
+    player1.changeDirection();
+    player2.changeDirection();
+
+// console.log(point);
+
+var point1 = player1.move();
+var point2 = player2.move();
+
+player1.hasEat(point1);
+player2.hasEat(point2);
+
+if(isTouchWall(point1)){
+  player1.remove();
+  player1 = new Snake('player1');
+}
+if(isTouchWall(point2)){
+  player2.remove();
+  player2 = new Snake('player2');
+}
+
+isWin(player1,"#greenWin");
+isWin(player2,"#orangeWin");
+// for (var key in keyWords){
+//   var font = keyWords[key];
+//   if (!player2.string.includes(font)){
+//     return;
+//   }
+//   //$("#orangeWin").show();
+// }
+// console.log(player1);
+
+}
+}
+
+function onKeyDown(event) {
+
+
+  if ('up'  === event.key || 'down'  === event.key || 'left'  === event.key|| 'right'  === event.key){
+    for(var k in player1.keyState){
+      player1.keyState[k] = false;
+    }
+    player1.keyState[event.key] = true;
+  }
+
+  if('w' === event.key || 's'  === event.key || 'a'  === event.key || 'd'  === event.key){
+    for(var k in player2.keyState){
+      player2.keyState[k] = false;
+    }
+    if ('w'  === event.key){
+      player2.keyState['up'] = true;
+    }else  if ('s'  === event.key){
+      player2.keyState['down'] = true;
+    }else  if ('a'  === event.key){
+      player2.keyState['left'] = true;
+    }else  if ('d'  === event.key){
+      player2.keyState['right'] = true;
+    }
+  }
+
+}
+
+var nowFoodArray = [];
+var getRandomXY = function(){
+  var tempblockcountx = Math.round(Math.random()*(bound.x2-blockSize)/blockSize + 1);
+  var tempblockcounty = Math.round(Math.random()*(bound.y2-blockSize)/blockSize + 1);
+  tempblockcounty = (tempblockcounty >= 19)? 18 : tempblockcounty;
+  tempblockcountx = (tempblockcountx >= 29)? 28 : tempblockcountx;
+  var x = tempblockcountx*blockSize;
+  var y = tempblockcounty*blockSize;
+  return [x,y];
+}
+
+var getNotContainsPosition = function(position){
+  var hasthesamepoint = _.filter(nowFoodArray, function(n) {
+    return (n[0] == position[0]) && (n[1] == position[1]);
+  });
+  if (hasthesamepoint.length != 0){
+    console.log(hasthesamepoint);
+    return getNotContainsPosition(getRandomXY());
+  }else{
+    return position;
+  }
+
+}
+var createFood = function(words){
+  var food;
+  if (words == boom){
+    food = new Boom();
+  }else if (words == ham){
+    food = new Ham();
+  }else if (words == rocket){
+    food = new Rocket();
+  }else if (typeof words === 'string'){
+    food = new Food(words);
+  }
+
+  var position = getNotContainsPosition(getRandomXY());
+
+  nowFoodArray.push(position);
+  food.position = position;
+
+  return food;
+}
+
+
+function Background(b){
+  var path = new Path();
+// Give the stroke a color
+path.style = {
+  strokeColor: '#40A836',
+  strokeWidth: 1,
+};
+var startx = 0
+var starty = 0;
+var start = new Point(startx, starty);
+// Move to start and draw a line from there
+path.moveTo(start);
+// Note the plus operator on Point objects.
+// PaperScript does that for us, and much more!
+path.lineTo(start + [ b.x1, b.y2 ]);
+path.lineTo(start + [ b.x2, b.y2 ]);
+path.lineTo(start + [ b.x2, b.y1 ]);
+path.lineTo(start + [ -b.x2, b.y1]);
+for (var i=0;i<b.y2/blockSize;i++){
+  path.moveTo(start);
+  path.lineTo(start + [ 0, i*blockSize ]);
+  path.lineTo(start + [ boundWidth, i*blockSize ]);
+  path.lineTo(start + [ 0, i*blockSize ]);
+}
+for (var j=0;j<b.x2/blockSize;j++){
+  path.moveTo(start);
+  path.lineTo(start + [ j*blockSize, 0 ]);
+  path.lineTo(start + [ j*blockSize, boundHeight ]);
+  path.lineTo(start + [ j*blockSize, 0 ]);
+}
+
+}
+new Background(bound);
+
+
+window.animateDefine = {
+  startLeft: 20,
+  endLeft: 240
+}
+
+window.secondStamp = 0;
+
+window.mobj = $(moonImg);
+window.sobj = $(sunImg);
+var mf1obj = $(moonFlower1);
+var sf1obj = $(sunFlower1);
+var mf2obj = $(moonFlower2);
+var sf2obj = $(sunFlower2);
+var mglass = $(moonGlass);
+var sglass = $(sunGlass);
+
+var showSunObject = function(){
+  $('.background').css('background-image',"url('/image/snakebb/白天.png')");
+  sobj.show();
+  sf1obj.show();
+  sf2obj.show();
+  sglass.show();
+}
+
+var hideSunObject = function(){
+  sobj.hide();
+  sf1obj.hide();
+  sf2obj.hide();
+  sglass.hide();
+}
+
+var showMoonObject = function(){
+  $('.background').css('background-image',"url('/image/snakebb/夜晚.png')");
+  mobj.show();
+  mf1obj.show();
+  mf2obj.show();
+  mglass.show();
+}
+
+var hideMoonObject = function(){
+  mobj.hide();
+  mf1obj.hide();
+  mf2obj.hide();
+  mglass.hide();
+}
+
+
+setInterval(function(){
+
+  if(secondStamp == 0){
+    showSunObject();
+    hideMoonObject();
+    sobj.css({left:animateDefine.startLeft});
+    sobj.animate({left:animateDefine.endLeft}, 40000);
+  }else if(secondStamp == 40){
+    sobj.stop();
+    hideSunObject();
+
+    showMoonObject();
+    mobj.css({left:animateDefine.startLeft});
+    mobj.animate({left:animateDefine.endLeft}, 40000);
+  }else if(secondStamp == 80){
+    mobj.stop();
+    hideMoonObject();
+  }
+
+  if(secondStamp == 80){
+    secondStamp = 0;
+  }else{
+    secondStamp++;
+  }
+
+},1000);
+</script>
+<script type="text/javascript">
+
+  var resizeHandler = function(){
+    console.log("resize");
+    var w = window.backgroundWidth = $(".background").height()*0.89;
+    var sw = window.sceneWidth = w * 0.95;
+    $(".background").width(w);
+    $("#myCanvas").width(sw);
+    $("#myCanvas").height(sw * 2 / 3);
+  // handle the changes of sun and moon during resizing.
+  animateDefine.endLeft = w * 0.9;
+  if(secondStamp > 0 && secondStamp < 40){
+    var remains = 40 - secondStamp;
+    sobj.stop();
+    sobj.css({left:(animateDefine.endLeft - animateDefine.startLeft) * ((40-remains) / 40)});
+    sobj.animate({left:animateDefine.endLeft}, remains * 1000);
+  }else if(secondStamp > 40 && secondStamp < 80){
+    var remains = 80 - secondStamp;
+    mobj.stop();
+    mobj.css({left:(animateDefine.endLeft - animateDefine.startLeft) * ((80-remains) / 40)});
+    mobj.animate({left:animateDefine.endLeft}, remains * 1000);
+  }
+
+};
+window.onload = function(){
+  console.log("onload");
+  if (typeof io != 'undefined' && io != null) {
+    window.realtime.token = '291c8816b32d71664f45c3e2278967dc';
+    window.realtime.userId = 'server';
+    window.realtime.socketIo = io.connect('http://'+window.location.hostname+':5001/?_rtUserId='+ window.realtime.userId +'&_rtToken=' + window.realtime.token);
+  }
+
+  window.realtime.socketIo.on('connect', function(){
+    window.realtime.socketIo.emit('realtime_user_id_connected');
+    console.log("connect");
+  });
+
+  window.realtime.socketIo.on('disconnect', function() {
+// Give a nice round-trip ACK to our realtime server that we connected.
+console.log("disconnect");
+});
+
+var userArray = [];  //第一個是player1,第二個是player2
+window.realtime.socketIo.on('direct', function(e) {
+// Give a nice round-trip ACK to our realtime server that we connected.
+// for(var k in player1.keyState){
+//   player1.keyState[k] = false;
+// }
+// for(var k in player2.keyState){
+//   player2.keyState[k] = false;
+// }
+
+console.log(e.user_id);
+if (userArray.length == 0){
+  for(var k in player1.keyState){
+    player1.keyState[k] = false;
+  }
+  player1.keyState[e.direct] = true;
+  userArray.push(e.user_id);
+}else if(userArray.length == 1){
+  if (userArray[0] == e.user_id){
+    for(var k in player1.keyState){
+      player1.keyState[k] = false;
+    }
+    player1.keyState[e.direct] = true;
+  }else{
+    for(var k in player2.keyState){
+      player2.keyState[k] = false;
+    }
+    player2.keyState[e.direct] = true;
+    userArray.push(e.user_id);
+  }
+
+}else if(userArray.length == 2){
+  if (userArray[0] == e.user_id){
+    for(var k in player1.keyState){
+      player1.keyState[k] = false;
+    }
+    player1.keyState[e.direct] = true;
+  }else{
+    for(var k in player2.keyState){
+      player2.keyState[k] = false;
+    }
+    player2.keyState[e.direct] = true;
+  }
+}
+});
+
+resizeHandler();
+
+};
+
+$(window).resize(function(){
+  resizeHandler();
+});
+
+</script>
+
+</body>
+</html>

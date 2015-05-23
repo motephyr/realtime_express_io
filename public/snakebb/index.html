@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1.0, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+  <title></title>
+
+
+  <link href="css/style.css" rel="stylesheet">
+  <link rel="stylesheet" href="css/main.css">
+  <link rel="stylesheet" href="css/modal.css">
+  <link rel="stylesheet" href="css/controller.css">
+  <style>
+    body{
+      /*position: relative;*/
+      width: 100%;
+      height:100%;
+      background-color: black;
+    }
+    canvas{
+      position: absolute;
+      left:40%;
+      top:40%;
+    }
+    .debugText{
+      color:white;
+      left:0px;
+      top:0px;
+      position: absolute;
+      font-size: 20px;
+      height: 30px;
+      width:100px;
+    }
+    .activeRegion{
+      position: relative;
+      background-color: #503493;
+    }
+  </style>
+  <script type="text/javascript">
+    window.realtime = {enabled: false};
+    var socketLoadScript = document.createElement('script');
+    socketLoadScript.type = 'text/javascript';
+    socketLoadScript.src = "http://"+window.location.hostname+":5001/socket.io/socket.io.js";    
+
+    document.getElementsByTagName('head')[0].appendChild(socketLoadScript);
+  </script>
+</head>
+<body>
+  <div class="debugText"></div>
+  <div id="joyRegion" class="activeRegion">
+    <canvas id="joyCanvas"></canvas>
+  </div>
+  <!-- <figure id="pad-traditional">
+    <div class="cord"></div>
+    <section class="dpad-pane">
+      <div class="dpad-hole"></div>
+      <div id="dpad">
+        <canvas height="150" id="dpad-body" width="150"></canvas>
+        <button class="button" id="up"></button>
+        <button class="button" id="right"></button>
+        <button class="button" id="down"></button>
+        <button class="button" id="left"></button>
+      </div>
+    </section> -->
+
+<!--     <section class="menu-pane">
+    <div class="labels">
+      <label class="select" for="select">Select
+      </label>
+      <label class="start" for="start">Start</label>
+    </div>
+    <div class="buttons">
+      <button class="button select" id="select">Select</button>
+      <button class="button start" id="start">Start</button>
+    </div>
+  </section> -->
+
+    <!-- <section class="action-pane">
+      <div class="logo">Joystick</div>
+      <div class="buttons">
+        <label class="label">
+          B <button class="button" id="b"></button>
+        </label>
+        <label class="label">
+          A <button class="button" id="a"></button>
+        </label>
+      </div>
+    </section>
+  </figure> -->
+  <script src="/js/jquery.min.js"></script>
+
+  <script type="text/javascript">
+
+    window.shouldRotateToOrientation = function(degrees) {
+     return true;
+   }
+
+   window.user_id = "";
+   window.holdFlag = false;
+   window.curX = 0;
+   window.curY = 0;
+   window.cachedX = 0;
+   window.cachedY = 0;
+
+   window.stampCheck = 0;
+
+   window.actionObj = {
+    width:0,
+    height:0,
+    // limitTime:200,
+    // isPassing:false,
+    debugCount:0,
+    // boundx1: 2.5 / 7,
+    // boundx2: 4.5 / 7,
+    // boundy1: 2.5 / 7,
+    // boundy2: 4.5 / 7,
+    xBoundScale: 0.2,
+    yBoundScale: 0.2,
+    centerRegionPoints: [],
+    leftRegionPoints: [],
+    rightRegionPoints: [],
+    upRegionPoints: [],
+    downRegionPoints: [],
+    hasCompiled: false,
+    compileRegions:function(){
+      var self = this;
+      var leftBound = self.width * (1 - self.xBoundScale) / 2;
+      var topBound = self.height * (1 - self.yBoundScale) / 2;
+      var rightBound = leftBound + self.width * self.xBoundScale;
+      var bottomBound = topBound + self.height * self.yBoundScale;
+
+      self.leftBound = leftBound;
+      self.topBound = topBound;
+      self.rightBound = rightBound;
+      self.bottomBound = bottomBound;
+
+      // left region
+      self.leftRegionPoints.push({x:0.0,y:0.0});
+      self.leftRegionPoints.push({x:leftBound,y:topBound});
+      self.leftRegionPoints.push({x:leftBound,y:bottomBound});
+      self.leftRegionPoints.push({x:0.0,y:self.height});
+
+      // right region
+      self.rightRegionPoints.push({x:self.width,y:0.0});
+      self.rightRegionPoints.push({x:rightBound,y:topBound});
+      self.rightRegionPoints.push({x:rightBound,y:bottomBound});
+      self.rightRegionPoints.push({x:self.width,y:self.height});
+
+      // up region
+      self.upRegionPoints.push({x:0.0,y:0.0});
+      self.upRegionPoints.push({x:leftBound,y:topBound});
+      self.upRegionPoints.push({x:rightBound,y:topBound});
+      self.upRegionPoints.push({x:self.width,y:0.0});
+
+      // down region
+      self.downRegionPoints.push({x:0.0,y:self.height});
+      self.downRegionPoints.push({x:leftBound,y:bottomBound});
+      self.downRegionPoints.push({x:rightBound,y:bottomBound});
+      self.downRegionPoints.push({x:self.width,y:self.height});
+
+      // center region
+      self.centerRegionPoints.push({x:leftBound,y:topBound});
+      self.centerRegionPoints.push({x:rightBound,y:topBound});
+      self.centerRegionPoints.push({x:rightBound,y:bottomBound});
+      self.centerRegionPoints.push({x:leftBound,y:bottomBound});
+
+      self.hasCompiled = true;
+    },
+    checkInRegion:function(points, x, y){
+      var point = {x: x, y: y};
+      var i, j, nvert = points.length;
+      var c = false;
+      for(var i = 0, j = nvert - 1; i < nvert; j = i++){
+        if( ( (points[i].y >= point.y ) != (points[j].y >= point.y) ) 
+          && (point.x <= (points[j].x - points[i].x) * (point.y - points[i].y) / (points[j].y - points[i].y) + points[i].x) )
+          c = !c;
+      }
+      return c;
+    },
+    doAction:function(x, y){
+      var self = this;
+      if(!self.hasCompiled){
+        self.compileRegions();
+      }
+      // console.log("inputX:"+ x + " compareX:" + self.width * self.boundx1);
+      // console.log("inputY:"+ y + " compareY:" + self.height * self.boundy1);
+
+      // if (x < self.width * self.boundx1){
+      //   if(y > self.height * self.boundy1 && y < self.height * self.boundy2){
+      //     // left
+      //     self.passAction("left");
+      //   }
+      // }else if(x > self.width * self.boundx2){
+      //   if(y > self.height * self.boundy1 && y < self.height * self.boundy2){
+      //     // right
+      //     self.passAction("right");
+      //   }
+      // }
+
+      if(!self.checkInRegion(self.centerRegionPoints,x,y)){
+        // console.log("not center");
+        if(x <= self.width / 2){
+          if(self.checkInRegion(self.leftRegionPoints,x,y)){
+            self.passAction("left");
+          }else{
+            if(y <= self.height / 2){
+              self.passAction("up");
+            }else{
+              self.passAction("down");
+            }
+          }
+        }else{
+          if(self.checkInRegion(self.rightRegionPoints,x,y)){
+            self.passAction("right");
+          }else{
+            if(y <= self.height / 2){
+              self.passAction("up");
+            }else{
+              self.passAction("down");
+            }
+          }
+        }
+      }
+
+      // if(y < self.height * self.boundy1){
+      //   if (x > self.width * self.boundx1 && x < self.width * self.boundx2){
+      //     // up
+      //     self.passAction("up");
+      //   }
+      // }else if(y > self.height * self.boundy2){
+      //   if (x > self.width * self.boundx1 && x < self.width * self.boundx2){
+      //     // down
+      //     self.passAction("down");
+      //   }
+      // }
+
+
+
+      // if (x > self.width * 2.5 / 7 && x < self.width * 2 / 3){
+      //   // up or down
+      //   if(y < self.height / 3){
+      //     // up
+      //     self.passAction("up");
+      //   }else if(y > self.height * 2 / 3){
+      //     // down
+      //     self.passAction("down");
+      //   }
+      // }else{
+      //   // left or right
+      //   if(y > self.height / 3 && y < self.height * 2 / 3){
+      //     if(x < self.width / 3){
+      //       // left
+      //       self.passAction("left");
+      //     }else if(x > self.width * 2 / 3){
+      //       // right
+      //       self.passAction("right");
+      //     }
+      //   }        
+      // }
+    },
+    passAction: function(command){
+      this.debugCount++;
+      switch(command){
+        case "up":
+          // $(".debugText").html("up"+this.debugCount);
+          window.realtime.socketIo.emit('direct', {user_id:user_id, direct:'up'});
+          break;
+        case "down":
+          // $(".debugText").html("down"+this.debugCount);
+          window.realtime.socketIo.emit('direct', {user_id:user_id, direct:'down'});
+          break;
+        case "left":
+          // $(".debugText").html("left"+this.debugCount);
+          window.realtime.socketIo.emit('direct', {user_id:user_id, direct:'left'});
+          break;
+        case "right":
+          // $(".debugText").html("right"+this.debugCount);
+          window.realtime.socketIo.emit('direct', {user_id:user_id, direct:'right'});
+          break;
+        default:
+          break;
+      }
+    }
+   };
+
+   
+
+   $(function(){
+
+      var w = $(window).width();
+      var h = $(window).height();
+      var regionSize = Math.min(w, h);
+      var size = regionSize * 0.3;
+      var canvasDom = document.getElementById('joyCanvas');
+      var regionDom = document.getElementById('joyRegion');
+
+      var leftRange = [0,regionSize-size];
+      var topRange = [0,regionSize-size];
+
+      $(".activeRegion").width(regionSize);
+      $(".activeRegion").height(regionSize);
+      $(".activeRegion").css({left:0,top:(h-regionSize)/2});
+
+      actionObj.width = regionSize;
+      actionObj.height = regionSize;
+
+      canvasDom.width = size;
+      canvasDom.height = size;
+      
+      var canvasContext = canvasDom.getContext('2d');
+
+      var radius = size * 0.45;
+      canvasContext.beginPath();
+      canvasContext.arc(size / 2, size / 2, radius, 0, 2 * Math.PI, false);
+      // canvasContext.fillStyle = '#ffffff';
+      // canvasContext.fill();
+      // context.lineWidth = 5;
+      // canvasContext.strokeStyle = '#003300';
+      canvasContext.lineWidth = size / 12;
+      canvasContext.lineCap = "round";
+      canvasContext.strokeStyle = "#ececec";
+      canvasContext.stroke();
+
+      canvasDom.addEventListener('touchstart', function(e){
+        // e.preventDefault();
+        holdFlag = true;
+        // var position = e.touches[0];
+      });
+      canvasDom.addEventListener('touchmove', function(e){
+        // e.preventDefault();
+        // holdFlag = true;
+        var position = e.touches[0];
+        // console.log(position);
+        curX = position.clientX-regionDom.offsetLeft;
+        curY = position.clientY-regionDom.offsetTop;
+
+        var passLeft = curX - size / 2;
+        var passTop = curY - size / 2;
+        passLeft = Math.min(Math.max(passLeft, leftRange[0]),leftRange[1]);
+        passTop = Math.min(Math.max(passTop, topRange[0]),topRange[1]);
+        $(canvasDom).css({left: passLeft,top: passTop});
+      });
+      canvasDom.addEventListener('touchend', function(e){
+        // e.preventDefault();
+        holdFlag = false;
+        $(canvasDom).css({left:(regionSize-size)/2,top: (regionSize-size)/2 });
+        // $(canvasDom).css({left:(w-size)/2,top: h/2-size });
+      });
+
+      regionDom.addEventListener('touchstart', function(e){
+        holdFlag = true;
+        stampCheck = (new Date()).getTime();
+        var position = e.touches[0];
+        curX = cachedX = position.clientX-regionDom.offsetLeft;
+        curY = cachedY = position.clientY-regionDom.offsetTop;
+        // console.log(position);
+        // $(canvasDom).css({left:curX-size/2,top:curY-size/2});
+        // $(canvasDom).css({left:curX-size/2,top:curY-size/2});
+        var passLeft = curX - size / 2;
+        var passTop = curY - size / 2;
+        passLeft = Math.min(Math.max(passLeft, leftRange[0]),leftRange[1]);
+        passTop = Math.min(Math.max(passTop, topRange[0]),topRange[1]);
+        $(canvasDom).css({left: passLeft,top: passTop});
+      });
+
+      regionDom.addEventListener('touchmove', function(e){
+        var position = e.touches[0];
+        curX = position.clientX-regionDom.offsetLeft;
+        curY = position.clientY-regionDom.offsetTop;
+
+        var passLeft = curX - size / 2;
+        var passTop = curY - size / 2;
+        passLeft = Math.min(Math.max(passLeft, leftRange[0]),leftRange[1]);
+        passTop = Math.min(Math.max(passTop, topRange[0]),topRange[1]);
+        $(canvasDom).css({left: passLeft,top: passTop});
+        // e.preventDefault();
+      });
+
+      regionDom.addEventListener('touchend', function(e){
+        holdFlag = false;
+        var position = e.touches[0];
+        // $(canvasDom).css({left:(w-size)/2,top: h/2-size });
+        $(canvasDom).css({left:(regionSize-size)/2,top: (regionSize-size)/2 });
+        if ((new Date()).getTime() - stampCheck <= 300){
+          // means tap
+          actionObj.doAction(curX, curY);
+        }
+      });
+      // $(canvasDom).css({left:(w-size)/2,top: h/2-size });
+      $(canvasDom).css({left:(regionSize-size)/2,top: (regionSize-size)/2 });
+
+      setInterval(function(){
+        if(curX && curY && holdFlag){
+          actionObj.doAction(curX, curY);
+        }
+      },100);
+
+      document.body.addEventListener('touchmove', function(e){
+        // var position = e.touches[0];
+        // curX = position.clientX;
+        // curY = position.clientY;
+        // $(canvasDom).css({left:curX-size/2,top:curY-size/2});
+        // actionObj.doAction(curX, curY);
+        e.preventDefault();
+      }, false);
+
+    // document.getElementById("up").onmousedown = function(){
+    //   window.realtime.socketIo.emit('move', 'up');
+    // };
+    // document.getElementById("down").onmousedown = function(){
+    //   window.realtime.socketIo.emit('move', 'down');
+    // };
+    // document.getElementById("left").onmousedown = function(){
+    //   window.realtime.socketIo.emit('move', 'left');
+    // };
+    // document.getElementById("right").onmousedown = function(){
+    //   window.realtime.socketIo.emit('move', 'right');
+    // };
+    
+    // document.getElementById("up").ontouchend = function(){
+    //   window.realtime.socketIo.emit('direct', {user_id:user_id, direct:'up'});
+    // };
+    // document.getElementById("down").ontouchend = function(){
+    //   window.realtime.socketIo.emit('direct', {user_id:user_id, direct:'down'});
+    // };
+    // document.getElementById("left").ontouchend = function(){
+    //   window.realtime.socketIo.emit('direct', {user_id:user_id, direct:'left'});
+    // };
+    // document.getElementById("right").ontouchend = function(){
+    //   window.realtime.socketIo.emit('direct', {user_id:user_id, direct:'right'});
+    // };
+
+    // document.getElementById("b").onclick = function(){
+    //   console.log('b');
+    // };
+    // document.getElementById("a").onclick = function(){
+    //   console.log('a');
+    // };
+
+
+
+
+  });
+
+   window.onload = function(){
+
+    if (typeof io != 'undefined' && io != null) {
+      window.realtime.token = '291c8816b32d71664f45c3e2278967dc';
+      window.realtime.userId = 'client';
+      window.realtime.socketIo = io.connect('http://'+window.location.hostname+':5001/?_rtUserId='+ window.realtime.userId +'&_rtToken='+ window.realtime.token);
+    }
+
+    if (window.realtime.socketIo) {
+
+      window.realtime.enabled = true;
+
+      window.realtime.socketIo.on('connect', function() {
+        // Give a nice round-trip ACK to our realtime server that we connected.
+        window.realtime.socketIo.emit('realtime_user_id_connected');
+        console.log("connect");
+      });
+
+      window.realtime.socketIo.on('realtime_user_id_connected',function(message){
+        window.realtime.socketIo.emit('start',message.user_id);
+        user_id = message.user_id
+      });
+
+      window.realtime.socketIo.on('disconnect', function() {
+        // Give a nice round-trip ACK to our realtime server that we connected.
+        console.log("disconnect");
+      });
+
+
+    }
+
+  }
+  </script>
+
+</body>
+</html>

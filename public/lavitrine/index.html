@@ -1,0 +1,60 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+
+	<title>La vitrine</title>
+
+	<script type='text/javascript'>
+
+	window.realtime = {};
+	window.realtime.enabled = false;
+
+</script>
+	<meta name="viewport" content="width=device-width; initial-scale=1.0; maximum-scale=1.0; user-scalable=0;">
+	<link rel="stylesheet" type="text/css" href="/css/objects.css">
+	<link rel="stylesheet" type="text/css" href="/css/main.css">
+
+
+	<script src="http://0.0.0.0:5001/socket.io/socket.io.js"></script>
+
+</head>
+<body>
+
+	
+	<div id="canvas-wrap">
+		
+		<div id="overlay">
+		<ul id="scene">
+			<li id="main-background" class="layer" data-depth="0.1"></li>
+
+			<li class="layer deco" data-depth="0.1"><img id="rainbow" class="rainbow" src="/image/rainbow.png"></li>
+			<li class="layer deco" data-depth="0.1"><img id="airship" class="swing-roll" src="/image/airship.png"></li>	
+			<li class="layer deco" data-depth="0.1"><img id="ballon" class="swing-ballon" src="/image/ballon.png"></li>	
+			<li class="layer deco" data-depth="0.1"><img id="wheel" class="wheel" src="/image/wheel.png"></li>	
+			<li class="layer deco" data-depth="0.1"><img id="wheelbase" src="/image/wheelbase.png"></li>
+			
+
+			<li class="layer deco" data-depth="0.1"><img id="sun" class="sun" src="/image/sun.png"></li>
+			<li class="layer deco" data-depth="0.1"><img id="triomphe-back" src="/image/triomphe-back.png"></li>
+			<li class="layer deco" data-depth="0.1"><img id="tramway" class="roll-1" src="/image/tramway.png"></li>	
+			<li class="layer deco" data-depth="0.1"><img id="triomphe-front" src="/image/triomphe-front.png"></li>
+			
+			<li class="layer deco" data-depth="0.1"><img id="tree" src="/image/tree.png"></li>
+
+			<li class="layer deco" data-depth="0.4"><img id="table_chair" src="/image/table_chair.png"></li>
+			
+		</ul>
+		</div>
+	</div>
+		<script data-main="/js/main" src="/bower_components/requirejs/require.js"></script>
+	<!--
+		<script src="/bower_components/jquery/dist/jquery.js"></script>
+		<script src="/bower_components/threejs/build/three.js"></script>
+		<script src="/bower_components/parallax/deploy/parallax.js"></script>
+		<script src="/js/THREEx.KeyboardState.js"></script>
+		<script src="/js/3d.js"></script>
+	-->
+
+</body>
+</html>
